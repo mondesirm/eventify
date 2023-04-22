@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "eventify",
+    "slug": "eventify",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  },
+  "name": "eventify"
+}
