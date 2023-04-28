@@ -1,0 +1,64 @@
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" id="svg70571" viewBox="0 0 1024 768" height="768px" width="1024px" version="1.1">
+	<metadata id="metadata70577">
+		<rdf:rdf>
+			<cc:work rdf:about="">
+				<dc:format>image/svg+xml</dc:format>
+				<dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type>
+			</cc:work>
+		</rdf:rdf>
+	</metadata>
+
+	<defs id="defs70575"></defs>
+
+	<g id="logo-group">
+		<g id="title" style="font-style:normal;font-weight:500;font-size:72px;line-height:1;font-family:RalewayMediumAlt1;font-variant-ligatures:none;text-align:center;text-anchor:middle" aria-label="EVENTIFY">
+			<path id="path70579"
+				style="font-style: normal; font-weight: 500; font-size: 72px; line-height: 1; font-family: RalewayMediumAlt1; font-variant-ligatures: none; text-align: center; text-anchor: middle; fill: rgb(0, 0, 0);"
+				d="m 352.82656,74.64 h 27.576 v -5.76 h -34.056 v 15.84 h 6.48 z m -6.48,39.6 V 120 h 34.704 v -5.76 z m 6.48,-17.64 h 23.976 v -5.4 h -30.456 v 16.56 h 6.48 z"
+				transform="translate(0 284.83000000000004) translate(236.03656250000006 67.22) scale(1.25) translate(-346.34656 -68.88)">
+			</path>
+
+			<path id="path70581"
+				style="font-style: normal; font-weight: 500; font-size: 72px; line-height: 1; font-family: RalewayMediumAlt1; font-variant-ligatures: none; text-align: center; text-anchor: middle; fill: rgb(0, 0, 0);"
+				d="m 384.54031,68.88 17.136,41.976 3.24,-7.416 -13.536,-34.56 z m 40.608,0 -16.848,42.984 -3.168,7.416 0.36,0.72 h 5.616 l 20.88,-51.12 z"
+				transform="translate(0 284.83000000000004) translate(302.52875 67.22) scale(1.25) translate(-384.54031 -68.88)">
+			</path>
+
+			<path id="path70583"
+				style="font-style: normal; font-weight: 500; font-size: 72px; line-height: 1; font-family: RalewayMediumAlt1; font-variant-ligatures: none; text-align: center; text-anchor: middle; fill: rgb(0, 0, 0);"
+				d="m 445.35781,74.64 h 27.576 v -5.76 h -34.056 v 15.84 h 6.48 z m -6.48,39.6 V 120 h 34.704 v -5.76 z m 6.48,-17.64 h 23.976 v -5.4 h -30.456 v 16.56 h 6.48 z"
+				transform="translate(0 284.83000000000004) translate(389.20062500000006 67.22) scale(1.25) translate(-438.87781 -68.88)">
+			</path>
+
+			<path id="path70585"
+				style="font-style: normal; font-weight: 500; font-size: 72px; line-height: 1; font-family: RalewayMediumAlt1; font-variant-ligatures: none; text-align: center; text-anchor: middle; fill: rgb(0, 0, 0);"
+				d="m 482.47156,120 h 6.48 V 91.272 l -6.48,-8.424 z m 36.72,-51.048 v 39.744 l -31.68,-39.816 h -5.04 v 3.888 l 6.48,8.208 31.248,39.024 h 5.472 V 68.952 Z"
+				transform="translate(0 284.83000000000004) translate(462.44281250000006 67.22) scale(1.25) translate(-482.47156 -68.88)">
+			</path>
+
+			<path id="path70587"
+				style="font-style: normal; font-weight: 500; font-size: 72px; line-height: 1; font-family: RalewayMediumAlt1; font-variant-ligatures: none; text-align: center; text-anchor: middle; fill: rgb(0, 0, 0);"
+				d="m 550.62181,120 h 6.48 V 81.12 h -6.48 z m -17.64,-51.12 v 5.76 h 41.76 v -5.76 z"
+				transform="translate(0 284.83000000000004) translate(544.330625 67.22) scale(1.25) translate(-532.98181 -68.88)">
+			</path>
+
+			<path id="path70589"
+				style="font-style: normal; font-weight: 500; font-size: 72px; line-height: 1; font-family: RalewayMediumAlt1; font-variant-ligatures: none; text-align: center; text-anchor: middle; fill: rgb(0, 0, 0);"
+				d="m 582.03406,120 h 6.48 V 68.88 h -6.48 z"
+				transform="translate(0 284.83000000000004) translate(624.3959375000001 67.22) scale(1.25) translate(-582.03406 -68.88)">
+			</path>
+
+			<path id="path70591"
+				style="font-style: normal; font-weight: 500; font-size: 72px; line-height: 1; font-family: RalewayMediumAlt1; font-variant-ligatures: none; text-align: center; text-anchor: middle; fill: rgb(0, 0, 0);"
+				d="m 600.73719,120 h 6.48 V 97.104 h 22.968 v -5.4 h -29.448 z m 0,-51.12 v 16.344 h 6.48 V 74.64 h 27.288 v -5.76 z"
+				transform="translate(0 284.83000000000004) translate(666.5248500000002 67.22) scale(1.25) translate(-600.73719 -68.88)">
+			</path>
+
+			<path id="path70593"
+				style="font-style: normal; font-weight: 500; font-size: 72px; line-height: 1; font-family: RalewayMediumAlt1; font-variant-ligatures: none; text-align: center; text-anchor: middle; fill: rgb(0, 0, 0);"
+				d="m 637.60006,68.88 15.912,26.64 3.312,-5.688 -12.096,-20.952 z m 38.232,0 -15.624,26.64 -3.24,5.832 V 120 h 6.48 v -18.648 l 19.44,-32.472 z"
+				transform="translate(0 284.83000000000004) translate(731.3534375000002 67.22) scale(1.25) translate(-637.60006 -68.88)">
+			</path>
+		</g>
+	</g>
+</svg>

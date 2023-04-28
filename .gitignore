@@ -34,6 +34,10 @@ local.properties
 *.keystore
 !debug.keystore
 
+# VS Code
+#
+.vscode/
+
 # node.js
 #
 node_modules/
