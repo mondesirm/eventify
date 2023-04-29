@@ -2,13 +2,13 @@ import React from 'react'
 import _ from 'lodash'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
+import Constants from 'expo-constants'
 import Toast from 'react-native-toast-message'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button, IconButton, MD3Colors, TextInput } from 'react-native-paper'
 import { Dimensions, GestureResponderEvent, Image, StatusBar, StyleSheet, Text, View } from 'react-native'
 
-const iconApp = require('@/assets/ios/logo.png')
 const { width, height } = Dimensions.get('screen')
 
 const schema = Yup.object().shape({
@@ -32,7 +32,7 @@ export default function ForgotPassword({ navigation }) {
 				<StatusBar barStyle="dark-content" />
 
 				<View style={styles.logoContainer}>
-					<Image style={styles.logo} source={iconApp} />
+					<Image style={styles.logo} source={{ uri: Constants.manifest.icon }} />
 				</View>
 
 				<View style={styles.innerContainer}>

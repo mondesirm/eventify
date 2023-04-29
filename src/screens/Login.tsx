@@ -2,13 +2,13 @@ import React from 'react'
 import _ from 'lodash'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
+import Constants from 'expo-constants'
 import Toast from 'react-native-toast-message'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Button, MD3Colors, TextInput } from 'react-native-paper'
 import { Dimensions, GestureResponderEvent, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-const iconApp = require('@/assets/ios/logo.png')
 const { width, height } = Dimensions.get('screen')
 
 const schema = Yup.object().shape({
@@ -33,7 +33,7 @@ export default function Login({ navigation }) {
 				<StatusBar barStyle="dark-content" />
 
 				<View style={styles.logoContainer}>
-					<Image style={styles.logo} source={iconApp} />
+					<Image style={styles.logo} source={{ uri: Constants.manifest.icon }} />
 				</View>
 
 				<View style={styles.innerContainer}>
@@ -67,8 +67,8 @@ export default function Login({ navigation }) {
 									<TextInput
 										style={styles.input}
 										left={<TextInput.Icon icon={() => (<Icon name="lock" size={24} color={MD3Colors.neutral60} />)} />}
-										label="Mot de passe"
-										placeholder="Mot de passe"
+										label="Password"
+										placeholder="Password"
 										secureTextEntry
 										underlineColor={'#AB0000'}
 										selectionColor={'#AB0000'}

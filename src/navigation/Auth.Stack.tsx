@@ -11,7 +11,7 @@ export default function AuthStack() {
 	return (
 		<Navigator
 			initialRouteName="Login"
-			screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerMode: 'none' }}
+			screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}
 		>
 			<Screen name="Login" component={Login} />
 			<Screen name="Register" component={Register} />

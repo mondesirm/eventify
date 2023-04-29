@@ -1,12 +1,10 @@
 {
-  "expo": {
-    "name": "eventify",
-    "description": "Planning events made easy.",
-    "slug": "eventify",
-    "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
-  },
-  "name": "eventify"
+	"expo": {
+		"name": "eventify",
+		"description": "Planning events made easy.",
+		"slug": "eventify",
+		"version": "1.0.0",
+		"assetBundlePatterns": ["**/*"]
+	},
+	"name": "eventify"
 }
