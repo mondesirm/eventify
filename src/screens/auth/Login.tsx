@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import * as Yup from 'yup'
-import { Formik } from 'formik'
+import { useEffect, useRef } from 'react'
+import { Formik, FormikProps } from 'formik'
 import Toast from 'react-native-toast-message'
 import { Button, Switch } from 'react-native-paper'
 import { NavigationProp } from '@react-navigation/native'
@@ -18,17 +19,20 @@ interface ScreenProps {
 
 const { width } = Dimensions.get('screen')
 
-const schema = Yup.object().shape({
-	email: Yup.string().email().required(),
-	password: Yup.string().min(8).required(),
-	remember: Yup.boolean()
-})
-
-const errors = _.mapValues(schema.fields, () => '')
-const values: Record<keyof Yup.InferType<typeof schema>, string> = errors
-
-export default function Login({ navigation }: ScreenProps) {
+export default function ({ navigation, route }: ScreenProps) {
 	const { i18n: { __ } } = usePreferences()
+
+	const schema = Yup.object().shape({
+		email: Yup.string().email().required(),
+		password: Yup.string().min(8).required(),
+		remember: Yup.boolean()
+	})
+
+	const errors = _.mapValues(schema.fields, () => '')
+	const values: Record<keyof Yup.InferType<typeof schema>, string> = errors
+	const form = useRef<FormikProps<typeof values>>(null)
+
+	useEffect(() => { if (route.params?.email) form.current.setFieldValue('email', route.params?.email) }, [route.params?.email])
 
 	const login = ({ email, password, remember }) => Promise.resolve({ email, password, remember })
 
@@ -50,6 +54,7 @@ export default function Login({ navigation }: ScreenProps) {
 
 			<View style={styles.form}>
 				<Formik
+					innerRef={form}
 					initialValues={values}
 					initialErrors={errors}
 					validationSchema={schema}
@@ -57,7 +62,7 @@ export default function Login({ navigation }: ScreenProps) {
 				>
 					{({ handleChange, handleSubmit, handleBlur, setFieldValue, values, errors, touched }) => (
 						<View style={styles.inputs}>
-							<InputGroup type="email" label={__('form.email')} left="email-outline" value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
+							<InputGroup autoFocus type="email" label={__('form.email')} left="email-outline" value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
 
 							<View style={styles.group}>
 								<InputGroup type="password" label={__('form.password')} left="lock-outline" value={values.password} errors={[touched.password, errors.password]} onBlur={handleBlur('password')} onChangeText={handleChange('password')} />
@@ -68,7 +73,7 @@ export default function Login({ navigation }: ScreenProps) {
 										<Text style={styles.text}>{__('login.remember')}</Text>
 									</View>
 
-									<TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+									<TouchableOpacity onPress={() => navigation.navigate('ForgotPassword', { email: values.email })}>
 										<Text style={[styles.link, styles.typo]}>{__('login.forgot')}</Text>
 									</TouchableOpacity>
 								</View>

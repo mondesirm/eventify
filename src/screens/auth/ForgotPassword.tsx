@@ -1,120 +1,214 @@
-import React from 'react'
 import _ from 'lodash'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
-import Constants from 'expo-constants'
+import { useEffect, useState } from 'react'
 import Toast from 'react-native-toast-message'
+import { Button, Switch } from 'react-native-paper'
+import { NavigationProp } from '@react-navigation/native'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Button, IconButton, MD3Colors, TextInput } from 'react-native-paper'
-import { Dimensions, GestureResponderEvent, Image, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { Border, Color, FontFamily, FontSize, Padding } from 'GlobalStyles'
+import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 
-const { width, height } = Dimensions.get('screen')
+import InputGroup from '@/components/InputGroup'
+import { usePreferences } from '@/contexts/PreferencesContext'
 
-const schema = Yup.object().shape({
-	email: Yup.string().email().required()
-})
+interface ScreenProps {
+	navigation: NavigationProp<any, any>
+	route: { key: string, name: string, params: any }
+}
 
-const values = { email: '' } 
+const { width } = Dimensions.get('screen')
 
-export default function ForgotPassword({ navigation }) {
-	const recoverPassword = ({ email }) => Promise.resolve({ email })
+export default function ({ navigation, route }: ScreenProps) {
+	const { i18n: { __ } } = usePreferences()
+	const [code, setCode] = useState('')
+	const [timer, setTimer] = useState(0)
+	const [emailWasSent, setEmailWasSent] = useState(false)
 
-	const onSubmit = ({ email }, actions: any) => {
-		recoverPassword({ email })
-			.then(res => Toast.show({ type: 'success', text1: 'Recovery Password Success', text2: JSON.stringify(res) }))
-			.catch(err => console.log(err))
+	const schema = Yup.object().shape({
+		email: Yup.string().email().required(),
+		code: Yup.string().length(6).required().oneOf([code], 'Code doesn\'t match.')
+	})
+	
+	const errors = _.mapValues(schema.fields, () => '')
+	const values: Record<keyof Yup.InferType<typeof schema>, string> = errors
+	values.email = route.params?.email || ''
+
+	useEffect(() => console.log('code', code), [code])
+
+	useEffect(() => {
+		if (timer > 0) {
+			const interval = setInterval(() => setTimer(timer - 1), 1000)
+			return () => clearInterval(interval)
+		}
+
+		setCode('')
+	}, [timer])
+
+	const sendEmail = (email: string) => {
+		setEmailWasSent(true)
+		setCode(Math.random().toString(36).substring(2, 8).toUpperCase())
+		setTimer(60)
+		return Promise.resolve({ email })
+	}
+
+	const resetPassword = ({ email, code }) => Promise.resolve({ email, code })
+
+	const getCode = (email: string) => {
+		sendEmail(email)
+			.then(res => Toast.show({ type: 'success', text1: 'Password Reset Email Sent', text2: 'Please check your mail inbox for it.' }))
+			.catch(err => setTimeout(() => Toast.show({ type: 'error', text1: 'Password Reset Email Error', text2: JSON.stringify(err) }), 1000))
+	}
+
+	const onSubmit = ({ email, code }, actions: any) => {
+		if (!emailWasSent || !code) return Toast.show({ type: 'error', text1: 'Invalid Code', text2: 'Please check your mail inbox for it or retry.' })
+
+		resetPassword({ email, code })
+			.then(res => {
+				Toast.show({ type: 'success', text1: 'Password Reset Successfully', text2: 'Please login with your new password.' })
+				navigation.navigate('Login', { email })
+			}).catch(err => setTimeout(() => Toast.show({ type: 'error', text1: 'Password Reset Email Error', text2: JSON.stringify(err) }), 1000))
 	}
 
 	return (
-		<SafeAreaView style={{ flex: 1 }} /* forceInset={{ top: 'always' }} */>
-			<View style={styles.container}>
-				<StatusBar barStyle="dark-content" />
-
-				<View style={styles.logoContainer}>
-					<Image style={styles.logo} source={{ uri: Constants.manifest.icon }} />
-				</View>
-
-				<View style={styles.innerContainer}>
-					<Formik
-						initialValues={values}
-						initialErrors={values}
-						validationSchema={schema}
-						onSubmit={(values, actions) => onSubmit(values, actions)}
-					>
-						{({ handleChange, handleSubmit, handleBlur, values, errors, touched }) => (
-							<>
-								<View style={{ flexDirection: 'column', marginBottom: 10 }}>
-									<TextInput
-										style={styles.input}
-										left={<TextInput.Icon icon={() => <Icon name="email" size={24} color={MD3Colors.neutral60} />} />}
-										label="Email Address"
-										placeholder="Email Address"
-										keyboardType="email-address"
-										autoCapitalize="none"
-										underlineColor={'#AB0000'}
-										selectionColor={'#AB0000'}
-										value={values.email.trim()}
-										onChangeText={handleChange('email')}
-										onBlur={handleBlur('email')}
-									/>
-
-									{errors.email && touched.email ? <Text style={styles.errorValidation}>{errors.email}</Text> : null}
-								</View>
-
-								<Button
-									mode="contained"
-									buttonColor={'#AB0000'}
-									style={{ width: width / 1.3, marginBottom: 30 }}
-									contentStyle={{ width: '100%', padding: 8 }}
-									onPress={handleSubmit as (values: GestureResponderEvent | React.FormEvent<HTMLFormElement> | undefined) => void}
-									disabled={!_.isEmpty(errors)} // Si il y'a des erreurs on désactive
-								>
-									Send
-								</Button>
-							</>
-						)}
-					</Formik>
-
-					<IconButton
-						icon="arrow-left"
-						iconColor={'#AB0000'}
-						size={32}
-						onPress={() => navigation.goBack()}
-					/>
-				</View>
+		<ScrollView style={styles.screen} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+			<View style={styles.content}>
+				<Text style={[styles.title, styles.typo]}>{__('forgot.title')}</Text>
+				<Text style={[styles.subtitle, styles.typo]}>{__('forgot.subtitle')}</Text>
 			</View>
-		</SafeAreaView>
+
+			<View style={styles.form}>
+				<Formik
+					initialValues={values}
+					initialErrors={errors}
+					validationSchema={schema}
+					onSubmit={(values, actions) => onSubmit(values, actions)}
+				>
+					{({ handleChange, handleSubmit, handleBlur, values, errors, touched }) => (
+						<View style={styles.inputs}>
+							<InputGroup autoFocus type="email" label={__('form.email')} left="email-outline" value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
+
+							<View style={styles.group}>
+								{emailWasSent && <InputGroup type="code" label={__('form.code')} left="key-outline" value={values.code} errors={[touched.code, errors.code]} onBlur={handleBlur('code')} onChangeText={handleChange('code')} />}
+
+								<View style={[styles.extras, !emailWasSent && { display: 'none' }]}>
+									<Text style={styles.text}>{timer > 0 ? __('forgot.expires') + ' ' +  timer + 's' : __('forgot.expired')}</Text>
+
+									<TouchableOpacity onPress={() => touched.email && !errors.email && getCode(values.email)}>
+										<Text style={[styles.link, styles.typo]}>{__('forgot.resend')}</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+
+							<View style={styles.actions}>
+								{emailWasSent ? (
+									<Button
+										disabled={!_.isEmpty(errors) || timer <= 0}
+										labelStyle={[styles.submit, (!_.isEmpty(errors) || timer <= 0) && { color: Color.body }]}
+										style={[styles.button, (!_.isEmpty(errors) || timer <= 0) && { backgroundColor: Color.border }]}
+										onPress={handleSubmit as (e: GestureResponderEvent | React.FormEvent<HTMLFormElement> | undefined) => void}
+									>
+										{__('forgot.submit')}
+									</Button>
+								) : (
+									<Button
+										disabled={(!touched.email || !_.isEmpty(errors.email))}
+										labelStyle={[styles.submit, (!touched.email || !_.isEmpty(errors.email)) && { color: Color.body }]}
+										style={[styles.button, (!touched.email || !_.isEmpty(errors.email)) && { backgroundColor: Color.border }]}
+										onPress={() => getCode(values.email)}
+									>
+										{__('forgot.send')}
+								</Button>
+								)}
+
+								<View style={styles.other}>
+									<Text style={styles.text}>{__('forgot.other.0')}&nbsp;</Text>
+
+									{/* <TouchableOpacity onPress={() => navigation.navigate('Contact')}> */}
+										<Text style={[styles.link, styles.typo]}>{__('forgot.other.1')}</Text>
+									{/* </TouchableOpacity> */}
+								</View>
+							</View>
+						</View>
+					)}
+				</Formik>
+			</View>
+		</ScrollView>
 	)
 }
 
 const styles = StyleSheet.create({
-	container: {
+	screen: {
 		flex: 1
 	},
-
-	innerContainer: {
-		flex: 1,
+	content: {
+		width,
+		gap: 16,
+		top: '10%'
+	},
+	typo: {
+		fontWeight: '500',
+		textAlign: 'center',
+		fontFamily: FontFamily.primary
+	},
+	title: {
+		fontSize: FontSize.x2l,
+		textTransform: 'capitalize'
+	},
+	subtitle: {
+		color: Color.body,
+		fontSize: FontSize.sm
+	},
+	form: {
+		width,
+		top: '28%',
+		position: 'absolute',
+		alignItems: 'center'
+	},
+	inputs: {
+		gap: 24
+	},
+	text: {
+		color: Color.body,
+		fontWeight: '500',
+		fontFamily: FontFamily.primary
+	},
+	group: {
+		gap: 10
+	},
+	extras: {
 		alignItems: 'center',
-		justifyContent: 'center'
+		flexDirection: 'row',
+		justifyContent: 'space-between'
 	},
-	logoContainer: {
-		alignItems: 'center',
-		justifyContent: 'flex-start',
-		marginVertical: 10
+	actions: {
+		gap: 20,
+		alignItems: 'center'
 	},
-	logo: {
-		width: '100%',
-		height: 100,
-		resizeMode: 'contain'
+	button: {
+		width: width - 80,
+		flexDirection: 'row',
+		borderRadius: Border.xs,
+		justifyContent: 'center',
+		paddingVertical: Padding.x2s,
+		backgroundColor: Color.primary
 	},
-	input: {
-		width: width / 1.3,
-		height: height / 14,
-		backgroundColor: '#fff'
+	submit: {
+		width: width - 80,
+		// height: 40,
+		borderWidth: 1,
+		fontWeight: '600',
+		color: Color.white,
+		fontSize: FontSize.base,
+		textTransform: 'uppercase',
+		fontFamily: FontFamily.primary
 	},
-	errorValidation: {
-		color: MD3Colors.error50,
-		fontSize: 10
+	other: {
+		flexDirection: 'row'
+	},
+	link: {
+		color: Color.primary,
+		fontSize: FontSize.sm,
+		textDecorationLine: 'underline'
 	}
 })

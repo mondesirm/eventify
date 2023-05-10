@@ -5,7 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
 import { usePreferences } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize } from 'GlobalStyles'
-import { Dimensions, StyleSheet, Text, View, I18nManager, Platform } from 'react-native'
+import { Dimensions, I18nManager, Platform, StyleSheet, Text, View } from 'react-native'
 import { Props } from 'react-native-paper/lib/typescript/src/components/TextInput/TextInput'
 
 interface InputGroupProps extends Props {
@@ -17,6 +17,8 @@ interface InputGroupProps extends Props {
 	type?: string
 	left?: keyof typeof MaterialCommunityIcons.glyphMap
 	right?: keyof typeof MaterialCommunityIcons.glyphMap
+	onPressLeft?: () => void
+	onPressRight?: () => void
 }
 
 const { width } = Dimensions.get('screen')
@@ -45,10 +47,10 @@ export default function InputGroup(props: InputGroupProps) {
 	return (
 		<View style={styles.group}>
 			<TextInput
+				{...props}
 				error={props.errors[0] && props.errors[1]}
 				value={props?.type === 'phone' ? props.value.replace(/[^0-9]/g, '') : props.value.trim()}
 				mode={props.mode || 'outlined'}
-				label={props.label}
 				placeholder={props.label}
 				secureTextEntry={isPassword && secureTextEntry}
 				outlineStyle={props.outlineStyle || styles.input}
@@ -58,10 +60,8 @@ export default function InputGroup(props: InputGroupProps) {
 				placeholderTextColor={props.placeholderTextColor || Color.body}
 				autoComplete={types[props.type]?.[0] || props.autoComplete}
 				keyboardType={types[props.type]?.[1] || props.keyboardType}
-				left={props.left && <TextInput.Icon icon={() => <Icon name={props.left} size={24} color={Color.primary} />} />}
-				right={(isPassword || props.right) && <TextInput.Icon icon={() => <Icon name={isPassword ? toggle : props.right} size={24} color={Color.primary} />} onPress={() => isPassword && setSecureTextEntry(!secureTextEntry)} />}
-				onBlur={props.onBlur}
-				onChangeText={props.onChangeText}
+				left={props.left && <TextInput.Icon icon={() => <Icon name={props.left} size={24} color={Color.primary} />} onPress={props.onPressLeft} />}
+				right={(isPassword || props.right) && <TextInput.Icon icon={() => <Icon name={isPassword ? toggle : props.right} size={24} color={Color.primary} />} onPress={() => isPassword ? setSecureTextEntry(!secureTextEntry) : props.onPressRight} />}
 			/>
 
 			{props.errors[0] && props.errors[1] && <Text style={styles.error}>{props.errors[1]}</Text>}

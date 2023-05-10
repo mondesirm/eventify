@@ -31,7 +31,7 @@ const schema = Yup.object().shape({
 const errors = _.mapValues(schema.fields, () => '')
 const values: Record<keyof Yup.InferType<typeof schema>, string> = errors
 
-export default function Register({ navigation }: ScreenProps) {
+export default function ({ navigation }: ScreenProps) {
 	const { i18n: { __ } } = usePreferences()
 
 	const register = ({ username, phone, email, password, confirm }) => Promise.resolve({ username, phone, email, password, confirm })
@@ -58,7 +58,7 @@ export default function Register({ navigation }: ScreenProps) {
 				>
 					{({ handleChange, handleSubmit, handleBlur, values, errors, touched }) => (
 						<View style={styles.inputs}>
-							<InputGroup type="username" label={__('form.username')} left="account-outline" value={values.username} errors={[touched.username, errors.username]} onBlur={handleBlur('username')} onChangeText={handleChange('username')} />
+							<InputGroup autoFocus type="username" label={__('form.username')} left="account-outline" value={values.username} errors={[touched.username, errors.username]} onBlur={handleBlur('username')} onChangeText={handleChange('username')} />
 							<InputGroup type="email" label={__('form.email')} left="email-outline" value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
 							<InputGroup type="phone" label={__('form.phone')} left="phone-outline" value={values.phone} errors={[touched.phone, errors.phone]} onBlur={handleBlur('phone')} onChangeText={handleChange('phone')} />
 							<InputGroup type="password" label={__('form.password')} left="lock-outline" value={values.password} errors={[touched.password, errors.password]} onBlur={handleBlur('password')} onChangeText={handleChange('password')} />

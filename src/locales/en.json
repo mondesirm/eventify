@@ -22,6 +22,14 @@
 	"back": "Back",
 	"next": "Next",
 	"done": "Done",
+	"form": {
+		"username": "Username",
+		"phone": "Phone Number",
+		"email": "Email Address",
+		"password": "Password",
+		"confirm": "Confirm Password",
+		"code": "Verification Code"
+	},
 	"login": {
 		"title": "Sign in to Eventify",
 		"subtitle": "We were waiting for you.",
@@ -37,11 +45,14 @@
 		"submit": "Sign up",
 		"other": ["Already have an account?", "Sign in!"]
 	},
-	"form": {
-		"username": "Username",
-		"phone": "Phone Number",
-		"email": "Email Address",
-		"password": "Password",
-		"confirm": "Confirm Password"
+	"forgot": {
+		"title": "Recover your account",
+		"subtitle": "If the account exists, we'll send you a code.",
+		"expires": "Expires in",
+		"expired": "Expired",
+		"send": "Send Code",
+		"resend": "Resend code?",
+		"submit": "Reset Password",
+		"other": ["Having trouble?", "Contact us!"]
 	}
 }
