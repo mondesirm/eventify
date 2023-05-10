@@ -9,5 +9,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		image: 'https://github.com/expo/expo/blob/master/templates/expo-template-blank/assets/splash.png?raw=true',
 		resizeMode: 'contain',
 		backgroundColor: '#ffffff'
-	}
+	},
+	"plugins": [
+		"expo-localization"
+	]
 })

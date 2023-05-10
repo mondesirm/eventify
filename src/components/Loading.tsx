@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { ActivityIndicator, MD3Colors } from 'react-native-paper'
 
 
-const Loading = () => {
+export default function Loading() {
 	const [loading, setLoading] = useState(true)
 
 	//! Set loading to false after 1s
@@ -24,5 +24,3 @@ const Loading = () => {
 		<ActivityIndicator animating={loading} color={MD3Colors.primary100} />
 	)
 }
-
-export default Loading

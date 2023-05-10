@@ -1,23 +1,45 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Asset } from 'expo-asset'
 import Constants from 'expo-constants'
 import * as SplashScreen from 'expo-splash-screen'
-import { Animated, StyleSheet, View } from 'react-native'
+import { Animated, AppState, StyleSheet, View } from 'react-native'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 function AnimatedSplash({ children, image }) {
 	const animation = useMemo(() => new Animated.Value(1), [])
-	const [isAppReady, setAppReady] = useState(false)
+	const appState = useRef(AppState.currentState)
+	const [appReady, setAppReady] = useState(false)
 	const [isSplashAnimationComplete, setAnimationComplete] = useState(false)
 
 	useEffect(() => {
-		if (isAppReady) {
+		if (appReady) {
 			Animated.timing(animation, {
 				toValue: 0,
 				duration: 1000,
 				useNativeDriver: true
 			}).start(() => setAnimationComplete(true))
 		}
-	}, [isAppReady])
+	}, [appReady])
+
+	// useEffect(() => {
+	// 	const subscription = AppState.addEventListener('change', nextState => {
+	// 		if (
+	// 			appState.current.match(/inactive|background/) &&
+	// 			nextState === 'active'
+	// 		) {
+	// 			Animated.timing(animation, {
+	// 				toValue: 1,
+	// 				duration: 0,
+	// 				useNativeDriver: true
+	// 			}).start(() => setAnimationComplete(false))
+	// 			setAppReady(false)
+	// 		}
+
+	// 		appState.current = nextState
+	// 		console.log('AppState', appState.current)
+	// 	})
+
+	// 	return () => subscription.remove()
+	// }, [])
 
 	const onImageLoaded = useCallback(async () => {
 		try {
@@ -30,7 +52,7 @@ function AnimatedSplash({ children, image }) {
 
 	return (
 		<View style={{ flex: 1 }}>
-			{isAppReady && children}
+			{appReady && children}
 
 			{!isSplashAnimationComplete &&
 				<Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: Constants.manifest.splash.backgroundColor, opacity: animation }]}>

@@ -1,3 +1,4 @@
+import { useFonts } from 'expo-font'
 import Constants from 'expo-constants'
 import { StatusBar } from 'expo-status-bar'
 import Toast from 'react-native-toast-message'
@@ -10,7 +11,6 @@ import { adaptNavigationTheme, Provider as PaperProvider, useTheme } from 'react
 import Splash from '@/components/Splash'
 import Loading from '@/components/Loading'
 import NavigationProvider from '@/navigation'
-// import AppRouter from '@/components/AppRouter'
 import PreferencesContextProvider from '@/contexts/PreferencesContext'
 
 // Instruct SplashScreen not to hide yet, we want to do this manually
@@ -24,8 +24,14 @@ export default function App() {
 	const theme = useTheme() //? https://callstack.github.io/react-native-paper/docs/guides/theming/#extending-the-theme
 	const { LightTheme } = adaptNavigationTheme({ reactNavigationLight: DefaultTheme })
 
+	const [fontsLoaded, error] = useFonts({
+		'WorkSans-Medium': require('@/assets/fonts/WorkSans-Medium.ttf')
+	})
+
+	const { statusBarHeight } = Constants
+
 	return (
-		<SafeAreaProvider>
+		<SafeAreaProvider style={{ marginTop: -statusBarHeight / 2 }}>
 			<PreferencesContextProvider>
 				<PaperProvider theme={theme}>
 					<Splash image={{ uri: Constants.manifest.splash.image }}>
@@ -33,7 +39,7 @@ export default function App() {
 						<NavigationContainer theme={LightTheme}>
 							<Loading />
 							<NavigationProvider />
-							<Toast />
+							<Toast topOffset={80} />
 						</NavigationContainer>
 					</Splash>
 				</PaperProvider>

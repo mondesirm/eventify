@@ -1,0 +1,24 @@
+{
+	"onboarding": {
+		"0": {
+			"title": "Bienvenue sur Eventify",
+			"subtitle": "Organisez vos événements en toute simplicité."
+		},
+		"1": {
+			"title": "Créez un événement",
+			"subtitle": "Créez un événement et invitez vos amis."
+		},
+		"2": {
+			"title": "Invitez vos amis",
+			"subtitle": "Invite your friends to your event."
+		},
+		"3": {
+			"title": "Recevez des notifications",
+			"subtitle": "Recevez des notifications pour ne rien rater."
+		}
+	},
+	"get-started": "Commencer",
+	"skip": "Passer",
+	"back": "Retour",
+	"next": "Suivant"
+}

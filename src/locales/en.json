@@ -1,0 +1,47 @@
+{
+	"onboarding": {
+		"0": {
+			"title": "Welcome to Eventify!",
+			"subtitle": "Planning events made easy."
+		},
+		"1": {
+			"title": "Create an event",
+			"subtitle": "Create an event and invite your friends."
+		},
+		"2": {
+			"title": "Invite your friends",
+			"subtitle": "Invite your friends to your event."
+		},
+		"3": {
+			"title": "Get notified",
+			"subtitle": "Get notified when your friends respond."
+		}
+	},
+	"get-started": "Get Started",
+	"skip": "Skip",
+	"back": "Back",
+	"next": "Next",
+	"done": "Done",
+	"login": {
+		"title": "Sign in to Eventify",
+		"subtitle": "We were waiting for you.",
+		"remember": "Remember me",
+		"forgot": "Forgot Password?",
+		"submit": "Sign in",
+		"other": ["Don't have an account yet?", "Sign up!"],
+		"continue": "Or continue with"
+	},
+	"register": {
+		"title": "Create an account",
+		"subtitle": "Let's get started.",
+		"submit": "Sign up",
+		"other": ["Already have an account?", "Sign in!"]
+	},
+	"form": {
+		"username": "Username",
+		"phone": "Phone Number",
+		"email": "Email Address",
+		"password": "Password",
+		"confirm": "Confirm Password"
+	}
+}
