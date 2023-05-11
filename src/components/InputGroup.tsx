@@ -3,10 +3,11 @@ import { useState } from 'react'
 import { MD3Colors, TextInput } from 'react-native-paper'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { usePreferences } from '@/contexts/PreferencesContext'
-import { Border, Color, FontFamily, FontSize } from 'GlobalStyles'
 import { Dimensions, I18nManager, Platform, StyleSheet, Text, View } from 'react-native'
 import { Props } from 'react-native-paper/lib/typescript/src/components/TextInput/TextInput'
+
+import { Border, Color, FontFamily, FontSize } from 'globals'
+import { usePreferences } from '@/contexts/PreferencesContext'
 
 interface InputGroupProps extends Props {
 	label: string

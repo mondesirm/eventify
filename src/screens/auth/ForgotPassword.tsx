@@ -2,15 +2,14 @@ import _ from 'lodash'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
 import { useEffect, useState } from 'react'
+import { Button } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
-import { Button, Switch } from 'react-native-paper'
 import { NavigationProp } from '@react-navigation/native'
-import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { Border, Color, FontFamily, FontSize, Padding } from 'GlobalStyles'
-import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import InputGroup from '@/components/InputGroup'
 import { usePreferences } from '@/contexts/PreferencesContext'
+import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
 interface ScreenProps {
 	navigation: NavigationProp<any, any>

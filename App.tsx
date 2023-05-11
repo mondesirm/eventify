@@ -8,10 +8,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native'
 import { adaptNavigationTheme, Provider as PaperProvider, useTheme } from 'react-native-paper'
 
+import { Color } from 'globals'
 import Splash from '@/components/Splash'
 import Loading from '@/components/Loading'
 import NavigationProvider from '@/navigation'
-import PreferencesContextProvider from '@/contexts/PreferencesContext'
+import IconlyProvider from '@/contexts/IconlyContext'
+import PreferencesProvider from '@/contexts/PreferencesContext'
 
 // Instruct SplashScreen not to hide yet, we want to do this manually
 SplashScreen.preventAutoHideAsync().catch(() => {
@@ -32,18 +34,20 @@ export default function App() {
 
 	return (
 		<SafeAreaProvider style={{ marginTop: -statusBarHeight / 2 }}>
-			<PreferencesContextProvider>
+			<PreferencesProvider>
 				<PaperProvider theme={theme}>
-					<Splash image={{ uri: Constants.manifest.splash.image }}>
-						<StatusBar /* style={theme.dark ? 'light' : 'dark'} backgroundColor={theme.colors.primary} */ />
-						<NavigationContainer theme={LightTheme}>
-							<Loading />
-							<NavigationProvider />
-							<Toast topOffset={80} />
-						</NavigationContainer>
-					</Splash>
+					<IconlyProvider set="two-tone" primaryColor={Color.primary} secondaryColor={Color.secondary} stroke="bold" size="xlarge">
+						<Splash image={{ uri: Constants.manifest.splash.image }}>
+							<StatusBar /* style={theme.dark ? 'light' : 'dark'} backgroundColor={theme.colors.primary} */ />
+							<NavigationContainer theme={LightTheme}>
+								<Loading />
+								<NavigationProvider />
+								<Toast topOffset={80} />
+							</NavigationContainer>
+						</Splash>
+					</IconlyProvider>
 				</PaperProvider>
-			</PreferencesContextProvider>
+			</PreferencesProvider>
 		</SafeAreaProvider>
 	)
 }

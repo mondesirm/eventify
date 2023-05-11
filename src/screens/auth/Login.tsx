@@ -4,16 +4,16 @@ import { useEffect, useRef } from 'react'
 import { Formik, FormikProps } from 'formik'
 import Toast from 'react-native-toast-message'
 import { Button, Switch } from 'react-native-paper'
-import { NavigationProp } from '@react-navigation/native'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { Border, Color, FontFamily, FontSize, Padding } from 'GlobalStyles'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 
 import InputGroup from '@/components/InputGroup'
 import { usePreferences } from '@/contexts/PreferencesContext'
+import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
 interface ScreenProps {
-	navigation: NavigationProp<any, any>
+	navigation: StackNavigationProp<any, any>
 	route: { key: string, name: string, params: any }
 }
 
@@ -34,12 +34,15 @@ export default function ({ navigation, route }: ScreenProps) {
 
 	useEffect(() => { if (route.params?.email) form.current.setFieldValue('email', route.params?.email) }, [route.params?.email])
 
-	const login = ({ email, password, remember }) => Promise.resolve({ email, password, remember })
+	const login = ({ email, password, remember }) => {
+		navigation.replace('MainStack')
+		return Promise.resolve({ email, password, remember })
+	}
 
 	const onSubmit = ({ email, password, remember }, actions: any) => {
 		login({ email, password, remember: Boolean(remember) })
-			.then(res => Toast.show({ type: 'success', text1: 'Login Success', text2: JSON.stringify(res) }))
-			.catch(err => setTimeout(() => Toast.show({ type: 'error', text1: 'Login Error', text2: JSON.stringify(err) }), 1000))
+			.then(res => Toast.show({ type: 'success', text1: 'Welcome to Eventify', text2: 'You are now logged as ' + res.email }))
+			.catch(err => Toast.show({ type: 'error', text1: 'Login Error', text2: JSON.stringify(err) }))
 	}
 
 	const signInWithGoogle = () => Toast.show({ type: 'success', text1: 'WIP Feature', text2: 'Signing with Google...' })

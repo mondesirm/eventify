@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { NavigationProp } from '@react-navigation/native'
 import AppIntroSlider from 'react-native-app-intro-slider'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { Animated, Dimensions, I18nManager, Image, Platform, SafeAreaView, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native'
 
 import { Translation } from '@/locales'
-import { Color, FontFamily, FontSize } from 'GlobalStyles'
+import { Color, FontFamily, FontSize } from 'globals'
 import { usePreferences } from '@/contexts/PreferencesContext'
 
 interface ScreenProps {
-	navigation: NavigationProp<any, any>
+	navigation: StackNavigationProp<any, any>
 	route: { key: string, name: string, params: any }
 }
 
@@ -20,7 +20,6 @@ interface BtnProps {
 	styles: StyleProp<ViewStyle> | [StyleProp<ViewStyle>, StyleProp<TextStyle>]
 }
 
-const scrollX = new Animated.Value(0)
 const { width, height } = Dimensions.get('screen')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
@@ -33,9 +32,10 @@ const images = [
 
 const steps = images.map((image, key) => ({ image, key }))
 
-export default function Onboarding({ navigation }: ScreenProps) {
+export default function ({ navigation }: ScreenProps) {
 	const { i18n: { __ } } = usePreferences()
 	const slider = useRef<AppIntroSlider>(null)
+	const scrollX = useRef(new Animated.Value(0)).current
 	const [step, setStep] = useState(slider.current?.state.activeIndex || 0)
 
 	useEffect(() => slider.current?.goToSlide(step), [step])
@@ -123,7 +123,7 @@ export default function Onboarding({ navigation }: ScreenProps) {
 			scrollEventThrottle={1}
 			onSlideChange={i => setStep(i)}
 			renderPagination={renderPagination}
-			onDone={() => navigation.navigate('AuthStack')}
+			onDone={() => navigation.replace('AuthStack')}
 			onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
 		/>
 	)

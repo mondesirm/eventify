@@ -17,7 +17,7 @@ export const PreferencesContext = createContext<PreferencesContextProps>({
 
 export const usePreferences = () => useContext(PreferencesContext)
 
-export default function PreferencesContextProvider({ children }) {
+export default function ({ children }) {
 	const i18n: CustomI18n = new I18n(locales)
 	i18n.locale = Localization.locale
 	i18n.enableFallback = true

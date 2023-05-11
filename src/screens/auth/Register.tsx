@@ -1,19 +1,17 @@
 import _ from 'lodash'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
-import { useState } from 'react'
+import { Button } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
-import { Button, MD3Colors } from 'react-native-paper'
-import { NavigationProp } from '@react-navigation/native'
-import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { Border, Color, FontFamily, FontSize, Padding } from 'GlobalStyles'
-import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
+import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import InputGroup from '@/components/InputGroup'
 import { usePreferences } from '@/contexts/PreferencesContext'
 
 interface ScreenProps {
-	navigation: NavigationProp<any, any>
+	navigation: StackNavigationProp<any, any>
 	route: { key: string, name: string, params: any }
 }
 
@@ -34,12 +32,15 @@ const values: Record<keyof Yup.InferType<typeof schema>, string> = errors
 export default function ({ navigation }: ScreenProps) {
 	const { i18n: { __ } } = usePreferences()
 
-	const register = ({ username, phone, email, password, confirm }) => Promise.resolve({ username, phone, email, password, confirm })
+	const register = ({ username, phone, email, password, confirm }) => {
+		navigation.navigate('Login', { email })
+		return Promise.resolve({ username, phone, email, password, confirm })
+	}
 
 	const onSubmit = ({ username, phone, email, password, confirm }, actions: any) => {
 		register({ username, phone, email, password, confirm })
-			.then(res => Toast.show({ type: 'success', text1: 'Register Success', text2: JSON.stringify(res) }))
-			.catch(err => setTimeout(() => Toast.show({ type: 'error', text1: 'Register Error', text2: JSON.stringify(err) }), 1000))
+			.then(res => Toast.show({ type: 'success', text1: 'Account Created', text2: 'You can now login with your credentials.' }))
+			.catch(err => Toast.show({ type: 'error', text1: 'Register Error', text2: JSON.stringify(err) }))
 	}
 
 	return (

@@ -1,6 +1,7 @@
-import { Color } from 'GlobalStyles'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Animated, Dimensions, Easing, StyleSheet, View } from 'react-native'
+
+import { Color } from 'globals'
 
 const steps = 4
 const loading = new Animated.Value(0)
