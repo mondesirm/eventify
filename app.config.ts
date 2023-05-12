@@ -12,5 +12,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	},
 	"plugins": [
 		"expo-localization"
-	]
+	],
+	"extra": {
+		"eas": {
+			"projectId": "dc763e39-e4a4-4ba0-a9ac-648dc16e5411"
+		}
+	}
 })
