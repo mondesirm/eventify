@@ -15,9 +15,14 @@ export const PreferencesContext = createContext<PreferencesContextProps>({
 	setLang: null
 })
 
-export const usePreferences = () => useContext(PreferencesContext)
+export const usePreferences = () => {
+	const context = useContext(PreferencesContext)
 
-export default function ({ children }) {
+	if (context === undefined) throw new Error('usePreferences must be used within a PreferencesProvider.')
+	return context
+}
+
+export default function ({ children }: { children: React.ReactNode }) {
 	const i18n: CustomI18n = new I18n(locales)
 	i18n.locale = Localization.locale
 	i18n.enableFallback = true

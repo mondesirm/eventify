@@ -13,6 +13,7 @@ import Splash from '@/components/Splash'
 import Loading from '@/components/Loading'
 import NavigationProvider from '@/navigation'
 import IconlyProvider from '@/contexts/IconlyContext'
+import AnalyticsProvider from '@/contexts/AnalyticsContext'
 import PreferencesProvider from '@/contexts/PreferencesContext'
 
 // Instruct SplashScreen not to hide yet, we want to do this manually
@@ -34,20 +35,22 @@ export default function App() {
 
 	return (
 		<SafeAreaProvider style={{ marginTop: -statusBarHeight / 2 }}>
-			<PreferencesProvider>
-				<PaperProvider theme={theme}>
-					<IconlyProvider set="two-tone" primaryColor={Color.primary} secondaryColor={Color.secondary} stroke="bold" size="xlarge">
-						<Splash image={{ uri: Constants.manifest.splash.image }}>
-							<StatusBar /* style={theme.dark ? 'light' : 'dark'} backgroundColor={theme.colors.primary} */ />
-							<NavigationContainer theme={LightTheme}>
-								<Loading />
-								<NavigationProvider />
-								<Toast topOffset={80} />
-							</NavigationContainer>
-						</Splash>
-					</IconlyProvider>
-				</PaperProvider>
-			</PreferencesProvider>
+			<AnalyticsProvider>
+				<PreferencesProvider>
+					<PaperProvider theme={theme}>
+						<IconlyProvider set="two-tone" primaryColor={Color.primary} secondaryColor={Color.secondary} stroke="bold" size="xlarge">
+							<Splash image={{ uri: Constants.manifest.splash.image }}>
+								<StatusBar /* style={theme.dark ? 'light' : 'dark'} backgroundColor={theme.colors.primary} */ />
+								<NavigationContainer theme={LightTheme}>
+									<Loading />
+									<NavigationProvider />
+									<Toast topOffset={80} />
+								</NavigationContainer>
+							</Splash>
+						</IconlyProvider>
+					</PaperProvider>
+				</PreferencesProvider>
+			</AnalyticsProvider>
 		</SafeAreaProvider>
 	)
 }

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { G, Path } from 'react-native-svg'
 
-import withIcon from '@/contexts/withIcon'
+import { withIcon } from '@/contexts/IconlyContext'
 
 type Props = {
 	color?: string

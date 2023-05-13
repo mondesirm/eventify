@@ -1,4 +1,4 @@
-import type { Theme } from '@/contexts/IconlyContext'
+import type { IconlyContextProps } from '@/contexts/IconlyContext'
 
 /* Fonts */
 export const FontFamily = {
@@ -71,4 +71,4 @@ export const getOpacity = (primaryColor: string | undefined, secondaryColor: str
 	return primaryColor === secondaryColor ? '0.4' : '1'
 }
 
-export const getThemeProp = (prop: 'primaryColor' | 'secondaryColor' | 'size' | 'set' | 'stroke', theme: Theme): Theme[typeof prop] => theme[prop]
+export const getThemeProp = (prop: 'primaryColor' | 'secondaryColor' | 'size' | 'set' | 'stroke', theme: IconlyContextProps): IconlyContextProps[typeof prop] => theme[prop]
