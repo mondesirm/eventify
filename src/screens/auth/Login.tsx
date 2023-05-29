@@ -1,14 +1,17 @@
 import _ from 'lodash'
 import * as Yup from 'yup'
-import { useRef } from 'react'
 import { Formik } from 'formik'
+import { CLIENT_ID } from '@env'
 import Constants from 'expo-constants'
+import { useEffect, useRef } from 'react'
+import * as WebBrowser from 'expo-web-browser'
 import Toast from 'react-native-toast-message'
 import { Button, Switch } from 'react-native-paper'
+import * as Google from 'expo-auth-session/providers/google'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { Animated, Dimensions, GestureResponderEvent, SafeAreaView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import { Animated, Dimensions, GestureResponderEvent, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 import { AllowedScope } from '@/locales'
 import { useStoreActions } from '@/store'
@@ -23,10 +26,14 @@ interface ScreenProps {
 
 const { width } = Dimensions.get('screen')
 
+WebBrowser.maybeCompleteAuthSession()
+
 export default ({ navigation, route }: ScreenProps) => {
 	const { __ } = useI18n()
 	const y = useRef(new Animated.Value(0)).current
-	const login = useStoreActions(({ auth }) => auth.login)
+	const { login, provider, getUserInfo } = useStoreActions(({ auth }) => auth)
+
+	const [request, response, promptAsync] = Google.useAuthRequest({ clientId: CLIENT_ID })
 
 	const animation = {
 		height: y.interpolate({ inputRange: [0, 150 - 80], outputRange: [150, 80], extrapolate: 'clamp' }),
@@ -52,6 +59,17 @@ export default ({ navigation, route }: ScreenProps) => {
 	const inputs = Array.from({ length: _.keys(values).length }, () => useRef<TextInput>())
 	const navs = useNavs(inputs)
 
+	useEffect(() => {
+		if (response?.type === 'success') {
+			getUserInfo(response.authentication.accessToken)
+				.then((res: AllowedScope[]) => {
+					Toast.show({ text1: __(res[0]), text2: __(res[1]) })
+					navigation.replace('MainStack')
+				})
+				.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
+		}
+	}, [response])
+
 	const onSubmit = ({ email, password, remember }) => {
 		login({ email, password, remember: Boolean(remember) })
 			.then((res: AllowedScope[]) => {
@@ -61,8 +79,11 @@ export default ({ navigation, route }: ScreenProps) => {
 			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
 	}
 
-	const signInWithGoogle = () => Toast.show({ text1: 'WIP Feature', text2: 'Signing with Google...' })
-	const signInWithPhone = () => Toast.show({ text1: 'WIP Feature', text2: 'Signing with Phone...' })
+	const signInWith = (social: 'phone' | 'twitter' | 'google' | 'github' | 'facebook') => {
+		provider({ social, data: 'malikmondesir@gmail.com' })
+			.then((res: AllowedScope[]) => Toast.show({ text1: __(res[0]), text2: __(res[1]) }))
+			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
+	}
 
 	return (
 		<SafeAreaView style={styles.screen} onTouchStart={navs.dismiss}>
@@ -122,14 +143,14 @@ export default ({ navigation, route }: ScreenProps) => {
 					</View>
 
 					<View style={styles.socials}>
-						<TouchableOpacity style={styles.social} onPress={signInWithGoogle}>
+						<TouchableOpacity disabled={!request} style={styles.social} onPress={() => promptAsync()}>
 							<>
 								<Icon name="google" size={24} color={Color.danger} />
 								<Text style={[styles.provider, styles.text]}>Google</Text>
 							</>
 						</TouchableOpacity>
 
-						<TouchableOpacity style={styles.social} onPress={signInWithPhone}>
+						<TouchableOpacity style={styles.social} onPress={() => signInWith('phone')}>
 							<>
 								<Icon name="phone" size={24} color={Color.primary} />
 								<Text style={[styles.provider, styles.text]}>Phone</Text>

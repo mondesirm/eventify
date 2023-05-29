@@ -1,18 +1,28 @@
 import _ from 'lodash'
 import * as Haptics from 'expo-haptics'
 import { Thunk, thunk } from 'easy-peasy'
+import * as WebBrowser from 'expo-web-browser'
 import { FirebaseError } from '@firebase/util'
+import * as Google from 'expo-auth-session/providers/google'
 import { collection, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
-import { createUserWithEmailAndPassword, getIdTokenResult, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth'
+
+import { FacebookAuthProvider, GithubAuthProvider, GoogleAuthProvider, TwitterAuthProvider, createUserWithEmailAndPassword, getIdTokenResult, onAuthStateChanged, sendEmailVerification, sendPasswordResetEmail, signInWithCredential, signInWithEmailAndPassword, signInWithPopup, signOut, updateProfile, useDeviceLanguage } from 'firebase/auth'
 
 import { StoreModel } from '@/store'
 import { AllowedScope } from '@/locales'
 import { auth, firestore } from '@/utils/firebase'
+import user from './user'
+import { err } from 'react-native-svg/lib/typescript/xml'
 
 type LoginPayload = {
 	email: string
 	password: string
 	remember?: boolean
+}
+
+type ProviderPayload = {
+	data: string
+	social: keyof typeof providers | 'phone'
 }
 
 type RegisterPayload = {
@@ -25,11 +35,34 @@ type RegisterPayload = {
 }
 
 export interface AuthModel {
-	login: Thunk<this, LoginPayload, any, StoreModel>
+	login: Thunk<this, LoginPayload, any, StoreModel, Promise<AllowedScope[]>>
 	logout: Thunk<this, never, any, StoreModel>
+	provider: Thunk<this, ProviderPayload, any, StoreModel, Promise<AllowedScope[]>>
+	getUserInfo: Thunk<this, string, any, StoreModel, Promise<AllowedScope[]>>
 	register: Thunk<this, RegisterPayload, any, StoreModel, Promise<AllowedScope[]>>
 	resetPassword: Thunk<this, string, any, StoreModel, Promise<AllowedScope[]>>
 	restoreSession: Thunk<this, never, any, StoreModel, Promise<string>>
+}
+
+// export type Providers = Record<string, { provider: InstanceType<typeof FacebookAuthProvider | typeof PhoneAuthProvider>; scopes: string[] }>
+
+const providers = {
+	facebook: {
+		provider: new FacebookAuthProvider(),
+		scopes: ['public_profile', 'email']
+	},
+	github: {
+		provider: new GithubAuthProvider(),
+		scopes: ['read:user']
+	},
+	google: {
+		provider: new GoogleAuthProvider(),
+		scopes: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email']
+	},
+	twitter: {
+		provider: new TwitterAuthProvider(),
+		scopes: []
+	}	
 }
 
 export default {
@@ -43,7 +76,7 @@ export default {
 			signInWithEmailAndPassword(auth, email, password).then(({ user }) => {
 				if (!user.emailVerified) return reject(['login.error', 'login.verify'])
 
-				// If verification link was opened, get user role
+				// Get user role and token if email is verified
 				getIdTokenResult(user).then(({ token }) => {
 					// Get Firestore user document
 					getDoc(doc(firestore, 'users', user.uid)).then(doc => {
@@ -76,6 +109,76 @@ export default {
 			})
 			.catch(() => {
 				reject('logout.error')
+			})
+			.finally(() => getStoreActions().user.setLoading(false))
+		})
+	}),
+	provider: thunk((actions, payload, { getStoreActions, getStoreState }) => {
+		// getStoreActions().user.setLoading(true)
+
+		const { data, social } = payload
+		const isConnected = getStoreState().utils.netInfoState.isConnected
+
+		return new Promise((resolve, reject) => {
+			// Get provider data
+			// const { provider, scopes } = providers[social]
+			const provider = new GoogleAuthProvider()
+
+			// useDeviceLanguage(auth)
+			// auth.languageCode = 'es'
+
+			// Sign in with provider
+			signInWithPopup(auth, provider).then(userCredential => {
+				if (!userCredential.user.emailVerified) return reject(['login.error', 'login.verify'])
+
+				const credential = GoogleAuthProvider.credentialFromResult(userCredential)
+
+				console.log(credential)
+
+				signInWithCredential(auth, credential).then(({ user }) => {
+					// Get user role and token if email is verified
+					getIdTokenResult(user).then(({ token }) => {
+						// Get Firestore user document
+						getDoc(doc(firestore, 'users', user.uid)).then(doc => {
+							const currentUser = doc.data()
+							getStoreActions().user.setLogin({ role: currentUser.role, token })
+
+							if (currentUser.role === 'admin') getStoreActions().user.setRoleAdmin(currentUser.role)
+
+							getStoreActions().user.setUser(currentUser)
+							resolve(['login.success.0', 'login.success.1'])
+						})
+					})
+				})
+			})
+			.catch(e => {
+				console.log(e)
+				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+
+				if (!isConnected) reject(['login.error', 'errors.connection'])
+				reject(['login.error', 'errors.' + e.code])
+			})
+			// .finally(() => getStoreActions().user.setLoading(false))
+		})
+	}),
+	getUserInfo: thunk((actions, payload, { getStoreActions, getStoreState }) => {
+		getStoreActions().user.setLoading(true)
+
+		const isConnected = getStoreState().utils.netInfoState.isConnected
+
+		return new Promise((resolve, reject) => {
+			fetch('https://www.googleapis.com/userinfo/v2/me', { headers: { Authorization: `Bearer ${payload}` } }).then(res => res.json()).then(user => {
+				getStoreActions().user.setLogin({ role: 'user', token: payload })
+				getStoreActions().user.setUser(user)
+				// console.log(user)
+				resolve(['login.success.0', 'login.success.1'])
+			})
+			.catch(err => {
+				console.log(err)
+				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+
+				if (!isConnected) reject(['login.error', 'errors.connection'])
+				reject(['login.error', 'errors.' + err.code])
 			})
 			.finally(() => getStoreActions().user.setLoading(false))
 		})
@@ -133,6 +236,8 @@ export default {
 	resetPassword: thunk((actions, payload, { getStoreActions, getStoreState }) => {
 		getStoreActions().user.setLoading(true)
 
+		const isConnected = getStoreState().utils.netInfoState.isConnected
+
 		return new Promise((resolve, reject) => {
 			sendPasswordResetEmail(auth, payload).then(() => {
 				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
@@ -142,6 +247,7 @@ export default {
 			.catch(({ code }: FirebaseError) => {
 				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
 
+				if (!isConnected) reject(['reset.error', 'errors.connection'])
 				reject(['reset.error', 'errors.' + code])
 			})
 			.finally(() => getStoreActions().user.setLoading(false))
