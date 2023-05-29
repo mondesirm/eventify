@@ -10,12 +10,19 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		resizeMode: 'contain',
 		backgroundColor: '#ffffff'
 	},
-	"plugins": [
-		"expo-localization"
+	plugins: [
+		'expo-localization',
+		[
+			'expo-image-picker', {
+				photosPermission: 'Allow Eventify to access your photos',
+				cameraPermission: 'Allow Eventify to access your camera',
+				microphonePermission: 'Allow Eventify to access your microphone'
+			}
+		]
 	],
-	"extra": {
-		"eas": {
-			"projectId": "dc763e39-e4a4-4ba0-a9ac-648dc16e5411"
+	extra: {
+		eas: {
+			projectId: 'dc763e39-e4a4-4ba0-a9ac-648dc16e5411'
 		}
 	}
 })

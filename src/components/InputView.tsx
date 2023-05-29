@@ -1,58 +1,49 @@
 import _ from 'lodash'
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
 import { MD3Colors, TextInput } from 'react-native-paper'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { Dimensions, I18nManager, Platform, StyleSheet, Text, View } from 'react-native'
+import { I18nManager, Platform, StyleSheet, Text, View } from 'react-native'
 import { Props } from 'react-native-paper/lib/typescript/src/components/TextInput/TextInput'
 
+import { useNavs } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize } from 'globals'
-import { usePreferences } from '@/contexts/PreferencesContext'
 
-interface InputGroupProps extends Props {
-	label: string
-	value: string
-	errors: [boolean, any]
-	onBlur: Required<Props>['onBlur']
-	onChangeText: Required<Props>['onChangeText']
+interface InputViewProps extends Props {
+	errors?: [boolean, string]
 	type?: string
+	navs?: [number, ReturnType<typeof useNavs>]
 	left?: keyof typeof MaterialCommunityIcons.glyphMap
 	right?: keyof typeof MaterialCommunityIcons.glyphMap
 	onPressLeft?: () => void
 	onPressRight?: () => void
 }
 
-const { width } = Dimensions.get('screen')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
-export default function InputGroup(props: InputGroupProps) {
-	const { i18n: { __ } } = usePreferences()
+export default forwardRef((props: InputViewProps, ref) => {
 	const [secureTextEntry, setSecureTextEntry] = useState(true)
 
 	// Customize autoComplete and keyboardType based on type
-	const types: {
-		[key: string]: [
-			typeof TextInput.defaultProps.autoComplete,
-			typeof TextInput.defaultProps.keyboardType
-		]
-	} = {
+	const types: Record<string, [typeof TextInput.defaultProps.autoComplete, typeof TextInput.defaultProps.keyboardType]> = {
 		username: ['username', 'default'],
 		phone: ['tel', 'phone-pad'],
 		email: ['email', 'email-address'],
 		password: ['password', 'visible-password']
 	}
 
-	const isPassword = props.label.toLowerCase().includes('password')
+	const isPassword = ['password', 'confirm'].includes(props.type)
 	const toggle = secureTextEntry ? 'eye-outline' : 'eye-off-outline'
 
 	return (
-		<View style={styles.group}>
+		<View>
 			<TextInput
 				{...props}
-				error={props.errors[0] && props.errors[1]}
-				value={props?.type === 'phone' ? props.value.replace(/[^0-9]/g, '') : props.value.trim()}
+				ref={ref}
+				error={props.errors[0] && props.errors[1] as any}
+				value={props?.type === 'phone' ? props.value.replace(/[\D]/g, '') : props.value.trim()}
 				mode={props.mode || 'outlined'}
-				placeholder={props.label}
+				placeholder={typeof props.label === 'string' && props.label}
 				secureTextEntry={isPassword && secureTextEntry}
 				outlineStyle={props.outlineStyle || styles.input}
 				outlineColor={props.outlineColor || 'transparent'}
@@ -61,22 +52,21 @@ export default function InputGroup(props: InputGroupProps) {
 				placeholderTextColor={props.placeholderTextColor || Color.body}
 				autoComplete={types[props.type]?.[0] || props.autoComplete}
 				keyboardType={types[props.type]?.[1] || props.keyboardType}
+				returnKeyType={props.returnKeyType || 'next'}
+				enablesReturnKeyAutomatically
+				onPressIn={() => props.navs && props.navs[1]?.setCurr(props.navs?.[0])}
+				onSubmitEditing={() => props.navs && props.navs[1]?.next(props.navs?.[0])}
 				left={props.left && <TextInput.Icon icon={() => <Icon name={props.left} size={24} color={Color.primary} />} onPress={props.onPressLeft} />}
 				right={(isPassword || props.right) && <TextInput.Icon icon={() => <Icon name={isPassword ? toggle : props.right} size={24} color={Color.primary} />} onPress={() => isPassword ? setSecureTextEntry(!secureTextEntry) : props.onPressRight} />}
 			/>
 
-			{props.errors[0] && props.errors[1] && <Text style={styles.error}>{props.errors[1]}</Text>}
+			{props.errors[0] && props.errors[1] && <Text style={styles.error}>{props.errors[1].charAt(0).toUpperCase() + props.errors[1].slice(1).toLowerCase()}.</Text>}
 		</View>
 	)
-}
+}) as React.FC<InputViewProps>
 
 const styles = StyleSheet.create({
-	group: {
-		gap: 10,
-		flexDirection: 'column'
-	},
 	input: {
-		width: width - 80,
 		fontSize: FontSize.sm,
 		borderRadius: Border.xs,
 		backgroundColor: Color.background,
@@ -85,10 +75,12 @@ const styles = StyleSheet.create({
 	text: {
 		color: Color.body,
 		fontWeight: '500',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.medium
 	},
 	error: {
+		bottom: -20,
 		fontSize: 10,
+		position: 'absolute',
 		color: MD3Colors.error50
 	}
 })

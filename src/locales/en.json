@@ -1,20 +1,26 @@
 {
+	"grant": {
+		"micro": "We need to access your microphone.",
+		"photos": "We need to access your photos.",
+		"camera": "We need to access your camera.",
+		"subtitle": "Please grant us this permission in your device settings."
+	},
 	"onboarding": {
 		"0": {
-			"title": "Welcome to Eventify!",
-			"subtitle": "Planning events made easy."
+			"title": "Welcome to %{title}",
+			"subtitle": "Planning events made easy with safety in mind."
 		},
 		"1": {
-			"title": "Create an event",
-			"subtitle": "Create an event and invite your friends."
+			"title": "Spend valuable time worries-free",
+			"subtitle": "Invite friends or forge new bonds."
 		},
 		"2": {
-			"title": "Invite your friends",
-			"subtitle": "Invite your friends to your event."
+			"title": "Keep track of your activities",
+			"subtitle": "Retrace your steps on a map in real time."
 		},
 		"3": {
-			"title": "Get notified",
-			"subtitle": "Get notified when your friends respond."
+			"title": "Stay in touch and in the know",
+			"subtitle": "Party away but never lose sight of your friends."
 		}
 	},
 	"get-started": "Get Started",
@@ -31,28 +37,67 @@
 		"code": "Verification Code"
 	},
 	"login": {
-		"title": "Sign in to Eventify",
-		"subtitle": "We were waiting for you.",
+		"title": "Sign in to %{title}",
+		"subtitle": "We were waiting for you!",
 		"remember": "Remember me",
 		"forgot": "Forgot Password?",
 		"submit": "Sign in",
 		"other": ["Don't have an account yet?", "Sign up!"],
-		"continue": "Or continue with"
+		"continue": "Or continue with",
+		"error": "Authentication failed.",
+		"verify": "Please verify your account first with the link we sent you.",
+		"success": ["Welcome!", "You are now signed in!"]
 	},
 	"register": {
 		"title": "Create an account",
-		"subtitle": "Let's get started.",
+		"subtitle": "Join the community!",
 		"submit": "Sign up",
-		"other": ["Already have an account?", "Sign in!"]
+		"other": ["Already have an account?", "Sign in!"],
+		"error": "Account creation failed.",
+		"success": ["Your account has been created successfully!", "A verification link has been sent to your email address."]
 	},
 	"forgot": {
-		"title": "Recover your account",
+		"title": "Recover your password",
 		"subtitle": "If the account exists, we'll send you a code.",
-		"expires": "Expires in",
+		"expires": "Expires in %{timer}s",
 		"expired": "Expired",
-		"send": "Send Code",
+		"send": "Send code",
 		"resend": "Resend code?",
-		"submit": "Reset Password",
-		"other": ["Having trouble?", "Contact us!"]
+		"submit": "Reset password",
+		"other": ["Having trouble?", "Contact us!"],
+		"error": "Password reset email was not sent.",
+		"success": ["A password reset email has been sent to your email address.", "Please input it below."]
+	},
+	"reset": {
+		"error": "Password reset failed.",
+		"success": ["Your password has been reset successfully!", "You can now sign in with your new password."]
+	},
+	"errors": {
+		"size": ["File size too large.", "It shouldn't exceed %{size}MB."],
+		"type": ["File type not supported.", "Only \"%{type}\" files are allowed."],
+		"min": "Must be at least %{min} characters long",
+		"max": "Must be at most %{max} characters long",
+		"length": "Must be %{length} characters long",
+		"email": "Must be a valid email address",
+		"phone": "French phone numbers only",
+		"required": "%{label} is required",
+		"is": "Must be the same as %{is}",
+		"unique": "This %{label} is already taken",
+		"exists": "This %{label} does not exist",
+		"connection": "Please check your internet connection.",
+		"auth": {
+			"missing-email": "The email address is missing.",
+			"invalid-email": "The email address is invalid.",
+			"email-already-in-use": "The email address is already in use.",
+			"weak-password": "The password is too weak.",
+			"wrong-password": "The password is invalid.",
+			"missing-password": "The password is missing.",
+			"user-disabled": "The user account has been disabled.",
+			"user-not-found": "The user account does not exist.",
+			"operation-not-allowed": "This operation is not allowed. Please contact an admin."
+		},
+		"storage": {
+			"object-not-found": "The requested file does not exist."
+		}
 	}
 }

@@ -24,8 +24,9 @@ type Leaves<T, D extends number = 10> = [D] extends [never] ? never : T extends 
 	{ [K in keyof T]-?: Join<K, Leaves<T[K], Prev[D]>> }[keyof T] : ''
 
 // Only allows localized strings that exist (in `en` since it's the fallback)
-export type Translation = Leaves<typeof en>
+export type AllowedScope = Leaves<typeof en>
 
 export const locales = {
-	en, fr
+	en,
+	fr
 }

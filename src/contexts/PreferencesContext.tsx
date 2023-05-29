@@ -1,9 +1,13 @@
-import { I18n, I18nOptions } from 'i18n-js'
-import { locales, Translation } from '@/locales'
+import { FAB } from 'react-native-paper'
+import { I18n, TranslateOptions } from 'i18n-js'
 import * as Localization from 'expo-localization'
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { GestureResponderEvent, Keyboard, TextInput } from 'react-native'
 
-type CustomI18n = typeof I18n.prototype & { __?: (scope: Translation, options?: Partial<I18nOptions>) => string }
+import { Color } from 'globals'
+import { locales, AllowedScope } from '@/locales'
+
+type CustomI18n = typeof I18n.prototype & { __?: (scope: AllowedScope, options?: TranslateOptions) => string }
 
 interface PreferencesContextProps {
 	i18n: CustomI18n
@@ -22,13 +26,53 @@ export const usePreferences = () => {
 	return context
 }
 
-export default function ({ children }: { children: React.ReactNode }) {
-	const i18n: CustomI18n = new I18n(locales)
-	i18n.locale = Localization.locale
-	i18n.enableFallback = true
+export const useI18n = () => usePreferences().i18n
 
-	// Re-typing the scope parameter to ensure that it exists in the english locale
-	i18n.__ = (scope: Translation, options?: Partial<I18nOptions>) => i18n.t(scope, options)
+export const useNavs = (inputs: React.MutableRefObject<TextInput>[], style: typeof FAB.defaultProps.style = { right: 20, position: 'absolute', backgroundColor: Color.primary }) => {
+	const [curr, setCurr] = useState(0)
+	const [visible, setVisible] = useState(false)
+
+	useEffect(() => {
+		const listeners = [
+			Keyboard.addListener('keyboardWillShow', () => setVisible(true)),
+			Keyboard.addListener('keyboardWillHide', () => setVisible(false))
+		]
+		return () => listeners.forEach(l => l.remove())
+	}, [])
+
+	const prev = (index: number = curr) => {
+		if (index === 0) return
+		inputs[index - 1].current?.focus()
+		setCurr(index - 1)
+	}
+
+	const next = (index: number = curr) => {
+		if (index === inputs.length - 1) return
+		inputs[index + 1].current?.focus()
+		setCurr(index + 1)
+	}
+
+	const fabs = () => (
+		<>
+			<FAB style={[style, { top: 80 }]} visible={visible} color="white" customSize={32} icon="arrow-up" onPress={() => prev()} />
+			<FAB style={[style, { top: 120 }]} visible={visible} color="white" customSize={32} icon="arrow-down" onPress={() => next()} />
+		</>
+	)
+
+	const dismiss = (e: GestureResponderEvent) => e.target === e.currentTarget && Keyboard.dismiss()
+
+	return { curr, setCurr, prev, next, fabs, dismiss }
+}
+
+export default function ({ children }: { children: React.ReactNode }) {
+	const i18n: CustomI18n = new I18n(locales, { defaultSeparator: '/' })
+	i18n.enableFallback = true
+	i18n.missingBehavior = 'error' // TODO put 'guess' in production, 'error' in local
+	i18n.locale = Localization.locale
+
+	// Re-typing the scope argument with our custom type
+	i18n.__ = (scope: AllowedScope, options?: TranslateOptions) => i18n.t(scope, options)
+	// i18n.__ = i18n.t.bind(i18n)
 
 	const setLang = (lang: keyof typeof locales) => {
 		i18n.locale = lang

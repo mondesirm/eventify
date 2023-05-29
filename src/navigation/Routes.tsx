@@ -1,16 +1,19 @@
-import AuthStack from './Auth.Stack'
-import MainStack from './Main.Stack'
-import OnboardingStack from './Onboarding.Stack'
+import { useStoreState } from '@/store'
+import AuthStack from '@/navigation/Auth.Stack'
+import MainStack from '@/navigation/Main.Stack'
+import OnboardingStack from '@/navigation/Onboarding.Stack'
 
 export default function Routes() {
-	const user = false
-	const role = 'intro'
+	const role = useStoreState(({ user }) => user.role)
 	const firstTime = true
 
-	// TODO firebase auth + stack per role
-	// ex: const RoleStack: JSX.Element = require(`./${role.charAt(0).toUpperCase() + role.slice(1)}.Stack`).default
+	//? dynamically call stack per role
+	// ex: const RoleStack: JSX.Element = require(`./${role.charAt(0).toUpperCase() + role.slice(1).toLowercase()}.Stack`).default
 
-	if (user) return <MainStack />
-	if (firstTime) return <OnboardingStack />
-	return <AuthStack />
+	switch (role) {
+		case 'user':
+			return <MainStack />
+		default:
+			return firstTime ? <OnboardingStack /> : <AuthStack />
+	}
 }

@@ -1,11 +1,14 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
+import Constants from 'expo-constants'
 import { FAB } from 'react-native-paper'
 import { NavigationProp } from '@react-navigation/native'
+// import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Animated, Dimensions, I18nManager, ImageBackground, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 
+import { useStoreState } from '@/store'
 import Carousel from '@/components/Carousel'
 import { Color, FontFamily, FontSize } from 'globals'
-import { usePreferences } from '@/contexts/PreferencesContext'
+import { useI18n } from '@/contexts/PreferencesContext'
 
 interface ScreenProps {
 	navigation: NavigationProp<any, any>
@@ -27,8 +30,10 @@ const images = new Array(4).fill('https://images.unsplash.com/photo-1556740749-8
 const carousel = images.map((image, key) => ({ image: { uri: image }, key }))
 
 export default function ({ navigation, route }: ScreenProps) {
-	const { i18n: { __ } } = usePreferences()
-	const scrollX = useRef(new Animated.Value(0)).current
+	const { __ } = useI18n()
+	const currentUser = useStoreState(({ user }) => user.currentUser)
+
+	useEffect(() => { console.log('Home', currentUser?.email) }, [])
 
 	return (
 		<ScrollView style={styles.screen} keyboardShouldPersistTaps="handled">
@@ -44,7 +49,7 @@ export default function ({ navigation, route }: ScreenProps) {
 
 			<View style={styles.content}>
 				<Text style={[styles.title, styles.typo]}>
-					{__('onboarding.0.title')}
+					{__('onboarding.0.title', { title: Constants.manifest.name })}
 				</Text>
 				<Text style={[styles.subtitle, styles.typo]}>
 					{__('onboarding.0.subtitle')}
@@ -66,7 +71,7 @@ const styles = StyleSheet.create({
 	typo: {
 		fontWeight: '500',
 		textAlign: 'center',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.medium
 	},
 	title: {
 		fontSize: FontSize.x2l,

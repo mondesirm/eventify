@@ -7,16 +7,17 @@ import ForgotPassword from '@/screens/auth/ForgotPassword'
 
 const { Navigator, Screen } = createStackNavigator()
 
+const screens = [
+	{ name: 'Login', component: Login },
+	{ name: 'Register', component: Register },
+	{ name: 'ForgotPassword', component: ForgotPassword },
+	{ name: 'MainStack', component: MainStack }
+]
+
 export default function AuthStack() {
 	return (
-		<Navigator
-			initialRouteName="Login"
-			screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}
-		>
-			<Screen name="Login" component={Login} />
-			<Screen name="Register" component={Register} />
-			<Screen name="ForgotPassword" component={ForgotPassword} />
-			<Screen name="MainStack" component={MainStack} />
+		<Navigator initialRouteName="Login" screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
+			{screens.map(({ name, component }) => <Screen key={name} name={name} component={component} />)}
 		</Navigator>
 	)
 }

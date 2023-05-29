@@ -1,3 +1,4 @@
+import Constants from 'expo-constants'
 import { useEffect, useRef, useState } from 'react'
 import AppIntroSlider from 'react-native-app-intro-slider'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -5,9 +6,10 @@ import Icon from '@expo/vector-icons/MaterialCommunityIcons'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { Animated, Dimensions, I18nManager, Image, Platform, SafeAreaView, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native'
 
-import { Translation } from '@/locales'
+import { AllowedScope } from '@/locales'
+import { useStoreActions } from '@/store'
 import { Color, FontFamily, FontSize } from 'globals'
-import { usePreferences } from '@/contexts/PreferencesContext'
+import { useI18n } from '@/contexts/PreferencesContext'
 
 interface ScreenProps {
 	navigation: StackNavigationProp<any, any>
@@ -15,7 +17,7 @@ interface ScreenProps {
 }
 
 interface BtnProps {
-	text?: Translation
+	text?: AllowedScope
 	name?: keyof typeof MaterialCommunityIcons.glyphMap
 	styles: StyleProp<ViewStyle> | [StyleProp<ViewStyle>, StyleProp<TextStyle>]
 }
@@ -33,14 +35,17 @@ const images = [
 const steps = images.map((image, key) => ({ image, key }))
 
 export default function ({ navigation }: ScreenProps) {
-	const { i18n: { __ } } = usePreferences()
+	const { __ } = useI18n()
 	const slider = useRef<AppIntroSlider>(null)
 	const scrollX = useRef(new Animated.Value(0)).current
 	const [step, setStep] = useState(slider.current?.state.activeIndex || 0)
+	const setFirstVisits = useStoreActions(({ utils }) => utils.setFirstVisits)
+
+	useEffect(() => { setFirstVisits({ onboarding: false }) }, [])
 
 	useEffect(() => slider.current?.goToSlide(step), [step])
 
-	const renderItem = ({ item }: { item: typeof steps[0] & { key: string } }) => {
+	const renderItem = ({ item }: { item: typeof steps[number] & { key: string } }) => {
 		return (
 			<View style={styles.screen}>
 				<View style={styles.header}>
@@ -49,7 +54,7 @@ export default function ({ navigation }: ScreenProps) {
 				</View>
 
 				<View style={styles.content}>
-					<Text style={[styles.title, styles.typo]}>{__(`onboarding.${item.key}.title`)}</Text>
+					<Text style={[styles.title, styles.typo]}>{__(`onboarding.${item.key}.title`, { title: Constants.manifest.name })}</Text>
 					<Text style={[styles.subtitle, styles.typo]}>{__(`onboarding.${item.key}.subtitle`)}</Text>
 				</View>
 			</View>
@@ -155,7 +160,7 @@ const styles = StyleSheet.create({
 	},
 	typo: {
 		fontWeight: '500',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.medium
 	},
 	title: {
 		fontSize: FontSize.title,
@@ -201,6 +206,7 @@ const styles = StyleSheet.create({
 		backgroundColor: Color.primary
 	},
 	skip: {
+		width: 'auto',
 		backgroundColor: 'transparent'
 	},
 	link: {

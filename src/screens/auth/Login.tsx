@@ -1,15 +1,19 @@
 import _ from 'lodash'
 import * as Yup from 'yup'
-import { useEffect, useRef } from 'react'
-import { Formik, FormikProps } from 'formik'
+import { useRef } from 'react'
+import { Formik } from 'formik'
+import Constants from 'expo-constants'
 import Toast from 'react-native-toast-message'
 import { Button, Switch } from 'react-native-paper'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { Animated, Dimensions, GestureResponderEvent, SafeAreaView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 
-import InputGroup from '@/components/InputGroup'
-import { usePreferences } from '@/contexts/PreferencesContext'
+import { AllowedScope } from '@/locales'
+import { useStoreActions } from '@/store'
+import InputView from '@/components/InputView'
+import { useI18n, useNavs } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
 interface ScreenProps {
@@ -19,56 +23,67 @@ interface ScreenProps {
 
 const { width } = Dimensions.get('screen')
 
-export default function ({ navigation, route }: ScreenProps) {
-	const { i18n: { __ } } = usePreferences()
+export default ({ navigation, route }: ScreenProps) => {
+	const { __ } = useI18n()
+	const y = useRef(new Animated.Value(0)).current
+	const login = useStoreActions(({ auth }) => auth.login)
+
+	const animation = {
+		height: y.interpolate({ inputRange: [0, 150 - 80], outputRange: [150, 80], extrapolate: 'clamp' }),
+		transform: [{ scale: y.interpolate({ inputRange: [0, 150 - 80], outputRange: [1, .8], extrapolate: 'clamp' }) }]
+	}
 
 	const schema = Yup.object().shape({
-		email: Yup.string().email().required(),
-		password: Yup.string().min(8).required(),
+		email: Yup.string()
+			.meta({ icon: 'email'})
+			.label(__('form.email'))
+			.email(__('errors.email'))
+			.required(e => __('errors.required', e)),
+		password: Yup.string()
+			.meta({ icon: 'lock'})
+			.label(__('form.password'))
+			.min(8, e => __('errors.min', e))
+			.required(e => __('errors.required', e)),
 		remember: Yup.boolean()
 	})
 
 	const errors = _.mapValues(schema.fields, () => '')
-	const values: Record<keyof Yup.InferType<typeof schema>, string> = errors
-	const form = useRef<FormikProps<typeof values>>(null)
+	const values: Record<keyof Yup.InferType<typeof schema>, string> = { ...errors, email: route.params?.email || '' }
+	const inputs = Array.from({ length: _.keys(values).length }, () => useRef<TextInput>())
+	const navs = useNavs(inputs)
 
-	useEffect(() => { if (route.params?.email) form.current.setFieldValue('email', route.params?.email) }, [route.params?.email])
-
-	const login = ({ email, password, remember }) => {
-		navigation.replace('MainStack')
-		return Promise.resolve({ email, password, remember })
-	}
-
-	const onSubmit = ({ email, password, remember }, actions: any) => {
+	const onSubmit = ({ email, password, remember }) => {
 		login({ email, password, remember: Boolean(remember) })
-			.then(res => Toast.show({ type: 'success', text1: 'Welcome to Eventify', text2: 'You are now logged as ' + res.email }))
-			.catch(err => Toast.show({ type: 'error', text1: 'Login Error', text2: JSON.stringify(err) }))
+			.then((res: AllowedScope[]) => {
+				Toast.show({ text1: __(res[0]), text2: __(res[1]) })
+				navigation.replace('MainStack')
+			})
+			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
 	}
 
-	const signInWithGoogle = () => Toast.show({ type: 'success', text1: 'WIP Feature', text2: 'Signing with Google...' })
-	const signInWithPhone = () => Toast.show({ type: 'success', text1: 'WIP Feature', text2: 'Signing with Phone...' })
+	const signInWithGoogle = () => Toast.show({ text1: 'WIP Feature', text2: 'Signing with Google...' })
+	const signInWithPhone = () => Toast.show({ text1: 'WIP Feature', text2: 'Signing with Phone...' })
 
 	return (
-		<ScrollView style={styles.screen} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-			<View style={styles.content}>
-				<Text style={[styles.title, styles.typo]}>{__('login.title')}</Text>
+		<SafeAreaView style={styles.screen} onTouchStart={navs.dismiss}>
+			<Animated.View style={[styles.header, animation]}>
+				<Text style={[styles.title, styles.typo]}>{__('login.title', { title: Constants.manifest.name })}</Text>
 				<Text style={[styles.subtitle, styles.typo]}>{__('login.subtitle')}</Text>
-			</View>
+			</Animated.View>
 
-			<View style={styles.form}>
+			<KeyboardAwareScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" scrollEventThrottle={16} onScroll={Animated.event([{ nativeEvent: { contentOffset: { y } } }], { useNativeDriver: false } )}>
 				<Formik
-					innerRef={form}
 					initialValues={values}
 					initialErrors={errors}
 					validationSchema={schema}
-					onSubmit={(values, actions) => onSubmit(values, actions)}
+					onSubmit={(v: typeof values) => onSubmit(v)}
 				>
 					{({ handleChange, handleSubmit, handleBlur, setFieldValue, values, errors, touched }) => (
 						<View style={styles.inputs}>
-							<InputGroup autoFocus type="email" label={__('form.email')} left="email-outline" value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
+							<InputView ref={inputs[0]} navs={[0, navs]} autoFocus type="email" label={schema.fields['email'].describe()?.['label']} left={schema.fields['email'].describe()?.['meta']?.icon + '-outline' as any} value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
 
 							<View style={styles.group}>
-								<InputGroup type="password" label={__('form.password')} left="lock-outline" value={values.password} errors={[touched.password, errors.password]} onBlur={handleBlur('password')} onChangeText={handleChange('password')} />
+								<InputView ref={inputs[1]} navs={[1, navs]} type="password" label={schema.fields['password'].describe()?.['label']} left={schema.fields['password'].describe()?.['meta']?.icon + '-outline' as any} value={values.password} errors={[touched.password, errors.password]} onBlur={handleBlur('password')} onChangeText={handleChange('password')} returnKeyType="done" />
 
 								<View style={styles.extras}>
 									<View style={styles.remember}>
@@ -77,74 +92,70 @@ export default function ({ navigation, route }: ScreenProps) {
 									</View>
 
 									<TouchableOpacity onPress={() => navigation.navigate('ForgotPassword', { email: values.email })}>
-										<Text style={[styles.link, styles.typo]}>{__('login.forgot')}</Text>
+										<Text style={[styles.typo, styles.link]}>{__('login.forgot')}</Text>
 									</TouchableOpacity>
 								</View>
 							</View>
 
 							<View style={styles.actions}>
-								<Button
-									disabled={!_.isEmpty(errors)}
-									labelStyle={[styles.submit, !_.isEmpty(errors) && { color: Color.body }]}
-									style={[styles.button, !_.isEmpty(errors) && { backgroundColor: Color.border }]}
-									onPress={handleSubmit as (e: GestureResponderEvent | React.FormEvent<HTMLFormElement> | undefined) => void}
-								>
-									{__('login.submit')}
-								</Button>
+								<TouchableOpacity disabled={!_.isEmpty(errors)} style={[styles.submit, !_.isEmpty(errors) && { backgroundColor: Color.border }]} onPress={handleSubmit as (e: GestureResponderEvent | React.FormEvent<HTMLFormElement> | undefined) => void}>
+									<Button labelStyle={[styles.button, !_.isEmpty(errors) && { color: Color.body }]}>{__('login.submit')}</Button>
+								</TouchableOpacity>
 
 								<View style={styles.other}>
 									<Text style={styles.text}>{__('login.other.0')}&nbsp;</Text>
 
 									<TouchableOpacity onPress={() => navigation.navigate('Register')}>
-										<Text style={[styles.link, styles.typo]}>{__('login.other.1')}</Text>
+										<Text style={[styles.typo, styles.link]}>{__('login.other.1')}</Text>
 									</TouchableOpacity>
 								</View>
 							</View>
 						</View>
 					)}
 				</Formik>
-			</View>
 
-			<View style={styles.providers}>
-				<View style={styles.divider}>
-					<View style={styles.line} />
-					<Text style={[styles.continue, styles.text]}>{__('login.continue')}</Text>
-					<View style={styles.line} />
+				<View style={styles.providers}>
+					<View style={styles.divider}>
+						<View style={styles.line} />
+						<Text style={[styles.continue, styles.text]}>{__('login.continue')}</Text>
+						<View style={styles.line} />
+					</View>
+
+					<View style={styles.socials}>
+						<TouchableOpacity style={styles.social} onPress={signInWithGoogle}>
+							<>
+								<Icon name="google" size={24} color={Color.danger} />
+								<Text style={[styles.provider, styles.text]}>Google</Text>
+							</>
+						</TouchableOpacity>
+
+						<TouchableOpacity style={styles.social} onPress={signInWithPhone}>
+							<>
+								<Icon name="phone" size={24} color={Color.primary} />
+								<Text style={[styles.provider, styles.text]}>Phone</Text>
+							</>
+						</TouchableOpacity>
+					</View>
 				</View>
+			</KeyboardAwareScrollView>
 
-				<View style={styles.socials}>
-					<TouchableHighlight style={styles.social} underlayColor={Color.primary} onPress={signInWithGoogle}>
-						<>
-							<Icon name="google" size={24} color={Color.primary} />
-							<Text style={[styles.provider, styles.text]}>Google</Text>
-						</>
-					</TouchableHighlight>
-
-					<TouchableOpacity style={styles.social} onPress={signInWithPhone}>
-						<>
-							<Icon name="phone" size={24} color={Color.primary} />
-							<Text style={[styles.provider, styles.text]}>Phone</Text>
-						</>
-					</TouchableOpacity>
-				</View>
-			</View>
-		</ScrollView>
+			{navs.fabs()}
+		</SafeAreaView>
 	)
 }
 
 const styles = StyleSheet.create({
 	screen: {
-		flex: 1
+		...StyleSheet.absoluteFillObject,
+		backgroundColor: Color.white
 	},
-	content: {
-		width,
+	header: {
 		gap: 16,
-		top: '10%'
+		justifyContent: 'center'
 	},
 	typo: {
-		fontWeight: '500',
 		textAlign: 'center',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.medium
 	},
 	title: {
 		fontSize: FontSize.x2l,
@@ -154,22 +165,20 @@ const styles = StyleSheet.create({
 		color: Color.body,
 		fontSize: FontSize.sm
 	},
-	form: {
-		width,
-		top: '28%',
-		position: 'absolute',
-		alignItems: 'center'
+	scroll: {
+		gap: 56,
+		paddingHorizontal: 40,
+		backgroundColor: Color.white
 	},
 	inputs: {
 		gap: 24
 	},
 	text: {
 		color: Color.body,
-		fontWeight: '500',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.medium
 	},
 	group: {
-		gap: 10
+		gap: 30
 	},
 	extras: {
 		alignItems: 'center',
@@ -179,14 +188,13 @@ const styles = StyleSheet.create({
 	remember: {
 		gap: 10,
 		alignItems: 'center',
-		flexDirection: 'row',
-		justifyContent: 'center'
+		flexDirection: 'row'
 	},
 	actions: {
 		gap: 20,
 		alignItems: 'center'
 	},
-	button: {
+	submit: {
 		width: width - 80,
 		flexDirection: 'row',
 		borderRadius: Border.xs,
@@ -194,15 +202,11 @@ const styles = StyleSheet.create({
 		paddingVertical: Padding.x2s,
 		backgroundColor: Color.primary
 	},
-	submit: {
-		width: width - 80,
-		// height: 40,
-		borderWidth: 1,
-		fontWeight: '600',
+	button: {
 		color: Color.white,
 		fontSize: FontSize.base,
 		textTransform: 'uppercase',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.semiBold
 	},
 	other: {
 		flexDirection: 'row'
@@ -210,17 +214,12 @@ const styles = StyleSheet.create({
 	link: {
 		color: Color.primary,
 		fontSize: FontSize.sm,
-		textDecorationLine: 'underline'
+		textDecorationLine: 'underline',
+		fontFamily: FontFamily.semiBoldItalic
 	},
 	providers: {
 		gap: 20,
-		left: 20,
-		right: 20,
-		top: '70%',
-		width: width - 40,
-		position: 'absolute',
-		alignItems: 'center',
-		flexDirection: 'column'
+		alignItems: 'center'
 	},
 	divider: {
 		gap: 20,
@@ -237,7 +236,9 @@ const styles = StyleSheet.create({
 	},
 	socials: {
 		gap: 20,
-		flexDirection: 'row'
+		flexWrap: 'wrap',
+		flexDirection: 'row',
+		justifyContent: 'center'
 	},
 	social: {
 		gap: 10,
@@ -249,7 +250,7 @@ const styles = StyleSheet.create({
 		backgroundColor: Color.background
 	},
 	provider: {
-		// display: 'none',
+		// display: 'none', // Toggle this to hide provider name
 		fontSize: FontSize.base
 	}
 })

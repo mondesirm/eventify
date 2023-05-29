@@ -1,13 +1,13 @@
 import { Asset } from 'expo-asset'
 import Constants from 'expo-constants'
 import * as SplashScreen from 'expo-splash-screen'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Animated, AppState, StyleSheet, View } from 'react-native'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 function AnimatedSplash({ children, image }) {
-	const animation = useMemo(() => new Animated.Value(1), [])
 	const appState = useRef(AppState.currentState)
 	const [appReady, setAppReady] = useState(false)
+	const animation = useRef(new Animated.Value(1)).current
 	const [isSplashAnimationComplete, setAnimationComplete] = useState(false)
 
 	useEffect(() => {
@@ -73,7 +73,7 @@ function AnimatedSplash({ children, image }) {
 	)
 }
 
-export default function Splash({ children, image }) {
+export default ({ children, image, fonts }) => {
 	const [isSplashReady, setSplashReady] = useState(false)
 
 	useEffect(() => {
@@ -85,7 +85,7 @@ export default function Splash({ children, image }) {
 		prepare()
 	}, [image])
 
-	if (!isSplashReady) return null
+	if (!isSplashReady || !fonts) return null
 
 	return <AnimatedSplash image={image}>{children}</AnimatedSplash>
 }

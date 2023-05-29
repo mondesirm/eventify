@@ -1,24 +1,103 @@
 {
+	"grant": {
+		"micro": "Nous avons besoin d'accéder à votre micro.",
+		"photos": "Nous avons besoin d'accéder à vos photos.",
+		"camera": "Nous avons besoin d'accéder à votre caméra.",
+		"subtitle": "Veuillez changer ça dans les paramètres de votre appareil."
+	},
 	"onboarding": {
 		"0": {
-			"title": "Bienvenue sur Eventify",
-			"subtitle": "Organisez vos événements en toute simplicité."
+			"title": "Bienvenue sur %{title}",
+			"subtitle": "Organisez vos événements en toute simplicité et sécurité."
 		},
 		"1": {
-			"title": "Créez un événement",
-			"subtitle": "Créez un événement et invitez vos amis."
+			"title": "Passer des\rmoments inoubliables",
+			"subtitle": "Invitez vos amis ou faites de nouvelles rencontres."
 		},
 		"2": {
-			"title": "Invitez vos amis",
-			"subtitle": "Invite your friends to your event."
+			"title": "Visualisez vos déplacements",
+			"subtitle": "Retracez vos pas sur une carte en temps réel."
 		},
 		"3": {
-			"title": "Recevez des notifications",
-			"subtitle": "Recevez des notifications pour ne rien rater."
+			"title": "Ne perdez pas\rle contact",
+			"subtitle": "Gardez un oeil sur vos amis quelque soit l'endroit où vous vous trouvez."
 		}
 	},
 	"get-started": "Commencer",
 	"skip": "Passer",
 	"back": "Retour",
-	"next": "Suivant"
+	"next": "Suivant",
+	"done": "Terminé",
+	"form": {
+		"username": "Nom d'utilisateur",
+		"phone": "Numéro de téléphone",
+		"email": "Adresse email",
+		"password": "Mot de passe",
+		"confirm": "Confirmer le mot de passe",
+		"code": "Code de vérification"
+	},
+	"login": {
+		"title": "Connectez-vous à %{title}",
+		"subtitle": "Nous vous attendions !",
+		"remember": "Se souvenir de moi",
+		"forgot": "Mot de passe oublié ?",
+		"submit": "Connexion",
+		"other": ["Pas encore de compte ?", "Créez-en un !"],
+		"continue": "Ou continuez avec",
+		"error": "Connexion échouée.",
+		"verify": "Veuillez vérifier votre compte avec le lien qui vous a été envoyé.",
+		"success": ["Bienvenue !", "Vous êtes maintenant connecté !"]
+	},
+	"register": {
+		"title": "Créez un compte",
+		"subtitle": "Rejoignez la communauté !",
+		"submit": "S'inscrire",
+		"other": ["Déjà inscrit ?", "Connectez-vous !"],
+		"error": "Création du compte échouée.",
+		"success": ["Votre compte a bien été créé !", "Un lien de vérification vous a été envoyé par email."]
+	},
+	"forgot": {
+		"title": "Récupérez votre mot de passe",
+		"subtitle": "Si le compte existe, un code vous sera envoyé.",
+		"expires": "Expire dans %{timer} s",
+		"expired": "Expiré",
+		"send": "Envoyer le code",
+		"resend": "Renvoyer le code ?",
+		"submit": "Réinitialiser le mot de passe",
+		"other": ["Besoin d'aide ?", "Contactez-nous !"],
+		"error": "Envoi du code par email échoué.",
+		"success": ["Un code de vérification vous a été envoyé par email.", "Veuillez le saisir ci-dessous."]
+	},
+	"reset": {
+		"error": "Réinitialisation du mot de passe échouée.",
+		"success": ["Votre mot de passe a bien été réinitialisé !", "Vous pouvez maintenant vous connecter avec."]
+	},
+	"errors": {
+		"size": ["La taille du fichier est trop petite.", "Elle ne doit pas dépasser %{size} Mo."],
+		"type": ["Le type de fichier est invalide.", "Seuls les fichiers de type \"%{type}\" sont autorisés."],
+		"min": "Doit contenir au moins %{min} caractères",
+		"max": "Doit contenir au plus %{max} caractères",
+		"length": "Doit contenir exactement %{length} caractères",
+		"email": "Doit être une adresse email valide",
+		"phone": "Numéros de téléphone français uniquement",
+		"required": "Le champ \"%{label}\" est requis",
+		"is": "Doit correspondre au champ \"%{is}\"",
+		"unique": "Le champ \"%{label}\" doit être unique",
+		"exists": "Le champ \"%{label}\" n'existe pas",
+		"connection": "Veuillez vérifier votre connexion internet.",
+		"auth": {
+			"missing-email": "L'adresse email est manquante.",
+			"invalid-email": "L'adresse email est invalide.",
+			"email-already-in-use": "L'adresse email est déjà utilisée.",
+			"weak-password": "Le mot de passe est trop faible.",
+			"wrong-password": "Le mot de passe est incorrect.",
+			"missing-password": "The password is missing.",
+			"user-disabled": "Le compte a été désactivé.",
+			"user-not-found": "Aucun compte n'a été trouvé.",
+			"operation-not-allowed": "L'opération n'est pas autorisée. Veuillez contacter un admin."
+		},
+		"storage": {
+			"object-not-found": "Le fichier recherché n'a pas été trouvé."
+		}
+	}
 }

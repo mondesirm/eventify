@@ -1,39 +1,63 @@
 import _ from 'lodash'
 import * as Yup from 'yup'
 import { Formik } from 'formik'
-import { useEffect, useState } from 'react'
 import { Button } from 'react-native-paper'
 import Toast from 'react-native-toast-message'
-import { NavigationProp } from '@react-navigation/native'
-import { Dimensions, GestureResponderEvent, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { fetchSignInMethodsForEmail } from 'firebase/auth'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { Animated, Dimensions, GestureResponderEvent, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
-import InputGroup from '@/components/InputGroup'
-import { usePreferences } from '@/contexts/PreferencesContext'
+import { auth } from '@/utils/firebase'
+import { AllowedScope } from '@/locales'
+import { useStoreActions } from '@/store'
+import InputView from '@/components/InputView'
+import { useI18n, useNavs } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
 interface ScreenProps {
-	navigation: NavigationProp<any, any>
+	navigation: StackNavigationProp<any, any>
 	route: { key: string, name: string, params: any }
 }
 
 const { width } = Dimensions.get('screen')
 
-export default function ({ navigation, route }: ScreenProps) {
-	const { i18n: { __ } } = usePreferences()
+export default ({ navigation, route }: ScreenProps) => {
+	const { __ } = useI18n()
 	const [code, setCode] = useState('')
 	const [timer, setTimer] = useState(0)
+	const y = useRef(new Animated.Value(0)).current
 	const [emailWasSent, setEmailWasSent] = useState(false)
+	const resetPassword = useStoreActions(({ auth }) => auth.resetPassword)
+	// const resetPassword = ({ email, code }) => Promise.resolve({ email, code })
+
+	const animation = {
+		height: y.interpolate({ inputRange: [0, 150 - 80], outputRange: [150, 80], extrapolate: 'clamp' }),
+		transform: [{ scale: y.interpolate({ inputRange: [0, 150 - 80], outputRange: [1, .8], extrapolate: 'clamp' }) }]
+	}
 
 	const schema = Yup.object().shape({
-		email: Yup.string().email().required(),
-		code: Yup.string().length(6).required().oneOf([code], 'Code doesn\'t match.')
+		email: Yup.string()
+			.meta({ icon: 'email'})
+			.label(__('form.email'))
+			.email(__('errors.email'))
+			.required(e => __('errors.required', e))
+			.test('exists', e => __('errors.exists', e), v => fetchSignInMethodsForEmail(auth, v).then(m => m.length !== 0).catch(() => false)),
+		code: Yup.string()
+			.meta({ icon: 'key'})
+			.label(__('form.code'))
+			.length(6, e => __('errors.length', e))
+			.required(e => __('errors.required', e))
+			.is([code], __('errors.is', { is: __('form.code') }))
 	})
-	
-	const errors = _.mapValues(schema.fields, () => '')
-	const values: Record<keyof Yup.InferType<typeof schema>, string> = errors
-	values.email = route.params?.email || ''
 
-	useEffect(() => console.log('code', code), [code])
+	const errors = _.mapValues(schema.fields, () => '')
+	const values: Record<keyof Yup.InferType<typeof schema>, string> = { ...errors, email: route.params?.email || '' }
+	const inputs = Array.from({ length: _.keys(values).length }, () => useRef<TextInput>())
+	const navs = useNavs(inputs)
+
+	useEffect(() => { if (code) console.log('code', code) }, [code])
 
 	useEffect(() => {
 		if (timer > 0) {
@@ -44,111 +68,101 @@ export default function ({ navigation, route }: ScreenProps) {
 		setCode('')
 	}, [timer])
 
-	const sendEmail = (email: string) => {
+	const sendEmail: (email: string) => Promise<AllowedScope[]> = (email: string) => {
 		setEmailWasSent(true)
 		setCode(Math.random().toString(36).substring(2, 8).toUpperCase())
 		setTimer(60)
-		return Promise.resolve({ email })
+		// TODO: send email
+		return Promise.resolve(['forgot.success.0', 'forgot.success.1'])
 	}
-
-	const resetPassword = ({ email, code }) => Promise.resolve({ email, code })
 
 	const getCode = (email: string) => {
 		sendEmail(email)
-			.then(res => Toast.show({ type: 'success', text1: 'Password Reset Email Sent', text2: 'Please check your mail inbox for it.' }))
-			.catch(err => setTimeout(() => Toast.show({ type: 'error', text1: 'Password Reset Email Error', text2: JSON.stringify(err) }), 1000))
+			.then(res => Toast.show({ text1: __(res[0]), text2: __(res[1]) }))
+			.catch(err => Toast.show({ type: 'error', text1: __('forgot.error') }))
 	}
 
-	const onSubmit = ({ email, code }, actions: any) => {
-		if (!emailWasSent || !code) return Toast.show({ type: 'error', text1: 'Invalid Code', text2: 'Please check your mail inbox for it or retry.' })
+	const onSubmit = ({ email, code }) => {
+		if (!emailWasSent || !code) return Toast.show({ type: 'error', text1: __('reset.error') })
 
-		resetPassword({ email, code })
+		resetPassword(email)
 			.then(res => {
-				Toast.show({ type: 'success', text1: 'Password Reset Successfully', text2: 'Please login with your new password.' })
+				Toast.show({ text1: __(res[0]), text2: __(res[1]) })
 				navigation.navigate('Login', { email })
-			}).catch(err => setTimeout(() => Toast.show({ type: 'error', text1: 'Password Reset Email Error', text2: JSON.stringify(err) }), 1000))
+			}).catch(err => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
 	}
 
 	return (
-		<ScrollView style={styles.screen} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-			<View style={styles.content}>
+		<SafeAreaView style={styles.screen}>
+			<Animated.View style={[styles.header, animation]}>
 				<Text style={[styles.title, styles.typo]}>{__('forgot.title')}</Text>
 				<Text style={[styles.subtitle, styles.typo]}>{__('forgot.subtitle')}</Text>
-			</View>
+			</Animated.View>
 
-			<View style={styles.form}>
+			<KeyboardAwareScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" scrollEventThrottle={16} onScroll={Animated.event([{ nativeEvent: { contentOffset: { y } } }], { useNativeDriver: false } )}>
 				<Formik
 					initialValues={values}
 					initialErrors={errors}
 					validationSchema={schema}
-					onSubmit={(values, actions) => onSubmit(values, actions)}
+					onSubmit={(v: typeof values) => onSubmit(v)}
 				>
 					{({ handleChange, handleSubmit, handleBlur, values, errors, touched }) => (
 						<View style={styles.inputs}>
-							<InputGroup autoFocus type="email" label={__('form.email')} left="email-outline" value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
+							<InputView ref={inputs[0]} navs={[0, navs]} autoFocus type="email" label={schema.fields['email'].describe()?.['label']} left={schema.fields['email'].describe()?.['meta']?.icon + '-outline' as any} value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
 
 							<View style={styles.group}>
-								{emailWasSent && <InputGroup type="code" label={__('form.code')} left="key-outline" value={values.code} errors={[touched.code, errors.code]} onBlur={handleBlur('code')} onChangeText={handleChange('code')} />}
+								{emailWasSent && <InputView ref={inputs[1]} navs={[1, navs]} type="code" label={schema.fields['code'].describe()?.['label']} left={schema.fields['code'].describe()?.['meta']?.icon + '-outline' as any} value={values.code} errors={[touched.code, errors.code]} onBlur={handleBlur('code')} onChangeText={handleChange('code')} />}
 
 								<View style={[styles.extras, !emailWasSent && { display: 'none' }]}>
-									<Text style={styles.text}>{timer > 0 ? __('forgot.expires') + ' ' +  timer + 's' : __('forgot.expired')}</Text>
+									<Text style={styles.text}>{timer > 0 ? __('forgot.expires', { timer }) : __('forgot.expired')}</Text>
 
-									<TouchableOpacity onPress={() => touched.email && !errors.email && getCode(values.email)}>
-										<Text style={[styles.link, styles.typo]}>{__('forgot.resend')}</Text>
+									<TouchableOpacity disabled={timer > 30} style={timer > 30 && { opacity: .2 }} onPress={() => touched.email && !errors.email && getCode(values.email)}>
+										<Text style={[styles.typo, styles.link]}>{__('forgot.resend')}</Text>
 									</TouchableOpacity>
 								</View>
 							</View>
 
 							<View style={styles.actions}>
 								{emailWasSent ? (
-									<Button
-										disabled={!_.isEmpty(errors) || timer <= 0}
-										labelStyle={[styles.submit, (!_.isEmpty(errors) || timer <= 0) && { color: Color.body }]}
-										style={[styles.button, (!_.isEmpty(errors) || timer <= 0) && { backgroundColor: Color.border }]}
-										onPress={handleSubmit as (e: GestureResponderEvent | React.FormEvent<HTMLFormElement> | undefined) => void}
-									>
-										{__('forgot.submit')}
-									</Button>
+									<TouchableOpacity disabled={!_.isEmpty(errors) || timer <= 0} style={[styles.submit, (!_.isEmpty(errors) || timer <= 0) && { backgroundColor: Color.border }]} onPress={handleSubmit as (e: GestureResponderEvent | React.FormEvent<HTMLFormElement> | undefined) => void}>
+										<Button labelStyle={[styles.button, (!_.isEmpty(errors) || timer <= 0) && { color: Color.body }]}>{__('forgot.submit')}</Button>
+									</TouchableOpacity>
 								) : (
-									<Button
-										disabled={(!touched.email || !_.isEmpty(errors.email))}
-										labelStyle={[styles.submit, (!touched.email || !_.isEmpty(errors.email)) && { color: Color.body }]}
-										style={[styles.button, (!touched.email || !_.isEmpty(errors.email)) && { backgroundColor: Color.border }]}
-										onPress={() => getCode(values.email)}
-									>
-										{__('forgot.send')}
-								</Button>
+									<TouchableOpacity disabled={(!touched.email || !_.isEmpty(errors.email))} style={[styles.submit, (!touched.email || !_.isEmpty(errors.email)) && { backgroundColor: Color.border }]} onPress={() => getCode(values.email)}>
+										<Button labelStyle={[styles.button, (!touched.email || !_.isEmpty(errors.email)) && { color: Color.body }]}>{__('forgot.send')}</Button>
+									</TouchableOpacity>
 								)}
 
 								<View style={styles.other}>
 									<Text style={styles.text}>{__('forgot.other.0')}&nbsp;</Text>
 
 									{/* <TouchableOpacity onPress={() => navigation.navigate('Contact')}> */}
-										<Text style={[styles.link, styles.typo]}>{__('forgot.other.1')}</Text>
+										<Text style={[styles.typo, styles.link]}>{__('forgot.other.1')}</Text>
 									{/* </TouchableOpacity> */}
 								</View>
 							</View>
 						</View>
 					)}
 				</Formik>
-			</View>
-		</ScrollView>
+			</KeyboardAwareScrollView>
+
+			{navs.fabs()}
+		</SafeAreaView>
 	)
 }
 
 const styles = StyleSheet.create({
 	screen: {
-		flex: 1
+		...StyleSheet.absoluteFillObject,
+		backgroundColor: Color.white
 	},
-	content: {
-		width,
+	header: {
 		gap: 16,
-		top: '10%'
+		justifyContent: 'center'
 	},
 	typo: {
-		fontWeight: '500',
 		textAlign: 'center',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.medium
 	},
 	title: {
 		fontSize: FontSize.x2l,
@@ -158,22 +172,20 @@ const styles = StyleSheet.create({
 		color: Color.body,
 		fontSize: FontSize.sm
 	},
-	form: {
-		width,
-		top: '28%',
-		position: 'absolute',
-		alignItems: 'center'
+	scroll: {
+		gap: 56,
+		paddingHorizontal: 40,
+		backgroundColor: Color.white
 	},
 	inputs: {
 		gap: 24
 	},
 	text: {
 		color: Color.body,
-		fontWeight: '500',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.medium
 	},
 	group: {
-		gap: 10
+		gap: 30
 	},
 	extras: {
 		alignItems: 'center',
@@ -184,7 +196,7 @@ const styles = StyleSheet.create({
 		gap: 20,
 		alignItems: 'center'
 	},
-	button: {
+	submit: {
 		width: width - 80,
 		flexDirection: 'row',
 		borderRadius: Border.xs,
@@ -192,15 +204,11 @@ const styles = StyleSheet.create({
 		paddingVertical: Padding.x2s,
 		backgroundColor: Color.primary
 	},
-	submit: {
-		width: width - 80,
-		// height: 40,
-		borderWidth: 1,
-		fontWeight: '600',
+	button: {
 		color: Color.white,
 		fontSize: FontSize.base,
 		textTransform: 'uppercase',
-		fontFamily: FontFamily.primary
+		fontFamily: FontFamily.semiBold
 	},
 	other: {
 		flexDirection: 'row'
@@ -208,6 +216,7 @@ const styles = StyleSheet.create({
 	link: {
 		color: Color.primary,
 		fontSize: FontSize.sm,
-		textDecorationLine: 'underline'
+		textDecorationLine: 'underline',
+		fontFamily: FontFamily.semiBoldItalic
 	}
 })

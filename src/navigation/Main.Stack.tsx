@@ -9,7 +9,7 @@ import { Color, FontFamily } from 'globals'
 const { Navigator, Screen } = createBottomTabNavigator()
 
 export default function () {
-	const screens: { name: string, component: any, Iconly: any }[] = [
+	const screens = [
 		{ name: 'Home', component: Home, Iconly: Iconly.Home },
 		{ name: 'Calendar', component: Blank, Iconly: Iconly.Calendar },
 		{ name: 'Explore', component: Blank, Iconly: Iconly.Category },
@@ -24,11 +24,11 @@ export default function () {
 					options={{
 						tabBarIcon: _ => (
 							<View style={{ bottom: Platform.OS === 'ios' ? -5 : 0 }}>
-								<Iconly set={_.focused && 'bulk'} />
+								<Iconly set={_.focused ? 'bulk' : undefined} />
 							</View>
 						),
 						tabBarShowLabel: false, // With and without both look good
-						tabBarLabel: _ => <Text style={{ fontFamily: FontFamily.primary, fontSize: 12, color: _.focused ? Color.primary : _.color }}>{_.children}</Text>
+						tabBarLabel: _ => <Text style={{ fontFamily: FontFamily.medium, fontSize: 12, color: _.focused ? Color.primary : _.color }}>{_.children}</Text>
 					}}
 				/>
 			))}
