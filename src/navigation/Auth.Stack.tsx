@@ -14,9 +14,9 @@ const screens = [
 	{ name: 'MainStack', component: MainStack }
 ]
 
-export default function AuthStack() {
+export default () => {
 	return (
-		<Navigator initialRouteName="Login" screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
+		<Navigator initialRouteName={screens[0].name} screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
 			{screens.map(({ name, component }) => <Screen key={name} name={name} component={component} />)}
 		</Navigator>
 	)

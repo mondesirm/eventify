@@ -1,30 +1,37 @@
+import { MemoExoticComponent } from 'react'
 import { Platform, Text, View } from 'react-native'
+import { NavigationProp } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
-import Iconly from '@/icons'
 import Blank from '@/screens/Blank'
-import Home from '@/screens/main/Home'
+import Icons, { Icon } from '@/icons'
 import { Color, FontFamily } from 'globals'
+import HomeStack from '@/navigation/Home.Stack'
+
+interface ScreenProps {
+	navigation: NavigationProp<any, any>
+	route: { key: string, name: string, params: any }
+}
 
 const { Navigator, Screen } = createBottomTabNavigator()
 
-export default function () {
-	const screens = [
-		{ name: 'Home', component: Home, Iconly: Iconly.Home },
-		{ name: 'Calendar', component: Blank, Iconly: Iconly.Calendar },
-		{ name: 'Explore', component: Blank, Iconly: Iconly.Category },
-		{ name: 'Chat', component: Blank, Iconly: Iconly.Chat },
-		{ name: 'Profile', component: Blank, Iconly: Iconly.User }
+export default () => {
+	const screens: { name: string, component: (props: ScreenProps) => JSX.Element, icon: Lowercase<keyof typeof Icons> }[] = [
+		{ name: 'HomeStack', component: HomeStack, icon: 'home' },
+		{ name: 'Calendar', component: Blank, icon: 'calendar' },
+		{ name: 'Explore', component: Blank, icon: 'category' },
+		{ name: 'Chat', component: Blank, icon: 'chat' },
+		{ name: 'Profile', component: Blank, icon: 'user' }
 	]
 
 	return (
-		<Navigator screenOptions={{ headerShown: false }}>
-			{screens.map(({ name, component, Iconly }, i) => (
+		<Navigator initialRouteName={screens[0].name} screenOptions={{ headerShown: false }}>
+			{screens.map(({ name, component, icon }, i) => (
 				<Screen key={i} name={name} component={component}
 					options={{
 						tabBarIcon: _ => (
 							<View style={{ bottom: Platform.OS === 'ios' ? -5 : 0 }}>
-								<Iconly set={_.focused ? 'bulk' : undefined} />
+								<Icon name={icon} set={_.focused ? 'bulk' : 'two-tone'} />
 							</View>
 						),
 						tabBarShowLabel: false, // With and without both look good

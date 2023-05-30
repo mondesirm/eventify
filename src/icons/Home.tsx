@@ -4,13 +4,12 @@ import { G, Path } from 'react-native-svg'
 import { withIcon } from '@/contexts/IconlyContext'
 
 type Props = {
-	color?: string
-	secondaryColor?: string
 	set?: string
+	color?: string
 	strokeWidth?: string | number
 }
 
-const Home = ({ color, strokeWidth, set }: Props) => {
+const Home = ({ set, color, strokeWidth }: Props) => {
 	const Bold = () => (
 		<G transform="translate(2.5 2)">
 			<Path d="M6.635,18.773V15.716A1.419,1.419,0,0,1,8.058,14.3h2.874a1.429,1.429,0,0,1,1.007.414,1.408,1.408,0,0,1,.417,1v3.058a1.213,1.213,0,0,0,.356.867,1.231,1.231,0,0,0,.871.36h1.961a3.46,3.46,0,0,0,2.443-1A3.41,3.41,0,0,0,19,16.578V7.867a2.473,2.473,0,0,0-.9-1.9L11.434.676A3.1,3.1,0,0,0,7.485.747L.967,5.965A2.474,2.474,0,0,0,0,7.867v8.7A3.444,3.444,0,0,0,3.456,20H5.372a1.231,1.231,0,0,0,1.236-1.218Z" fill={color} />

@@ -4,7 +4,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Animated, AppState, StyleSheet, View } from 'react-native'
 
-function AnimatedSplash({ children, image }) {
+const AnimatedSplash = ({ children, image }) => {
 	const appState = useRef(AppState.currentState)
 	const [appReady, setAppReady] = useState(false)
 	const animation = useRef(new Animated.Value(1)).current
@@ -77,7 +77,7 @@ export default ({ children, image, fonts }) => {
 	const [isSplashReady, setSplashReady] = useState(false)
 
 	useEffect(() => {
-		async function prepare() {
+		const prepare = async () => {
 			await Asset.fromURI(image.uri).downloadAsync()
 			setSplashReady(true)
 		}

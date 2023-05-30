@@ -44,6 +44,7 @@ export const Color = {
 	heading: '#1c1f34',
 	body: '#6c757d',
 	border: '#ebebeb',
+	ghostwhite: '#f0f0fa',
 	background: '#f6f7f9',
 	chat: {
 		// icon: '#b5bac1',
@@ -59,14 +60,16 @@ export const Padding = {
 	sm: 15, // TODO change to 14
 	base: 16,
 	lg: 18,
-	xl: 20
+	xl: 20,
+	x4l: 26
 } as const
 
 /* Borders */
 export const Border = {
 	x3s: 8,
 	xs: 12,
-	xl: 20
+	xl: 20,
+	x3l: 24
 } as const
 
 export const IconSizes = {

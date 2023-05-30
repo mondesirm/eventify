@@ -34,7 +34,7 @@ const images = [
 
 const steps = images.map((image, key) => ({ image, key }))
 
-export default function ({ navigation }: ScreenProps) {
+export default ({ navigation }: ScreenProps) => {
 	const { __ } = useI18n()
 	const slider = useRef<AppIntroSlider>(null)
 	const scrollX = useRef(new Animated.Value(0)).current

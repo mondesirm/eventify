@@ -1,13 +1,13 @@
 import { CardStyleInterpolators, createStackNavigator, } from '@react-navigation/stack'
 
-import Onboarding from '@/screens/Onboarding'
-import AuthStack from '@/navigation/Auth.Stack'
+import Blank from '@/screens/Blank'
+import Home from '@/screens/main/Home'
 
 const { Navigator, Screen } = createStackNavigator()
 
 const screens = [
-	{ name: 'Onboarding', component: Onboarding },
-	{ name: 'AuthStack', component: AuthStack }
+	{ name: 'Home', component: Home },
+	{ name: 'Category', component: Blank }
 ]
 
 export default () => {

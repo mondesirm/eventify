@@ -4,14 +4,14 @@ import { Circle, G, Path } from 'react-native-svg'
 import { withIcon } from '@/contexts/IconlyContext'
 
 type Props = {
-	opacity?: string
-	color?: string
-	secondaryColor?: string
 	set?: string
+	color?: string
+	opacity?: string
+	secondaryColor?: string
 	strokeWidth?: string | number
 }
 
-const User = ({ color, secondaryColor, strokeWidth, opacity, set }: Props) => {
+const User = ({ set, color, opacity, secondaryColor, strokeWidth }: Props) => {
 	const Bold = () => (
 		<G transform="translate(4 2)">
 			<Path d="M0,16.575c0-2.722,3.686-3.4,8-3.4,4.339,0,8,.7,8,3.424S12.315,20,8,20C3.662,20,0,19.3,0,16.575ZM2.706,5.291A5.294,5.294,0,1,1,8,10.583,5.274,5.274,0,0,1,2.706,5.291Z" transform="translate(0 0)" fill={color} />

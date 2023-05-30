@@ -34,7 +34,8 @@
 		"email": "Email Address",
 		"password": "Password",
 		"confirm": "Confirm Password",
-		"code": "Verification Code"
+		"code": "Verification Code",
+		"search": "Search"
 	},
 	"login": {
 		"title": "Sign in to %{title}",

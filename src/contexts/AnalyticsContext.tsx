@@ -17,7 +17,7 @@ export const useAnalytics = () => {
 	return context
 }
 
-export default function ({ children }) {
+export default ({ children }) => {
 	const value = {
 	}
 

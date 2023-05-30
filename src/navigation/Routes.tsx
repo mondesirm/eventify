@@ -3,7 +3,7 @@ import AuthStack from '@/navigation/Auth.Stack'
 import MainStack from '@/navigation/Main.Stack'
 import OnboardingStack from '@/navigation/Onboarding.Stack'
 
-export default function Routes() {
+export default () => {
 	const role = useStoreState(({ user }) => user.role)
 	const firstTime = true
 
@@ -14,6 +14,6 @@ export default function Routes() {
 		case 'user':
 			return <MainStack />
 		default:
-			return firstTime ? <OnboardingStack /> : <AuthStack />
+			return firstTime ? <MainStack /> : <AuthStack />
 	}
 }

@@ -4,7 +4,7 @@ import NetInfo from '@react-native-community/netinfo'
 import Routes from '@/navigation/Routes'
 import { useStoreActions } from '@/store'
 
-export default function NavigationProvider() {
+export default () => {
 	const { restoreSession, setNetInfoState } = useStoreActions(actions => ({
 		restoreSession: actions.auth.restoreSession,
 		setNetInfoState: actions.utils.setNetInfoState

@@ -1,20 +1,20 @@
 import _ from 'lodash'
 import { forwardRef, useState } from 'react'
-import { MD3Colors, TextInput } from 'react-native-paper'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { I18nManager, Platform, StyleSheet, Text, View } from 'react-native'
-import { Props } from 'react-native-paper/lib/typescript/src/components/TextInput/TextInput'
+import { MD3Colors, TextInput, TextInputProps } from 'react-native-paper'
+import { I18nManager, Platform, StyleSheet, Text } from 'react-native'
 
+import Icons from '@/icons'
 import { useNavs } from '@/contexts/PreferencesContext'
-import { Border, Color, FontFamily, FontSize } from 'globals'
+import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
-interface InputViewProps extends Props {
-	errors?: [boolean, string]
-	type?: string
+export interface InputViewProps<T = 'search'> extends TextInputProps {
 	navs?: [number, ReturnType<typeof useNavs>]
-	left?: keyof typeof MaterialCommunityIcons.glyphMap
-	right?: keyof typeof MaterialCommunityIcons.glyphMap
+	type?: string
+	left?: T extends 'search' ? Lowercase<keyof typeof Icons> : keyof typeof MaterialCommunityIcons.glyphMap
+	right?: T extends 'search' ? Lowercase<keyof typeof Icons> : keyof typeof MaterialCommunityIcons.glyphMap
+	errors?: [boolean, any]
 	onPressLeft?: () => void
 	onPressRight?: () => void
 }
@@ -29,21 +29,22 @@ export default forwardRef((props: InputViewProps, ref) => {
 		username: ['username', 'default'],
 		phone: ['tel', 'phone-pad'],
 		email: ['email', 'email-address'],
-		password: ['password', 'visible-password']
+		password: ['password', 'visible-password'],
+		search: ['off', 'web-search']
 	}
 
 	const isPassword = ['password', 'confirm'].includes(props.type)
 	const toggle = secureTextEntry ? 'eye-outline' : 'eye-off-outline'
 
 	return (
-		<View>
+		<>
 			<TextInput
 				{...props}
 				ref={ref}
-				error={props.errors[0] && props.errors[1] as any}
+				error={props.errors?.[0] && props.errors?.[1] as any}
 				value={props?.type === 'phone' ? props.value.replace(/[\D]/g, '') : props.value.trim()}
 				mode={props.mode || 'outlined'}
-				placeholder={typeof props.label === 'string' && props.label}
+				placeholder={props.placeholder || typeof props.label === 'string' && props.label}
 				secureTextEntry={isPassword && secureTextEntry}
 				outlineStyle={props.outlineStyle || styles.input}
 				outlineColor={props.outlineColor || 'transparent'}
@@ -56,12 +57,17 @@ export default forwardRef((props: InputViewProps, ref) => {
 				enablesReturnKeyAutomatically
 				onPressIn={() => props.navs && props.navs[1]?.setCurr(props.navs?.[0])}
 				onSubmitEditing={() => props.navs && props.navs[1]?.next(props.navs?.[0])}
-				left={props.left && <TextInput.Icon icon={() => <Icon name={props.left} size={24} color={Color.primary} />} onPress={props.onPressLeft} />}
-				right={(isPassword || props.right) && <TextInput.Icon icon={() => <Icon name={isPassword ? toggle : props.right} size={24} color={Color.primary} />} onPress={() => isPassword ? setSecureTextEntry(!secureTextEntry) : props.onPressRight} />}
+				left={props.left && <TextInput.Icon icon={() => props.type === 'search'
+					? <Icons.Location />
+					: <Icon name={props.left as keyof typeof MaterialCommunityIcons.glyphMap} size={24} color={Color.primary} />} onPress={props.onPressLeft} />
+				}
+				right={(isPassword || props.right) && <TextInput.Icon icon={() => props.type === 'search'
+					? <Icons.Discovery />
+					: <Icon name={isPassword ? toggle : props.right as keyof typeof MaterialCommunityIcons.glyphMap} size={24} color={Color.primary} />} onPress={() => isPassword ? setSecureTextEntry(!secureTextEntry) : props.onPressRight} />}
 			/>
 
-			{props.errors[0] && props.errors[1] && <Text style={styles.error}>{props.errors[1].charAt(0).toUpperCase() + props.errors[1].slice(1).toLowerCase()}.</Text>}
-		</View>
+			{props.errors?.[0] && props.errors?.[1] && <Text style={styles.error}>{props.errors[1].charAt(0).toUpperCase() + props.errors[1].slice(1).toLowerCase()}.</Text>}
+		</>
 	)
 }) as React.FC<InputViewProps>
 
@@ -82,5 +88,24 @@ const styles = StyleSheet.create({
 		fontSize: 10,
 		position: 'absolute',
 		color: MD3Colors.error50
+	},
+	box: {
+		shadowOffset: {
+			width: 0,
+			height: 24
+		},
+		shadowRadius: 10,
+		shadowOpacity: 1,
+		alignItems: 'center',
+		shadowColor: '#0002',
+		flexDirection: 'row',
+		padding: Padding.base,
+		borderRadius: Border.x3s,
+		backgroundColor: Color.white
+	},
+	location: {
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between'
 	}
 })

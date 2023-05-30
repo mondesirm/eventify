@@ -1,14 +1,18 @@
-import { useEffect, useRef } from 'react'
 import Constants from 'expo-constants'
 import { FAB } from 'react-native-paper'
+import { useEffect, useState } from 'react'
+import { LinearGradient } from 'expo-linear-gradient'
 import { NavigationProp } from '@react-navigation/native'
 // import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { Animated, Dimensions, I18nManager, ImageBackground, Platform, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Animated, Dimensions, I18nManager, ImageBackground, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
 
+import Icons from '@/icons'
 import { useStoreState } from '@/store'
 import Carousel from '@/components/Carousel'
+import SearchBar from '@/components/SearchBar'
+import Categories from '@/components/Categories'
 import { Color, FontFamily, FontSize } from 'globals'
-import { useI18n } from '@/contexts/PreferencesContext'
+import { useI18n, useNavs } from '@/contexts/PreferencesContext'
 
 interface ScreenProps {
 	navigation: NavigationProp<any, any>
@@ -18,7 +22,7 @@ interface ScreenProps {
 const { width } = Dimensions.get('screen')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
-const images = new Array(4).fill('https://images.unsplash.com/photo-1556740749-887f6717d7e4')
+const images = new Array(4).fill('https://loremflickr.com/640/480/people')
 
 // const images = [
 // 	require('@/assets/onboarding/0.png'),
@@ -27,33 +31,32 @@ const images = new Array(4).fill('https://images.unsplash.com/photo-1556740749-8
 // 	require('@/assets/onboarding/3.png')
 // ]
 
-const carousel = images.map((image, key) => ({ image: { uri: image }, key }))
+const carousel = images.map((uri, key) => ({ image: { uri }, key }))
 
-export default function ({ navigation, route }: ScreenProps) {
+export default ({ navigation, route }: ScreenProps) => {
 	const { __ } = useI18n()
+	const { dismiss } = useNavs()
+	const [search, setSearch] = useState('')
 	const currentUser = useStoreState(({ user }) => user.currentUser)
 
-	useEffect(() => { console.log('Home', currentUser?.email) }, [])
+	// useEffect(() => { console.log('Home', currentUser?.email) }, [])
 
 	return (
-		<ScrollView style={styles.screen} keyboardShouldPersistTaps="handled">
+		<ScrollView style={styles.screen} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
 			<Carousel items={carousel} color={Color.white} autoplay>
 				{({ image }) => (
-					<View style={{ width, height: 250 }}>
+					// TODO fix gradient
+					<LinearGradient style={{ height: 250 }} locations={[0, 1]} colors={['#000', '#0000']}>
 						<ImageBackground style={styles.screen} source={image} />
-					</View>
+					</LinearGradient>
 				)}
 			</Carousel>
 
 			<FAB style={styles.fab} icon="bell-outline" onPress={() => console.log('Pressed')} />
 
-			<View style={styles.content}>
-				<Text style={[styles.title, styles.typo]}>
-					{__('onboarding.0.title', { title: Constants.manifest.name })}
-				</Text>
-				<Text style={[styles.subtitle, styles.typo]}>
-					{__('onboarding.0.subtitle')}
-				</Text>
+			<View style={[styles.content, { marginTop: -28 }]}>
+				<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
+				<Categories max={6} />
 			</View>
 		</ScrollView>
 	)
@@ -61,15 +64,15 @@ export default function ({ navigation, route }: ScreenProps) {
 
 const styles = StyleSheet.create({
 	screen: {
-		flex: 1
+		...StyleSheet.absoluteFillObject,
+		backgroundColor: Color.white
 	},
 	content: {
-		width,
-		gap: 16,
-		top: '10%'
+		gap: 32,
+		marginBottom: 20,
+		paddingHorizontal: 20
 	},
 	typo: {
-		fontWeight: '500',
 		textAlign: 'center',
 		fontFamily: FontFamily.medium
 	},

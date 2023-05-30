@@ -56,7 +56,7 @@ export const withIcon = (Component: React.ElementType): React.MemoExoticComponen
 	return MemoIcon
 }
 
-export default function ({ children, primaryColor, secondaryColor, set, size, stroke }: IconlyContextProps & { children: React.ReactNode }) {
+export default ({ children, primaryColor, secondaryColor, set, size, stroke }: IconlyContextProps & { children: React.ReactNode }) => {
 	const value = {
 		primaryColor: primaryColor || 'currentColor',
 		secondaryColor,

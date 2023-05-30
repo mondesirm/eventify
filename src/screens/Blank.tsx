@@ -12,7 +12,7 @@ interface ScreenProps {
 
 const { width } = Dimensions.get('screen')
 
-export default function (props: ScreenProps) {
+export default (props: ScreenProps) => {
 	const { __ } = useI18n()
 
 	return (

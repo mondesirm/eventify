@@ -28,7 +28,7 @@ export const usePreferences = () => {
 
 export const useI18n = () => usePreferences().i18n
 
-export const useNavs = (inputs: React.MutableRefObject<TextInput>[], style: typeof FAB.defaultProps.style = { right: 20, position: 'absolute', backgroundColor: Color.primary }) => {
+export const useNavs = (inputs: React.MutableRefObject<TextInput>[] = [], style: typeof FAB.defaultProps.style = { right: 20, position: 'absolute', backgroundColor: Color.primary }) => {
 	const [curr, setCurr] = useState(0)
 	const [visible, setVisible] = useState(false)
 
@@ -42,13 +42,13 @@ export const useNavs = (inputs: React.MutableRefObject<TextInput>[], style: type
 
 	const prev = (index: number = curr) => {
 		if (index === 0) return
-		inputs[index - 1].current?.focus()
+		inputs?.[index - 1].current?.focus()
 		setCurr(index - 1)
 	}
 
 	const next = (index: number = curr) => {
 		if (index === inputs.length - 1) return
-		inputs[index + 1].current?.focus()
+		inputs?.[index + 1].current?.focus()
 		setCurr(index + 1)
 	}
 
@@ -64,7 +64,7 @@ export const useNavs = (inputs: React.MutableRefObject<TextInput>[], style: type
 	return { curr, setCurr, prev, next, fabs, dismiss }
 }
 
-export default function ({ children }: { children: React.ReactNode }) {
+export default ({ children }: { children: React.ReactNode }) => {
 	const i18n: CustomI18n = new I18n(locales, { defaultSeparator: '/' })
 	i18n.enableFallback = true
 	i18n.missingBehavior = 'error' // TODO put 'guess' in production, 'error' in local
