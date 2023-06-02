@@ -10,7 +10,7 @@ const screens = [
 	{ name: 'AuthStack', component: AuthStack }
 ]
 
-export default () => {
+export default function OnboardingStack() {
 	return (
 		<Navigator initialRouteName={screens[0].name} screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
 			{screens.map(({ name, component }) => <Screen key={name} name={name} component={component} />)}

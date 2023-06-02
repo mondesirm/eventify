@@ -9,10 +9,10 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Animated, Dimensions, GestureResponderEvent, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
+import Input from '@/components/Input'
 import { auth } from '@/utils/firebase'
 import { AllowedScope } from '@/locales'
 import { useStoreActions } from '@/store'
-import InputView from '@/components/InputView'
 import { useI18n, useNavs } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
@@ -108,10 +108,10 @@ export default ({ navigation, route }: ScreenProps) => {
 				>
 					{({ handleChange, handleSubmit, handleBlur, values, errors, touched }) => (
 						<View style={styles.inputs}>
-							<InputView ref={inputs[0]} navs={[0, navs]} autoFocus type="email" label={schema.fields['email'].describe()?.['label']} left={schema.fields['email'].describe()?.['meta']?.icon + '-outline' as any} value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
+							<Input ref={inputs[0]} navs={[0, navs]} autoFocus type="email" label={schema.fields['email'].describe()?.['label']} left={schema.fields['email'].describe()?.['meta']?.icon + '-outline' as any} value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
 
 							<View style={styles.group}>
-								{emailWasSent && <InputView ref={inputs[1]} navs={[1, navs]} type="code" label={schema.fields['code'].describe()?.['label']} left={schema.fields['code'].describe()?.['meta']?.icon + '-outline' as any} value={values.code} errors={[touched.code, errors.code]} onBlur={handleBlur('code')} onChangeText={handleChange('code')} />}
+								{emailWasSent && <Input ref={inputs[1]} navs={[1, navs]} type="code" label={schema.fields['code'].describe()?.['label']} left={schema.fields['code'].describe()?.['meta']?.icon + '-outline' as any} value={values.code} errors={[touched.code, errors.code]} onBlur={handleBlur('code')} onChangeText={handleChange('code')} />}
 
 								<View style={[styles.extras, !emailWasSent && { display: 'none' }]}>
 									<Text style={styles.text}>{timer > 0 ? __('forgot.expires', { timer }) : __('forgot.expired')}</Text>

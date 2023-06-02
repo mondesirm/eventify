@@ -2,14 +2,14 @@ import _ from 'lodash'
 import { forwardRef, useState } from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { MD3Colors, TextInput, TextInputProps } from 'react-native-paper'
 import { I18nManager, Platform, StyleSheet, Text } from 'react-native'
+import { MD3Colors, TextInput, TextInputProps } from 'react-native-paper'
 
 import Icons from '@/icons'
 import { useNavs } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
-export interface InputViewProps<T = 'search'> extends TextInputProps {
+export interface InputProps<T = 'search'> extends TextInputProps {
 	navs?: [number, ReturnType<typeof useNavs>]
 	type?: string
 	left?: T extends 'search' ? Lowercase<keyof typeof Icons> : keyof typeof MaterialCommunityIcons.glyphMap
@@ -21,7 +21,7 @@ export interface InputViewProps<T = 'search'> extends TextInputProps {
 
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
-export default forwardRef((props: InputViewProps, ref) => {
+export default forwardRef((props: InputProps, ref) => {
 	const [secureTextEntry, setSecureTextEntry] = useState(true)
 
 	// Customize autoComplete and keyboardType based on type
@@ -69,7 +69,7 @@ export default forwardRef((props: InputViewProps, ref) => {
 			{props.errors?.[0] && props.errors?.[1] && <Text style={styles.error}>{props.errors[1].charAt(0).toUpperCase() + props.errors[1].slice(1).toLowerCase()}.</Text>}
 		</>
 	)
-}) as React.FC<InputViewProps>
+}) as React.FC<InputProps>
 
 const styles = StyleSheet.create({
 	input: {
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
 		bottom: -20,
 		fontSize: 10,
 		position: 'absolute',
-		color: MD3Colors.error50
+		color: MD3Colors.error50 // TODO Color.danger
 	},
 	box: {
 		shadowOffset: {

@@ -42,7 +42,7 @@ const Loader = ({ when }: { when?: boolean }) => {
 	)
 }
 
-export default () => {
+export default function Loading() {
 	const { loading } = useStoreState(({ user }) => user)
 	return <Spinner visible={loading} color={Color.primary} animation="fade" customIndicator={<Loader when={loading} />} />
 }

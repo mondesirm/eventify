@@ -73,7 +73,7 @@ const AnimatedSplash = ({ children, image }) => {
 	)
 }
 
-export default ({ children, image, fonts }) => {
+export default function Splash({ children, image, fonts }) {
 	const [isSplashReady, setSplashReady] = useState(false)
 
 	useEffect(() => {

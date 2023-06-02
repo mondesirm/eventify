@@ -7,10 +7,11 @@ const { Navigator, Screen } = createStackNavigator()
 
 const screens = [
 	{ name: 'Home', component: Home },
-	{ name: 'Category', component: Blank }
+	{ name: 'Category', component: Blank },
+	{ name: 'Place', component: Blank }
 ]
 
-export default () => {
+export default function HomeStack() {
 	return (
 		<Navigator initialRouteName={screens[0].name} screenOptions={{ cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, headerShown: false }}>
 			{screens.map(({ name, component }) => <Screen key={name} name={name} component={component} />)}

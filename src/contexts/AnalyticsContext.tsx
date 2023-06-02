@@ -17,7 +17,7 @@ export const useAnalytics = () => {
 	return context
 }
 
-export default ({ children }) => {
+export default function AnalyticsProvider({ children }) {
 	const value = {
 	}
 

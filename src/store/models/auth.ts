@@ -48,8 +48,8 @@ export default {
 					// Get Firestore user document
 					getDoc(doc(firestore, 'users', user.uid)).then(doc => {
 						const currentUser = doc.data()
-						getStoreActions().user.setLogin({ role: currentUser.role, token })
 
+						getStoreActions().user.setLogin({ role: currentUser.role, token })
 						if (currentUser.role === 'admin') getStoreActions().user.setRoleAdmin(currentUser.role)
 
 						getStoreActions().user.setUser(currentUser)
@@ -96,33 +96,32 @@ export default {
 						// Send email verification
 						sendEmailVerification(user).then(() => {
 							// Create a document in Firestore with user data
-							const ref = collection(firestore, 'users')
-								setDoc(doc(ref, user.uid), {
-									phone,
-									username,
-									role: 'user',
-									uid: user.uid,
-									// isOnline: true,
-									isDisabled: false,
-									email: user.email,
-									avatar: user.photoURL,
-									createdAt: serverTimestamp(),
-									updatedAt: serverTimestamp()
-								})
-								.then(() => {
-									signOut(auth) // Force logout user
-									// TODO Disable user account with Firebase Admin SDK
-									Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+							setDoc(doc(collection(firestore, 'users'), user.uid), {
+								phone,
+								username,
+								role: 'user',
+								uid: user.uid,
+								// isOnline: true,
+								isDisabled: false,
+								email: user.email,
+								avatar: user.photoURL,
+								createdAt: serverTimestamp(),
+								updatedAt: serverTimestamp()
+							})
+							.then(() => {
+								signOut(auth) // Force logout user
+								// TODO Disable user account with Firebase Admin SDK
+								Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
 
-									resolve(['register.success.0', 'register.success.1'])
-								})
+								resolve(['register.success.0', 'register.success.1'])
+							})
 						})
 					})
 				})
 				// .catch(err => { reject(['register.error', 'errors.unknown']) })
 			})
 			.catch(({ code }: FirebaseError) => {
-				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)	
+				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
 
 				if (!isConnected) reject(['register.error', 'errors.connection'])
 				reject(['register.error', 'errors.' + code])
@@ -152,40 +151,29 @@ export default {
 
 		return new Promise((resolve, reject) => {
 			onAuthStateChanged(auth, user => {
-				if (user != null && getStoreState().user.role == null) {
-					if (user.emailVerified === true) {
-						user.getIdTokenResult()
-							.then(({ token }) => {
-								// Récupère les données de l'utilisateur
-								const ref = collection(firestore, 'users')
-								getDoc(doc(ref, user.uid))
-									.then(doc => {
-										const currentUser = doc.data()
-										getStoreActions().user.setLogin({ role: currentUser.role, token })
+				if (user === null || getStoreState().user.role !== null) return getStoreActions().user.setLoading(false) /* reject('You are not logged in.') */
+				if (user.emailVerified !== true) return getStoreActions().user.setLoading(false) /* reject('You are not verified.')
+ */
+				user.getIdTokenResult().then(({ token }) => {
+					// Get current user data
+					getDoc(doc(collection(firestore, 'users'), user.uid)).then(doc => {
+						const currentUser = doc.data()
 
-										if (currentUser.role == 'Admin') getStoreActions().user.setRoleAdmin(currentUser.role)
+						getStoreActions().user.setLogin({ role: currentUser.role, token })
+						if (currentUser.role == 'Admin') getStoreActions().user.setRoleAdmin(currentUser.role)
 
-										// resolve(getStoreActions().user.setUser(userData))
-										console.log('restoreSession', currentUser?.email)
-										getStoreActions().user.setUser(currentUser)
-										resolve(user.email)
-									})
-							})
-							.catch(() => {
-								reject()
-								getStoreActions().user.setLoading(false)
-							})
-							.finally(() => {
-								getStoreActions().user.setLoading(false)
-							})
-					} else {
-						getStoreActions().user.setLoading(false)
-						reject('Veuillez valider votre inscription en cliquant sur le lien qui vous a été envoyé par email.')
-					}
-				} else {
+						// resolve(getStoreActions().user.setUser(userData))
+						console.log('restoreSession', currentUser?.email)
+						getStoreActions().user.setUser(currentUser)
+						resolve(user.email)
+					})
+				})
+				.catch(() => {
+					reject()
+				})
+				.finally(() => {
 					getStoreActions().user.setLoading(false)
-					reject('You are not logged in.')
-				}
+				})
 			})
 		})
 	})

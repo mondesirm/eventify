@@ -1,13 +1,11 @@
-import Constants from 'expo-constants'
 import { FAB } from 'react-native-paper'
 import { useEffect, useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { NavigationProp } from '@react-navigation/native'
-// import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { Animated, Dimensions, I18nManager, ImageBackground, Platform, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
+import { I18nManager, ImageBackground, Platform, ScrollView, StyleSheet, View } from 'react-native'
 
-import Icons from '@/icons'
 import { useStoreState } from '@/store'
+import Places from '@/components/Places'
 import Carousel from '@/components/Carousel'
 import SearchBar from '@/components/SearchBar'
 import Categories from '@/components/Categories'
@@ -19,7 +17,6 @@ interface ScreenProps {
 	route: { key: string, name: string, params: any }
 }
 
-const { width } = Dimensions.get('screen')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
 const images = new Array(4).fill('https://loremflickr.com/640/480/people')
@@ -33,7 +30,7 @@ const images = new Array(4).fill('https://loremflickr.com/640/480/people')
 
 const carousel = images.map((uri, key) => ({ image: { uri }, key }))
 
-export default ({ navigation, route }: ScreenProps) => {
+export default function Home({ navigation, route }: ScreenProps) {
 	const { __ } = useI18n()
 	const { dismiss } = useNavs()
 	const [search, setSearch] = useState('')
@@ -52,11 +49,12 @@ export default ({ navigation, route }: ScreenProps) => {
 				)}
 			</Carousel>
 
-			<FAB style={styles.fab} icon="bell-outline" onPress={() => console.log('Pressed')} />
+			<FAB style={styles.fab} icon="bell-outline" onPress={() => {}} />
 
 			<View style={[styles.content, { marginTop: -28 }]}>
 				<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
-				<Categories max={6} />
+				<Categories limit={6} />
+				<Places limit={6} />
 			</View>
 		</ScrollView>
 	)
@@ -69,7 +67,6 @@ const styles = StyleSheet.create({
 	},
 	content: {
 		gap: 32,
-		marginBottom: 20,
 		paddingHorizontal: 20
 	},
 	typo: {

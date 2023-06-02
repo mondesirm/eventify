@@ -10,9 +10,9 @@ import { StackNavigationProp } from '@react-navigation/stack'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { Animated, Dimensions, GestureResponderEvent, SafeAreaView, StyleSheet, Text, TextInput, TouchableHighlight, TouchableOpacity, View } from 'react-native'
 
+import Input from '@/components/Input'
 import { AllowedScope } from '@/locales'
 import { useStoreActions } from '@/store'
-import InputView from '@/components/InputView'
 import { useI18n, useNavs } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
@@ -80,10 +80,10 @@ export default ({ navigation, route }: ScreenProps) => {
 				>
 					{({ handleChange, handleSubmit, handleBlur, setFieldValue, values, errors, touched }) => (
 						<View style={styles.inputs}>
-							<InputView ref={inputs[0]} navs={[0, navs]} autoFocus type="email" label={schema.fields['email'].describe()?.['label']} left={schema.fields['email'].describe()?.['meta']?.icon + '-outline' as any} value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
+							<Input ref={inputs[0]} navs={[0, navs]} autoFocus type="email" label={schema.fields['email'].describe()?.['label']} left={schema.fields['email'].describe()?.['meta']?.icon + '-outline' as any} value={values.email} errors={[touched.email, errors.email]} onBlur={handleBlur('email')} onChangeText={handleChange('email')} />
 
 							<View style={styles.group}>
-								<InputView ref={inputs[1]} navs={[1, navs]} type="password" label={schema.fields['password'].describe()?.['label']} left={schema.fields['password'].describe()?.['meta']?.icon + '-outline' as any} value={values.password} errors={[touched.password, errors.password]} onBlur={handleBlur('password')} onChangeText={handleChange('password')} returnKeyType="done" />
+								<Input ref={inputs[1]} navs={[1, navs]} type="password" label={schema.fields['password'].describe()?.['label']} left={schema.fields['password'].describe()?.['meta']?.icon + '-outline' as any} value={values.password} errors={[touched.password, errors.password]} onBlur={handleBlur('password')} onChangeText={handleChange('password')} returnKeyType="done" />
 
 								<View style={styles.extras}>
 									<View style={styles.remember}>

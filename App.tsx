@@ -54,9 +54,11 @@ export default function App() {
 						<IconlyProvider set="two-tone" primaryColor={Color.primary} secondaryColor={Color.secondary} stroke="bold" size="xlarge">
 							<Splash image={{ uri: Constants.manifest.splash.image }} fonts={fonts}>
 								<StatusBar />
+
 								<NavigationContainer theme={LightTheme}>
 									<StoreProvider store={store}>
 										<NavigationProvider />
+
 										<Loading />
 										<Toast topOffset={80} />
 									</StoreProvider>

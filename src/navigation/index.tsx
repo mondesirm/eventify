@@ -4,10 +4,11 @@ import NetInfo from '@react-native-community/netinfo'
 import Routes from '@/navigation/Routes'
 import { useStoreActions } from '@/store'
 
-export default () => {
-	const { restoreSession, setNetInfoState } = useStoreActions(actions => ({
-		restoreSession: actions.auth.restoreSession,
-		setNetInfoState: actions.utils.setNetInfoState
+export default function NavigationProvider() {
+	const { init, restoreSession, setNetInfoState } = useStoreActions(_ => ({
+		init: _.db.init,
+		restoreSession: _.auth.restoreSession,
+		setNetInfoState: _.utils.setNetInfoState
 	}))
 
 	useEffect(() => {
@@ -16,9 +17,10 @@ export default () => {
 		return () => unsubscribe()
 	}, [])
 
+	// init()
 	restoreSession()
-		.then(() => { console.log('Logged in.') })
-		.catch(() => { console.log('Not logged in.') })
+		// .then(() => { console.log('Logged in.') })
+		// .catch(() => { console.log('Not logged in.') })
 
 	return <Routes />
 }

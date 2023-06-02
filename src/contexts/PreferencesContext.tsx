@@ -64,7 +64,7 @@ export const useNavs = (inputs: React.MutableRefObject<TextInput>[] = [], style:
 	return { curr, setCurr, prev, next, fabs, dismiss }
 }
 
-export default ({ children }: { children: React.ReactNode }) => {
+export default function PreferencesProvider({ children }: { children: React.ReactNode }) {
 	const i18n: CustomI18n = new I18n(locales, { defaultSeparator: '/' })
 	i18n.enableFallback = true
 	i18n.missingBehavior = 'error' // TODO put 'guess' in production, 'error' in local

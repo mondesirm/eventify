@@ -1,33 +1,24 @@
+import { useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View, ViewProps } from 'react-native'
 
-import { StackNavigationProp } from '@react-navigation/stack'
+import { Category, useStoreActions } from '@/store'
 import { Border, Color, FontFamily, FontSize } from 'globals'
 
-interface Category {
-	name: string
-	icon: keyof typeof MaterialCommunityIcons.glyphMap
-}
-
 interface SectionProps extends ViewProps {
-	max?: number
+	limit?: number
 }
 
 const { width } = Dimensions.get('window')
 
-const categories: Category[] = [
-	{ name: 'Parties', icon: 'party-popper' },
-	{ name: 'Gatherings', icon: 'account-group' },
-	{ name: 'Outings', icon: 'account-child' },
-	{ name: 'Balls', icon: 'dance-ballroom' },
-	{ name: 'Breathers', icon: 'nature-people' },
-	{ name: 'Mature', icon: 'dance-pole' }
-]
-
-export default ({ max = null }: SectionProps) => {
+export default function Categories({ limit = null }: SectionProps) {
+	const query = useStoreActions(({ db }) => db.query)
+	const [categories, setCategories] = useState<Category[]>([])
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
+
+	useEffect(() => { query({ path: 'categories', limit }).then(setCategories) }, [limit])
 
 	return (
 		<View style={styles.section}>
@@ -40,7 +31,7 @@ export default ({ max = null }: SectionProps) => {
 			</View>
 
 			<View style={styles.content}>
-				{(max ? categories.slice(0, max) : categories).map(({ name, icon }, i) => (
+				{categories.map(({ name, icon }, i) => (
 					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Category', { name })}>
 						<View style={styles.image}>
 							<Icon name={icon} size={38} />
@@ -51,6 +42,12 @@ export default ({ max = null }: SectionProps) => {
 						</View>
 					</TouchableOpacity>
 				))}
+
+				{categories.length === 0 && (
+					<View style={styles.container}>
+						<Text style={[styles.text, styles.typo]}>No categories found</Text>
+					</View>
+				)}
 			</View>
 		</View>
 	)
@@ -102,10 +99,10 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		flex: 1,
-		alignItems: 'center',
 		justifyContent: 'center'
 	},
 	text: {
+		textAlign: 'center',
 		color: Color.heading,
 		fontSize: FontSize.xs,
 		textTransform: 'capitalize',

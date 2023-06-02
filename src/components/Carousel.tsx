@@ -17,7 +17,7 @@ interface CarouselProps extends Partial<AppIntroSlider<{ image: any, key: string
 const { width } = Dimensions.get('screen')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
-export default (props: CarouselProps) => {
+export default function Carousel(props: CarouselProps) {
 	const slider = useRef<AppIntroSlider>(null)
 	const scrollX = useRef(new Animated.Value(0)).current
 	const [timer, setTimer] = useState<NodeJS.Timeout>(null)

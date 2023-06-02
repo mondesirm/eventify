@@ -2,12 +2,12 @@ import { Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import Icons from '@/icons'
 import { Border, Color, Padding } from 'globals'
+import Input, { InputProps } from '@/components/Input'
 import { useI18n } from '@/contexts/PreferencesContext'
-import InputView, { InputViewProps } from '@/components/InputView'
 
 const { width } = Dimensions.get('window')
 
-export default (props: InputViewProps) => {
+export default function SearchBar(props: InputProps) {
 	const { __ } = useI18n()
 
 	return (
@@ -21,7 +21,7 @@ export default (props: InputViewProps) => {
 				</View>
 			</View> */}
 
-			<InputView style={[styles.box, styles.bar]} {...props} type="search" placeholder={__('form.search')} left="location" right="discovery" value={props.value} onBlur={props.onBlur} onChangeText={props.onChangeText} />
+			<Input style={[styles.box, styles.bar]} {...props} type="search" placeholder={__('form.search')} left="location" right="discovery" value={props.value} onBlur={props.onBlur} onChangeText={props.onChangeText} />
 
 			<TouchableOpacity style={[styles.box, styles.button]}>
 				<Icons.Search />

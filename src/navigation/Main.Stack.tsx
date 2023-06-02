@@ -15,7 +15,7 @@ interface ScreenProps {
 
 const { Navigator, Screen } = createBottomTabNavigator()
 
-export default () => {
+export default function MainStack() {
 	const screens: { name: string, component: (props: ScreenProps) => JSX.Element, icon: Lowercase<keyof typeof Icons> }[] = [
 		{ name: 'HomeStack', component: HomeStack, icon: 'home' },
 		{ name: 'Calendar', component: Blank, icon: 'calendar' },

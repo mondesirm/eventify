@@ -68,6 +68,8 @@ export const Padding = {
 export const Border = {
 	x3s: 8,
 	xs: 12,
+	sm: 14,
+	base: 16,
 	xl: 20,
 	x3l: 24
 } as const
