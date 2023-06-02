@@ -11,12 +11,12 @@ type QueryPayload = { path: AllPayload, limit?: number }
 type BatchPayload = { path: AllPayload, data: any[] }
 
 export interface DBModel {
-	init: Thunk<DBModel, never, any, StoreModel, void>
-	all: Thunk<DBModel, AllPayload, any, StoreModel, ReturnType<typeof getDocs<DocumentData>>>
-	get: Thunk<DBModel, GetPayload, any, StoreModel, ReturnType<typeof getDoc<DocumentData>>>
-	set: Thunk<DBModel, SetPayload, any, StoreModel, ReturnType<typeof setDoc<DocumentData>>>
-	query: Thunk<DBModel, QueryPayload, any, StoreModel, any>
-	batch: Thunk<DBModel, BatchPayload, any, StoreModel, Promise<void>>
+	init: Thunk<this, never, any, StoreModel, void>
+	all: Thunk<this, AllPayload, any, StoreModel, ReturnType<typeof getDocs<DocumentData>>>
+	get: Thunk<this, GetPayload, any, StoreModel, ReturnType<typeof getDoc<DocumentData>>>
+	set: Thunk<this, SetPayload, any, StoreModel, ReturnType<typeof setDoc<DocumentData>>>
+	query: Thunk<this, QueryPayload, any, StoreModel, any>
+	batch: Thunk<this, BatchPayload, any, StoreModel, Promise<void>>
 }
 
 const categories: Category[] = [
