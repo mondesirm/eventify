@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Blank from '@/screens/Blank'
 import Icons, { Icon } from '@/icons'
 import { Color, FontFamily } from 'globals'
+import Calendar from '@/screens/main/Calendar'
 import HomeStack from '@/navigation/Home.Stack'
 
 interface ScreenProps {
@@ -18,7 +19,7 @@ const { Navigator, Screen } = createBottomTabNavigator()
 export default function MainStack() {
 	const screens: { name: string, component: (props: ScreenProps) => JSX.Element, icon: Lowercase<keyof typeof Icons> }[] = [
 		{ name: 'HomeStack', component: HomeStack, icon: 'home' },
-		{ name: 'Calendar', component: Blank, icon: 'calendar' },
+		{ name: 'Calendar', component: Calendar, icon: 'calendar' },
 		{ name: 'Explore', component: Blank, icon: 'category' },
 		{ name: 'Chat', component: Blank, icon: 'chat' },
 		{ name: 'Profile', component: Blank, icon: 'user' }

@@ -6,13 +6,23 @@ import { DBModel } from './models/db'
 import { AuthModel } from './models/auth'
 import { UserModel } from './models/user'
 import { UtilsModel } from './models/utils'
+import { CalendarModel } from './models/calendar'
 
 export type StoreModel = {
 	db: DBModel
 	auth: AuthModel
 	user: UserModel
 	utils: UtilsModel
+	calendar: CalendarModel
 }
+
+const typedHooks = createTypedHooks<StoreModel>()
+
+export const useStoreActions = typedHooks.useStoreActions
+export const useStoreDispatch = typedHooks.useStoreDispatch
+export const useStoreState = typedHooks.useStoreState
+
+export default createStore<StoreModel>(models)
 
 type Timestamp = { seconds: number, nanoseconds: number }
 type Timestamps = { createdAt?: Timestamp, updatedAt?: Timestamp }
@@ -28,14 +38,14 @@ export type Place<T = false> = {
 	price: number
 	rating: number
 	category: T extends false ? string : Category
-	createdAt?: { seconds: number, nanoseconds: number }
-	updatedAt?: { seconds: number, nanoseconds: number }
 } & Timestamps
 
-const typedHooks = createTypedHooks<StoreModel>()
+export type Item = { name: string, time: `${number}:${number}`, labels: { name: string, color: string }[] }
+export type Days = Record<string, Item[]>
 
-export const useStoreActions = typedHooks.useStoreActions
-export const useStoreDispatch = typedHooks.useStoreDispatch
-export const useStoreState = typedHooks.useStoreState
-
-export default createStore<StoreModel>(models)
+export type Event = {
+	name: string
+	place: Place
+	start: Date
+	end: Date
+} & Timestamps

@@ -23,8 +23,8 @@ type Join<K, P> = K extends string | number ?
 type Leaves<T, D extends number = 10> = [D] extends [never] ? never : T extends object ?
 	{ [K in keyof T]-?: Join<K, Leaves<T[K], Prev[D]>> }[keyof T] : ''
 
-// Only allows localized strings that exist (in `en` since it's the fallback)
-export type AllowedScope = Leaves<typeof en>
+// Only allows localized strings that exist
+export type AllowedScope = Leaves<typeof en & typeof fr>
 
 export const locales = {
 	en,

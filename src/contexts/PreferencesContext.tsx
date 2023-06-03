@@ -1,6 +1,7 @@
 import { FAB } from 'react-native-paper'
 import { I18n, TranslateOptions } from 'i18n-js'
 import * as Localization from 'expo-localization'
+import { LocaleConfig } from 'react-native-calendars'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { GestureResponderEvent, Keyboard, TextInput } from 'react-native'
 
@@ -69,10 +70,11 @@ export default function PreferencesProvider({ children }: { children: React.Reac
 	i18n.enableFallback = true
 	i18n.missingBehavior = 'error' // TODO put 'guess' in production, 'error' in local
 	i18n.locale = Localization.locale
+	i18n.__ = (scope: AllowedScope, options?: TranslateOptions) => i18n.t(scope, options) // Custom __ function with a better scope type
 
-	// Re-typing the scope argument with our custom type
-	i18n.__ = (scope: AllowedScope, options?: TranslateOptions) => i18n.t(scope, options)
-	// i18n.__ = i18n.t.bind(i18n)
+	// Add locales to react-native-calendars (en is already added by default)
+	LocaleConfig.locales['fr'] = locales.fr.calendar
+	LocaleConfig.defaultLocale = i18n.locale.split('-')[0] === 'en' ? '' : i18n.locale.split('-')[0]
 
 	const setLang = (lang: keyof typeof locales) => {
 		i18n.locale = lang

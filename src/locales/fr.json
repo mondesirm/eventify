@@ -99,5 +99,12 @@
 		"storage": {
 			"object-not-found": "Le fichier recherché n'a pas été trouvé."
 		}
+	},
+	"calendar": {
+		"today": "Aujourd'hui",
+		"dayNamesShort": ["Dim.", "Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam."],
+		"dayNames": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+		"monthNamesShort": ["Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."],
+		"monthNames": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 	}
 }
