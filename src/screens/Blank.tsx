@@ -1,6 +1,6 @@
 import Constants from 'expo-constants'
 import { NavigationProp } from '@react-navigation/native'
-import { Dimensions, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 
 import { useI18n } from '@/contexts/PreferencesContext'
 import { Color, FontFamily, FontSize } from 'globals'
@@ -16,23 +16,24 @@ export default (props: ScreenProps) => {
 	const { __ } = useI18n()
 
 	return (
-		<ScrollView style={styles.screen} contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-			<View style={styles.content}>
+		<SafeAreaView style={styles.screen}>
+			<View style={styles.header}>
 				<Text style={[styles.title, styles.typo]}>{__('onboarding.0.title', { title: Constants.manifest.name })}</Text>
 				<Text style={[styles.subtitle, styles.typo]}>{__('onboarding.0.subtitle')}</Text>
 			</View>
-		</ScrollView>
+		</SafeAreaView>
 	)
 }
 
 const styles = StyleSheet.create({
 	screen: {
-		flex: 1
+		...StyleSheet.absoluteFillObject,
+		backgroundColor: Color.white
 	},
-	content: {
-		width,
+	header: {
 		gap: 16,
-		top: '10%'
+		height: 150,
+		justifyContent: 'center'
 	},
 	typo: {
 		fontWeight: '500',

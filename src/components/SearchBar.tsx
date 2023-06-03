@@ -33,7 +33,6 @@ export default function SearchBar(props: InputProps) {
 const styles = StyleSheet.create({
 	group: {
 		gap: 20,
-		width: width - 40,
 		alignItems: 'center',
 		flexDirection: 'row'
 	},
