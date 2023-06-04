@@ -12,7 +12,7 @@ interface ScreenProps {
 
 const { width } = Dimensions.get('screen')
 
-export default (props: ScreenProps) => {
+export default function Blank(props: ScreenProps) {
 	const { __ } = useI18n()
 
 	return (
@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center'
 	},
 	typo: {
-		fontWeight: '500',
 		textAlign: 'center',
 		fontFamily: FontFamily.medium
 	},

@@ -1,8 +1,8 @@
 import { FAB } from 'react-native-paper'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { NavigationProp } from '@react-navigation/native'
-import { I18nManager, ImageBackground, Platform, ScrollView, StyleSheet, View } from 'react-native'
+import { Dimensions, I18nManager, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 
 import { useStoreState } from '@/store'
 import Places from '@/components/Places'
@@ -11,12 +11,14 @@ import SearchBar from '@/components/SearchBar'
 import Categories from '@/components/Categories'
 import { Color, FontFamily, FontSize } from 'globals'
 import { useI18n, useNavs } from '@/contexts/PreferencesContext'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 
 interface ScreenProps {
 	navigation: NavigationProp<any, any>
 	route: { key: string, name: string, params: any }
 }
 
+const { width, height } = Dimensions.get('screen')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
 const images = new Array(4).fill('https://loremflickr.com/640/480/people')
@@ -34,12 +36,19 @@ export default function Home({ navigation, route }: ScreenProps) {
 	const { __ } = useI18n()
 	const { dismiss } = useNavs()
 	const [search, setSearch] = useState('')
+	const bottomTabBarHeight = useBottomTabBarHeight()
+	const [refreshing, setRefreshing] = useState(false)
 	const currentUser = useStoreState(({ user }) => user.currentUser)
 
 	// useEffect(() => { console.log('Home', currentUser?.email) }, [])
 
+	const onRefresh = useCallback(() => {
+		setRefreshing(true)
+		setTimeout(() => setRefreshing(false), 2000)
+	}, [])
+
 	return (
-		<ScrollView style={styles.screen} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive">
+		<ScrollView style={[styles.screen, { height: height - bottomTabBarHeight }]} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
 			<Carousel items={carousel} color={Color.white} autoplay>
 				{({ image }) => (
 					// TODO fix gradient
@@ -53,8 +62,8 @@ export default function Home({ navigation, route }: ScreenProps) {
 
 			<View style={[styles.content, { marginTop: -28 }]}>
 				<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
-				<Categories limit={6} />
-				<Places limit={6} />
+				<Categories limit={6} refreshing={refreshing} />
+				<Places limit={6} refreshing={refreshing} />
 			</View>
 		</ScrollView>
 	)
@@ -63,6 +72,7 @@ export default function Home({ navigation, route }: ScreenProps) {
 const styles = StyleSheet.create({
 	screen: {
 		...StyleSheet.absoluteFillObject,
+		overflow: 'visible',
 		backgroundColor: Color.white
 	},
 	content: {

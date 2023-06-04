@@ -2,8 +2,8 @@ import _ from 'lodash'
 import { forwardRef, useState } from 'react'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
-import { I18nManager, Platform, StyleSheet, Text } from 'react-native'
 import { MD3Colors, TextInput, TextInputProps } from 'react-native-paper'
+import { I18nManager, Platform, StyleSheet, Text, View } from 'react-native'
 
 import Icons from '@/icons'
 import { useNavs } from '@/contexts/PreferencesContext'
@@ -37,7 +37,7 @@ export default forwardRef((props: InputProps, ref) => {
 	const toggle = secureTextEntry ? 'eye-outline' : 'eye-off-outline'
 
 	return (
-		<>
+		<View style={props.style[0]}>
 			<TextInput
 				{...props}
 				ref={ref}
@@ -67,7 +67,7 @@ export default forwardRef((props: InputProps, ref) => {
 			/>
 
 			{props.errors?.[0] && props.errors?.[1] && <Text style={styles.error}>{props.errors[1].charAt(0).toUpperCase() + props.errors[1].slice(1).toLowerCase()}.</Text>}
-		</>
+		</View>
 	)
 }) as React.FC<InputProps>
 
@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		color: Color.body,
-		fontWeight: '500',
 		fontFamily: FontFamily.medium
 	},
 	error: {

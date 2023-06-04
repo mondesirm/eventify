@@ -115,7 +115,7 @@ export default ({ navigation }: ScreenProps) => {
 			</View>
 		)
 	}
-	
+
 	const Done = () => Btn({ name: 'check', styles: [styles.button] })
 	const Next = () => Btn({ name: 'arrow-right', styles: [styles.button] })
 	const Skip = () => Btn({ text: 'skip', styles: [[styles.button, styles.skip], [styles.link, styles.typo]] })
@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
 		width: width - 40
 	},
 	typo: {
-		fontWeight: '500',
 		fontFamily: FontFamily.medium
 	},
 	title: {

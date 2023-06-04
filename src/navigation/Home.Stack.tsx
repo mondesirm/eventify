@@ -1,4 +1,4 @@
-import { CardStyleInterpolators, createStackNavigator, } from '@react-navigation/stack'
+import { CardStyleInterpolators, createStackNavigator } from '@react-navigation/stack'
 
 import Blank from '@/screens/Blank'
 import Home from '@/screens/main/Home'

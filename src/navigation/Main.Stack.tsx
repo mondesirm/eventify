@@ -1,32 +1,36 @@
-import { MemoExoticComponent } from 'react'
-import { Platform, Text, View } from 'react-native'
-import { NavigationProp } from '@react-navigation/native'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { BlurView } from 'expo-blur'
+import { Platform, StyleSheet, Text, View } from 'react-native'
+import { BottomTabNavigationProp, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
 import Blank from '@/screens/Blank'
 import Icons, { Icon } from '@/icons'
 import { Color, FontFamily } from 'globals'
 import Calendar from '@/screens/main/Calendar'
 import HomeStack from '@/navigation/Home.Stack'
+import ExploreStack from '@/navigation/Explore.Stack'
 
 interface ScreenProps {
-	navigation: NavigationProp<any, any>
+	navigation: BottomTabNavigationProp<any, any>
 	route: { key: string, name: string, params: any }
 }
 
 const { Navigator, Screen } = createBottomTabNavigator()
 
-export default function MainStack() {
-	const screens: { name: string, component: (props: ScreenProps) => JSX.Element, icon: Lowercase<keyof typeof Icons> }[] = [
-		{ name: 'HomeStack', component: HomeStack, icon: 'home' },
-		{ name: 'Calendar', component: Calendar, icon: 'calendar' },
-		{ name: 'Explore', component: Blank, icon: 'category' },
-		{ name: 'Chat', component: Blank, icon: 'chat' },
-		{ name: 'Profile', component: Blank, icon: 'user' }
-	]
+const screens: { name: string, component: (props: ScreenProps) => JSX.Element, icon: Lowercase<keyof typeof Icons> }[] = [
+	{ name: 'HomeStack', component: HomeStack, icon: 'home' },
+	{ name: 'Calendar', component: Calendar, icon: 'calendar' },
+	{ name: 'ExploreStack', component: ExploreStack, icon: 'discovery' },
+	{ name: 'Chat', component: Blank, icon: 'chat' },
+	{ name: 'Profile', component: Blank, icon: 'user' }
+]
 
+export default function MainStack() {
 	return (
-		<Navigator initialRouteName={screens[0].name} screenOptions={{ headerShown: false }}>
+		<Navigator initialRouteName={screens[0].name} screenOptions={{
+			headerShown: false,
+			tabBarStyle: { position: 'absolute', borderTopWidth: 0 },
+			tabBarBackground: () => <BlurView intensity={75} tint='light' style={StyleSheet.absoluteFill} />
+		}}>
 			{screens.map(({ name, component, icon }, i) => (
 				<Screen key={i} name={name} component={component}
 					options={{

@@ -6,31 +6,33 @@ import { Dimensions, StyleSheet, Text, TouchableOpacity, View, ViewProps } from 
 
 import { Category, useStoreActions } from '@/store'
 import { Border, Color, FontFamily, FontSize } from 'globals'
+import { SharedElement } from 'react-navigation-shared-element'
 
 interface SectionProps extends ViewProps {
 	limit?: number
+	refreshing?: boolean
 }
 
-const { width } = Dimensions.get('window')
+const { width, height } = Dimensions.get('window')
 
-export default function Categories({ limit = null }: SectionProps) {
+export default function Categories({ limit = null, refreshing = false }: SectionProps) {
 	const query = useStoreActions(({ db }) => db.query)
 	const [categories, setCategories] = useState<Category[]>([])
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
 
-	useEffect(() => { query({ path: 'categories', limit }).then(setCategories) }, [limit])
+	useEffect(() => { query({ path: 'categories', limit }).then(docs => setCategories(docs as Category[])) }, [limit, refreshing])
 
 	return (
 		<View style={styles.section}>
 			<View style={styles.header}>
 				<Text style={[styles.title, styles.typo]}>Categories</Text>
 
-				<TouchableOpacity onPress={() => {}}>
+				<TouchableOpacity onPress={() => navigate('Categories')}>
 					<Text style={[styles.more, styles.typo]}>View All</Text>
 				</TouchableOpacity>
 			</View>
 
-			<View style={styles.content}>
+			<SharedElement id="categories" style={styles.content}>
 				{categories.map(({ name, icon }, i) => (
 					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Category', { name })}>
 						<View style={styles.image}>
@@ -48,7 +50,7 @@ export default function Categories({ limit = null }: SectionProps) {
 						<Text style={[styles.text, styles.typo]}>No categories found</Text>
 					</View>
 				)}
-			</View>
+			</SharedElement>
 		</View>
 	)
 }
@@ -83,9 +85,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderStyle: 'solid',
 		borderRadius: Border.xs,
-		flexDirection: 'column',
 		borderColor: Color.border,
-		backgroundColor: Color.white,
 		width: (width - 20 * 4) / 3 - 1,
 		height: (width - 20 * 4) / 3 - 1
 	},
@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 		color: Color.heading,
 		fontSize: FontSize.xs,
-		textTransform: 'capitalize',
-		fontFamily: FontFamily.medium
+		textTransform: 'capitalize'
 	}
 })

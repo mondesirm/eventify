@@ -12,10 +12,10 @@ type BatchPayload = { path: AllPayload, data: any[] }
 
 export interface DBModel {
 	init: Thunk<this, never, any, StoreModel, void>
-	all: Thunk<this, AllPayload, any, StoreModel, ReturnType<typeof getDocs<DocumentData>>>
+	all: Thunk<this, AllPayload, any, StoreModel, Promise<DocumentData[]>>
 	get: Thunk<this, GetPayload, any, StoreModel, ReturnType<typeof getDoc<DocumentData>>>
 	set: Thunk<this, SetPayload, any, StoreModel, ReturnType<typeof setDoc<DocumentData>>>
-	query: Thunk<this, QueryPayload, any, StoreModel, any>
+	query: Thunk<this, QueryPayload, any, StoreModel, Promise<DocumentData[]>>
 	batch: Thunk<this, BatchPayload, any, StoreModel, Promise<void>>
 }
 
@@ -42,16 +42,17 @@ export default {
 		// Store categories
 		getStoreActions().db.batch({ path: 'categories', data: categories }).then(() => {
 			// Store places and link them to categories
-			getStoreActions().db.all('categories').then(({ docs }) => {
-				const categories = docs.map(doc => doc.data() as Category)
-				getStoreActions().db.batch({ path: 'places', data: places.map(p => ({ ...p, category: categories.find(c => c.name === p.category) })) })
+			getStoreActions().db.all('categories').then((docs: Category[]) => {
+				getStoreActions().db.batch({ path: 'places', data: places.map(p => ({ ...p, category: docs.find(d => d.name === p.category) })) })
 				// const categories = docs.map(doc => ({ ...doc.data(), path: doc.ref.path } as Category & { path: string }))
 				// getStoreActions().db.batch({ path: 'places', data: places.map(p => ({ ...p, category: categories.find(c => c.name === p.category).path })) })
 			})
 		})
 	}),
 	all: thunk((actions, payload, { getStoreActions, getStoreState }) => {
-		return getDocs(collection(firestore, typeof payload === 'string' ? payload : payload.join('/')))
+		return getDocs(
+			collection(firestore, typeof payload === 'string' ? payload : payload.join('/')
+		)).then(({ docs }) => docs.map(d => ({ ...d.data(), id: d.id })))
 	}),
 	get: thunk((actions, payload, { getStoreActions, getStoreState }) => {
 		return getDoc(doc(firestore, typeof payload === 'string' ? payload : payload.join('/')))
@@ -66,7 +67,7 @@ export default {
 		return getDocs(query(
 			collection(firestore, typeof path === 'string' ? path : path.join('/')),
 			l ? limit(l) : null
-		)).then(({ docs }) => docs.map(doc => doc.data()))
+		)).then(({ docs }) => docs.map(d => ({ ...d.data(), id: d.id })))
 	}),
 	batch: thunk((actions, payload, { getStoreActions, getStoreState }) => {
 		const { path, data } = payload

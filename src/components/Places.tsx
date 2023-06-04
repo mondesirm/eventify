@@ -10,16 +10,17 @@ import { Border, Color, FontFamily, FontSize } from 'globals'
 
 interface SectionProps extends ViewProps {
 	limit?: number
+	refreshing?: boolean
 }
 
 const { width } = Dimensions.get('window')
 
-export default function Places({ limit = null }: SectionProps) {
+export default function Places({ limit = null, refreshing = false }: SectionProps) {
 	const [places, setPlaces] = useState<Place<true>[]>([])
 	const query = useStoreActions(({ db }) => db.query)
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
 
-	useEffect(() => { query({ path: 'places', limit }).then(setPlaces) }, [limit])
+	useEffect(() => { query({ path: 'places', limit }).then(docs => setPlaces(docs as Place<true>[])) }, [limit, refreshing])
 
 	return (
 		<View style={styles.section}>
@@ -57,7 +58,7 @@ export default function Places({ limit = null }: SectionProps) {
 
 				{places.length === 0 && (
 					<View style={styles.container}>
-						<Text style={[styles.text, styles.typo]}>No categories found</Text>
+						<Text style={[styles.text, styles.typo]}>No places found</Text>
 					</View>
 				)}
 			</ScrollView>

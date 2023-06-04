@@ -21,9 +21,9 @@ export default function SearchBar(props: InputProps) {
 				</View>
 			</View> */}
 
-			<Input style={[styles.box, styles.bar]} {...props} type="search" placeholder={__('form.search')} left="location" right="discovery" value={props.value} onBlur={props.onBlur} onChangeText={props.onChangeText} />
+			<Input style={[styles.bar, styles.box]} {...props} type="search" placeholder={__('form.search')} left="location" right="discovery" value={props.value} onBlur={props.onBlur} onChangeText={props.onChangeText} />
 
-			<TouchableOpacity style={[styles.box, styles.button]}>
+			<TouchableOpacity style={[styles.button, styles.box]}>
 				<Icons.Search />
 			</TouchableOpacity>
 		</View>

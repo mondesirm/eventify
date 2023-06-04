@@ -1,20 +1,23 @@
 import { Agenda } from 'react-native-calendars'
-import { NavigationProp } from '@react-navigation/native'
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
-
-import { Item, useStoreActions, useStoreState } from '@/store'
-import { Color, FontFamily, FontSize } from 'globals'
 import { AnimatedFAB, Badge } from 'react-native-paper'
+import { NavigationProp } from '@react-navigation/native'
+import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+
+import { Color, FontFamily, FontSize } from 'globals'
+import { useStoreActions, useStoreState } from '@/store'
 
 interface ScreenProps {
 	navigation: NavigationProp<any, any>
 	route: { key: string, name: string, params: any }
 }
 
+const { width, height } = Dimensions.get('screen')
+
 export default function Calendar({ navigation, route }: ScreenProps) {
+	const bottomTabBarHeight = useBottomTabBarHeight()
 	const items = useStoreState(({ calendar }) => calendar.items) as any
 	const loadItems = useStoreActions(({ calendar }) => calendar.loadItems)
-	// console.log(items)
 
 	const rowHasChanged: typeof Agenda.prototype.props.rowHasChanged = (r1, r2) => r1.name !== r2.name
 
@@ -40,8 +43,9 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 	}
 
 	return (
-		<SafeAreaView style={styles.screen}>
+		<SafeAreaView style={[styles.screen, { height: height - bottomTabBarHeight }]}>
 			<Agenda
+				// style={{ paddingBottom: 20 }}
 				firstDay={1}
 				items={items}
 				enableSwipeMonths

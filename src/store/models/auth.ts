@@ -100,7 +100,6 @@ export default {
 								phone,
 								username,
 								role: 'user',
-								uid: user.uid,
 								// isOnline: true,
 								isDisabled: false,
 								email: user.email,

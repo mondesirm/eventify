@@ -25,12 +25,12 @@ export const useStoreState = typedHooks.useStoreState
 export default createStore<StoreModel>(models)
 
 type Timestamp = { seconds: number, nanoseconds: number }
-type Timestamps = { createdAt?: Timestamp, updatedAt?: Timestamp }
+type Base = { id?: string, createdAt?: Timestamp, updatedAt?: Timestamp }
 
 export type Category = {
 	name: string
 	icon: keyof typeof MaterialCommunityIcons.glyphMap
-} & Timestamps
+} & Base
 
 export type Place<T = false> = {
 	name: string
@@ -38,7 +38,7 @@ export type Place<T = false> = {
 	price: number
 	rating: number
 	category: T extends false ? string : Category
-} & Timestamps
+} & Base
 
 export type Item = { name: string, time: `${number}:${number}`, labels: { name: string, color: string }[] }
 export type Days = Record<string, Item[]>
@@ -48,4 +48,4 @@ export type Event = {
 	place: Place
 	start: Date
 	end: Date
-} & Timestamps
+} & Base
