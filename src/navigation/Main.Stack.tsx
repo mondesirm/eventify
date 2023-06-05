@@ -4,6 +4,7 @@ import { BottomTabNavigationProp, createBottomTabNavigator } from '@react-naviga
 
 import Blank from '@/screens/Blank'
 import Icons, { Icon } from '@/icons'
+import Chat from '@/screens/main/Chat'
 import { Color, FontFamily } from 'globals'
 import Calendar from '@/screens/main/Calendar'
 import HomeStack from '@/navigation/Home.Stack'
@@ -20,7 +21,7 @@ const screens: { name: string, component: (props: ScreenProps) => JSX.Element, i
 	{ name: 'HomeStack', component: HomeStack, icon: 'home' },
 	{ name: 'Calendar', component: Calendar, icon: 'calendar' },
 	{ name: 'ExploreStack', component: ExploreStack, icon: 'discovery' },
-	{ name: 'Chat', component: Blank, icon: 'chat' },
+	{ name: 'Chat', component: Chat, icon: 'chat' },
 	{ name: 'Profile', component: Blank, icon: 'user' }
 ]
 
