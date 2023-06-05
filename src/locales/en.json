@@ -3,6 +3,7 @@
 		"micro": "We need to access your microphone.",
 		"photos": "We need to access your photos.",
 		"camera": "We need to access your camera.",
+		"location": "We need to access your location.",
 		"subtitle": "Please grant us this permission in your device settings."
 	},
 	"onboarding": {

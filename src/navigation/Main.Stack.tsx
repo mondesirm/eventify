@@ -26,11 +26,12 @@ const screens: { name: string, component: (props: ScreenProps) => JSX.Element, i
 
 export default function MainStack() {
 	return (
-		<Navigator initialRouteName={screens[0].name} screenOptions={{
+		<Navigator initialRouteName={screens[0].name} screenOptions={({ route }) => ({
 			headerShown: false,
-			tabBarStyle: { position: 'absolute', borderTopWidth: 0 },
+			tabBarShowLabel: false, // With and without both look good
+			tabBarStyle: [{ position: 'absolute', borderTopWidth: 0 }, route.name === 'Places' && { display: 'none' }],
 			tabBarBackground: () => <BlurView intensity={75} tint='light' style={StyleSheet.absoluteFill} />
-		}}>
+		})}>
 			{screens.map(({ name, component, icon }, i) => (
 				<Screen key={i} name={name} component={component}
 					options={{
@@ -39,7 +40,6 @@ export default function MainStack() {
 								<Icon name={icon} set={_.focused ? 'bulk' : 'two-tone'} />
 							</View>
 						),
-						tabBarShowLabel: false, // With and without both look good
 						tabBarLabel: _ => <Text style={{ fontFamily: FontFamily.medium, fontSize: 12, color: _.focused ? Color.primary : _.color }}>{_.children}</Text>
 					}}
 				/>

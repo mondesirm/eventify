@@ -2,6 +2,7 @@ import { CardStyleInterpolators, StackNavigationProp, createStackNavigator } fro
 import { SharedElementsComponentConfig, createSharedElementStackNavigator } from 'react-navigation-shared-element'
 
 import Blank from '@/screens/Blank'
+import Places from '@/screens/main/Places'
 import Explore from '@/screens/main/Explore'
 import Categories from '@/screens/main/Categories'
 
@@ -16,7 +17,7 @@ const screens: { name: string, component: (props: ScreenProps) => JSX.Element, s
 	{ name: 'Explore', component: Explore },
 	{ name: 'Categories', component: Categories },
 	{ name: 'Category', component: Blank, sharedElements: route => [{ id: route.params._.id }] },
-	{ name: 'Places', component: Blank },
+	{ name: 'Places', component: Places },
 	{ name: 'Place', component: Blank, sharedElements: route => [{ id: route.params._.id }] }
 ]
 

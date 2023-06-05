@@ -22,9 +22,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		'expo-localization',
 		[
 			'expo-image-picker', {
-				photosPermission: 'Allow Eventify to access your photos',
-				cameraPermission: 'Allow Eventify to access your camera',
-				microphonePermission: 'Allow Eventify to access your microphone'
+				photosPermission: 'Allow $(PRODUCT_NAME) to access your photos',
+				cameraPermission: 'Allow $(PRODUCT_NAME) to access your camera',
+				microphonePermission: 'Allow $(PRODUCT_NAME) to access your microphone'
+			}
+		],
+		[
+			'expo-location', {
+				locationAlwaysAndWhenInUsePermission: 'Allow $(PRODUCT_NAME) to access your location'
 			}
 		]
 	],
