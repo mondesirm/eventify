@@ -74,6 +74,9 @@
 		"error": "Password reset failed.",
 		"success": ["Your password has been reset successfully!", "You can now sign in with your new password."]
 	},
+	"upload": {
+		"error": "File upload failed."
+	},
 	"errors": {
 		"size": ["File size too large.", "It shouldn't exceed %{size}MB."],
 		"type": ["File type not supported.", "Only \"%{type}\" files are allowed."],
@@ -99,7 +102,8 @@
 			"operation-not-allowed": "This operation is not allowed. Please contact an admin."
 		},
 		"storage": {
-			"object-not-found": "The requested file does not exist."
+			"object-not-found": "The requested file does not exist.",
+			"unauthorized": "You are not authorized to access this file."
 		}
 	}
 }

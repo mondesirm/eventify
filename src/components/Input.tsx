@@ -37,7 +37,7 @@ export default forwardRef((props: InputProps, ref) => {
 	const toggle = secureTextEntry ? 'eye-outline' : 'eye-off-outline'
 
 	return (
-		<View style={props.style[0]}>
+		<View style={props.style?.[0]}>
 			<TextInput
 				{...props}
 				ref={ref}

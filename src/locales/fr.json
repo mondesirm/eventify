@@ -98,7 +98,8 @@
 			"operation-not-allowed": "L'opération n'est pas autorisée. Veuillez contacter un admin."
 		},
 		"storage": {
-			"object-not-found": "Le fichier recherché n'a pas été trouvé."
+			"object-not-found": "Le fichier recherché n'a pas été trouvé.",
+			"unauthorized": "Vous n'êtes pas autorisé à accéder à ce fichier."
 		}
 	},
 	"calendar": {

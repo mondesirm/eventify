@@ -14,6 +14,6 @@ export default function Routes() {
 		case 'user':
 			return <MainStack />
 		default:
-			return firstTime ? <MainStack /> : <AuthStack />
+			return firstTime ? <OnboardingStack /> : <AuthStack />
 	}
 }

@@ -84,6 +84,12 @@ export default {
 					URL.revokeObjectURL(uri)
 					resolve(getDownloadURL(ref))
 				})
+				// .catch(({ code }: FirebaseError) => {
+				// 	Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+
+				// 	if (!isConnected) reject(['upload.error', 'errors.connection'])
+				// 	reject(['upload.error', 'errors.' + code])
+				// })
 			})
 			.catch(({ code }: FirebaseError) => {
 				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
