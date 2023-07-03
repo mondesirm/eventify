@@ -6,8 +6,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	name: 'eventify',
 	description: 'Planning events made easy.',
 	version: '1.0.0',
+	sdkVersion: '48.0.0',
+	runtimeVersion: {
+		policy: 'sdkVersion'
+	},
 	orientation: 'portrait',
-	icon: 'https://github.com/expo/expo/blob/master/templates/expo-template-blank/assets/icon.png?raw=true',
+	icon: './src/assets/icon.png',
 	userInterfaceStyle: 'light',
 	splash: {
 		image: 'https://github.com/expo/expo/blob/master/templates/expo-template-blank/assets/splash.png?raw=true',
@@ -34,9 +38,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 		]
 	],
 	ios: {
-		supportsTablet: true
+		bundleIdentifier: 'com.mondesirm.eventify',
+		buildNumber: '1.0.0'
 	},
 	android: {
+		package: 'com.mondesirm.eventify',
+		versionCode: 1,
 		adaptiveIcon: {
 			foregroundImage: 'https://github.com/expo/expo/blob/master/templates/expo-template-blank/assets/adaptive-icon.png?raw=true',
 			backgroundColor: '#FFFFFF'

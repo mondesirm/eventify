@@ -6,7 +6,12 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "update": "eas update",
+    "build:android": "expo build:android",
+    "build:ios": "expo build:ios",
+    "build:aab": "expo build:android -t app-bundle",
+    "build:apk": "expo build:android -t apk"
   },
   "dependencies": {
     "@expo/webpack-config": "^18.0.1",
