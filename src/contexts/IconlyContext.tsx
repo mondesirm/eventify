@@ -1,5 +1,6 @@
 // Source: https://github.com/lnanhkhoa/react-native-iconly
 
+import { JSX } from 'react'
 import Svg, { SvgProps } from 'react-native-svg'
 import { createContext, memo, useContext } from 'react'
 import { getSize, getThemeProp, getStroke, getOpacity } from 'globals'

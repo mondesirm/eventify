@@ -6,6 +6,7 @@ import Calendar from '@/icons/Calendar'
 import Category from '@/icons/Category'
 import Location from '@/icons/Location'
 import Discovery from '@/icons/Discovery'
+import ChevronLeft from '@/icons/ChevronLeft'
 import Notification from '@/icons/Notification'
 import { IconlyContextProps } from '@/contexts/IconlyContext'
 
@@ -18,6 +19,7 @@ const Icons = {
 	Category,
 	Location,
 	Discovery,
+	ChevronLeft,
 	Notification
 }
 
