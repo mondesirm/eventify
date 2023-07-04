@@ -1,3 +1,4 @@
+import { JSX } from 'react'
 import { BlurView } from 'expo-blur'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { BottomTabNavigationProp, createBottomTabNavigator } from '@react-navigation/bottom-tabs'

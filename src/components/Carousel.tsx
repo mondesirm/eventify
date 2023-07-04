@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { JSX } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import AppIntroSlider from 'react-native-app-intro-slider'
 import { Animated, Dimensions, I18nManager, Platform, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native'

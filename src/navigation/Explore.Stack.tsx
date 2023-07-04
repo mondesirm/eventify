@@ -1,3 +1,4 @@
+import { JSX } from 'react'
 import { Image } from 'react-native'
 import { IconButton } from 'react-native-paper'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
