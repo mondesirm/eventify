@@ -23,7 +23,7 @@ export default function Explore({ navigation }: ScreenProps) {
 	const bottomTabBarHeight = useBottomTabBarHeight()
 
 	return (
-		<SafeAreaView style={[styles.screen, { height: height - bottomTabBarHeight }]}>
+		<SafeAreaView style={[styles.screen, { height: height - bottomTabBarHeight * 2 }]}>
 			<View style={styles.content}>
 				{screens.map(({ name, icon }, i) => (
 					<TouchableOpacity key={i} style={styles.block} onPress={() => navigation.navigate(name)}>
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
 	block: {
 		borderWidth: 1,
 		width: width / 2,
-		height: height / 3,
+		height: height / 4,
 		borderStyle: 'solid',
 		borderRadius: Border.xs,
 		borderColor: Color.border

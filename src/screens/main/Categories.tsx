@@ -25,7 +25,7 @@ export default function Explore({ navigation }: ScreenProps) {
 	useEffect(() => { all('categories').then(docs => setCategories(docs as Category[])) }, [])
 
 	return (
-		<SafeAreaView style={[styles.screen, { height: height - bottomTabBarHeight }]}>
+		<SafeAreaView style={[styles.screen, { height: height - bottomTabBarHeight * 2 }]}>
 			<SharedElement id="categories" style={styles.content}>
 				{categories.map((_, i) => (
 					<TouchableOpacity key={i} style={styles.block} onPress={() => navigation.navigate('Category', { _ })}>

@@ -5,7 +5,7 @@ import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 
 import { Color, FontFamily, FontSize } from 'globals'
-import { useStoreActions, useStoreState } from '@/store'
+import { Item, useStoreActions, useStoreState } from '@/store'
 
 interface ScreenProps {
 	navigation: NavigationProp<any, any>
@@ -28,13 +28,17 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 	)
 
 	const renderItem = (item: any) => {
-		const labels = item.labels.map((_, i) => <Badge key={i} style={[styles.badge, { backgroundColor: _.color }]}>{_.name}</Badge>)
+		let event = item as Item
+		const labels = event.labels.map((_, i) => <Badge key={i} style={[styles.badge, { backgroundColor: _.color }]}>{_.name}</Badge>)
 
 		return (
 			<View style={styles.item}>
 				<View>
-					<Text style={{ color: '#48506B', fontFamily: FontFamily.medium, marginBottom: 10 }}>{item.name}</Text>
-					<Text style={{ color: '#9B9B9B', fontFamily: FontFamily.medium }}>{item.time}</Text>
+					<Text style={{ color: '#48506B', fontFamily: FontFamily.medium, marginBottom: 10 }}>{event.title}</Text>
+					<Text style={{ color: '#9B9B9B', fontFamily: FontFamily.medium }}>
+						{event.start.toLocaleDateString('en', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
+						{event?.end && event.start !== event.end && ' • ' + event.end.toLocaleDateString('en', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
+					</Text>
 				</View>
 
 				<View /* style="horizontal h-start" */>{labels}</View>

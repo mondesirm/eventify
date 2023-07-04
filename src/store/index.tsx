@@ -32,6 +32,7 @@ export type Category = {
 	icon: keyof typeof MaterialCommunityIcons.glyphMap
 } & Base
 
+// If T is true then the relation is serialized
 export type Place<T = false> = {
 	name: string
 	uri: string
@@ -40,12 +41,60 @@ export type Place<T = false> = {
 	category: T extends false ? string : Category
 } & Base
 
-export type Item = { name: string, time: `${number}:${number}`, labels: { name: string, color: string }[] }
+export type Event<T = false> = {
+	title: string
+	description?: string
+	start: Date
+	end?: Date
+	limit?: number
+	visibility: 'public' | 'friends' | 'unlisted'
+	owner: T extends false ? string : User
+	place?: T extends false ? string : Place
+	category: T extends false ? string : Category
+	attendees: T extends false ? string[] : User[]
+	invitations: T extends false ? string[] : Invitation[]
+} & Base
+
+export type Item = {
+	title: string
+	description?: string
+	start: Date
+	end?: Date
+	limit?: number
+	visibility: 'public' | 'friends' | 'unlisted'
+	labels: { name: string, color: string }[]
+}
 export type Days = Record<string, Item[]>
 
-export type Event = {
-	name: string
-	place: Place
-	start: Date
-	end: Date
+export type User<T = false> = {
+	avatar?: string
+	username: string
+	email: string
+	phone?: string
+	password?: string
+	isDisabled: boolean
+	roles: ('user' | 'admin')[]
+	ownedEvents: T extends false ? string[] : Event[]
+	attendedEvents: T extends false ? string[] : Event[]
+	sentInvitations: T extends false ? string[] : Invitation[]
+	receivedInvitations: T extends false ? string[] : Invitation[]
+	trips: T extends false ? string[] : Trip[]
+} & Base
+
+export type Invitation<T = false> = {
+	kind: 'friend_request' | 'event_attendance'
+	event: T extends false ? string : Event
+	sender: T extends false ? string : User
+	receiver: T extends false ? string : User
+} & Base
+
+export type Trip<T = false> = {
+	day: Date
+	positions: T extends false ? string[] : Position[]
+	user: T extends false ? string : User
+} & Base
+
+export type Position<T = false> = {
+	coordinates: { latitude: number, longitude: number, [key: string]: any }
+	trip: T extends false ? string : Trip
 } & Base

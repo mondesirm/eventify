@@ -14,7 +14,7 @@ type User = DocumentData | {
 	username: string
 	email: string
 	phone: string
-	role: string
+	roles: string[]
 	createdAt: any
 	updatedAt: any
 }
@@ -27,40 +27,40 @@ type UploadPayload = {
 
 export interface UserModel {
 	currentUser: User
-	role: string
+	roles: string[]
 	token: string
-	roleAdmin: string
+	isAdmin: boolean
 	loading: boolean
 	isLoggedIn: Computed<this, boolean>
 	allUsers: []
 	setUser: Action<this, User>
-	setRole: Action<this, string>
-	setRoleAdmin: Action<this, string>
+	setRoles: Action<this, string[]>
+	setIsAdmin: Action<this, boolean>
 	setLoading: Action<this, boolean>
-	setLogin: Action<this, { role: string, token: string }>
+	setLogin: Action<this, { roles: string[], token: string }>
 	setLogout: Action<this>
 	upload: Thunk<this, UploadPayload, any, StoreModel, Promise<string>>
 }
 
 export default {
 	currentUser: null,
-	role: null,
+	roles: [],
 	token: null,
-	roleAdmin: null,
-	loading: true,
-	isLoggedIn: computed((state) => state.role != null),
+	isAdmin: false,
+	loading: false,
+	isLoggedIn: computed((state) => state.roles.length > 0),
 	allUsers: [],
 	setUser: action((state, payload) => { state.currentUser = payload }),
-	setRole: action((state, payload) => { state.role = payload }),
-	setRoleAdmin: action((state, payload) => { state.roleAdmin = payload }),
+	setRoles: action((state, payload) => { state.roles = payload }),
+	setIsAdmin: action((state, payload) => { state.isAdmin = payload }),
 	setLoading: action((state, payload) => { state.loading = payload }),
 	setLogin: action((state, payload) => {
-		state.role = payload.role
+		state.roles = payload.roles
 		state.token = payload.token
 	}),
 	setLogout: action(state => {
 		state.currentUser = null
-		state.role = null
+		state.roles = []
 		state.token = null
 		state.allUsers = null
 	}),

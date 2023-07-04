@@ -5,15 +5,8 @@ import OnboardingStack from '@/navigation/Onboarding.Stack'
 
 export default function Routes() {
 	const firstTime = true
-	const role = useStoreState(({ user }) => user.role)
+	const roles = useStoreState(({ user }) => user.roles)
 
-	//? dynamically call stack per role
-	// ex: const RoleStack: JSX.Element = require(`./${role.charAt(0).toUpperCase() + role.slice(1).toLowercase()}.Stack`).default
-
-	switch (role) {
-		case 'user':
-			return <MainStack />
-		default:
-			return firstTime ? <OnboardingStack /> : <AuthStack />
-	}
+	if (roles.length > 0) return <MainStack />
+	else return firstTime ? <OnboardingStack /> : <AuthStack />
 }

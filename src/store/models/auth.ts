@@ -43,14 +43,14 @@ export default {
 			signInWithEmailAndPassword(auth, email, password).then(({ user }) => {
 				if (!user.emailVerified) return reject(['login.error', 'login.verify'])
 
-				// If verification link was opened, get user role
+				// If verification link was opened, get user roles and token
 				getIdTokenResult(user).then(({ token }) => {
 					// Get Firestore user document
 					getDoc(doc(firestore, 'users', user.uid)).then(doc => {
 						const currentUser = doc.data()
 
-						getStoreActions().user.setLogin({ role: currentUser.role, token })
-						if (currentUser.role === 'admin') getStoreActions().user.setRoleAdmin(currentUser.role)
+						getStoreActions().user.setLogin({ roles: currentUser.roles, token })
+						if (currentUser.roles.includes('admin')) getStoreActions().user.setIsAdmin(true)
 
 						getStoreActions().user.setUser(currentUser)
 						resolve(['login.success.0', 'login.success.1'])
@@ -99,7 +99,7 @@ export default {
 							setDoc(doc(collection(firestore, 'users'), user.uid), {
 								phone,
 								username,
-								role: 'user',
+								roles: ['user'],
 								// isOnline: true,
 								isDisabled: false,
 								email: user.email,
@@ -150,7 +150,7 @@ export default {
 
 		return new Promise((resolve, reject) => {
 			onAuthStateChanged(auth, user => {
-				if (user === null || getStoreState().user.role !== null) return getStoreActions().user.setLoading(false) /* reject('You are not logged in.') */
+				if (user === null || getStoreState().user.roles.length === 0) return getStoreActions().user.setLoading(false) /* reject('You are not logged in.') */
 				if (user.emailVerified !== true) return getStoreActions().user.setLoading(false) /* reject('You are not verified.')
  */
 				user.getIdTokenResult().then(({ token }) => {
@@ -158,8 +158,8 @@ export default {
 					getDoc(doc(collection(firestore, 'users'), user.uid)).then(doc => {
 						const currentUser = doc.data()
 
-						getStoreActions().user.setLogin({ role: currentUser.role, token })
-						if (currentUser.role == 'Admin') getStoreActions().user.setRoleAdmin(currentUser.role)
+						getStoreActions().user.setLogin({ roles: currentUser.roles, token })
+						if (currentUser.roles.includes('Admin')) getStoreActions().user.setIsAdmin(true)
 
 						// resolve(getStoreActions().user.setUser(userData))
 						console.log('restoreSession', currentUser?.email)

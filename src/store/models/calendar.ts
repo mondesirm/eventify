@@ -12,18 +12,22 @@ export interface CalendarModel {
 	onLoadItems: ActionOn<this, StoreModel>
 }
 
-const names = [
+const titles = [
 	'Café', 'Dinner', 'Lunch', 'Breakfast', 'Brunch', 'Cocktail', 'Drinks', 'Beer',
 	'Beach', 'Hiking', 'Skiing', 'Surfing', 'Kayaking', 'Cycling', 'Sailing', 'Diving',
 	'Museum', 'Theater', 'Cinema', 'Park', 'Garden', 'Sightseeing', 'Monument', 'Church'
 ]
 
 const labels = ['Fun', 'Food', 'Culture', 'Nature', 'Sport', 'Relax', 'Party', 'Work', 'Study', 'Health', 'Family', 'Friends', 'Love', 'Other']
-	.map((name, i) => ({ name, color: `hsl(${i * 360 / names.length}, 100%, 50%)` }))
+	.map((name, i) => ({ name, color: `hsl(${i * 360 / titles.length}, 100%, 50%)` }))
 
 const items: Item[] = Array.from({ length: 48 }, () => ({
-	name: names[Math.floor(Math.random() * names.length)],
-	time: `${Math.floor(Math.random() * 24)}:${Math.floor(Math.random() * 2) * 30}`,
+	title: titles[Math.floor(Math.random() * titles.length)],
+	description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+	start: new Date(Math.random() * 24 * 60 * 60 * 1000),
+	end: new Date(Math.random() * 24 * 60 * 60 * 1000),
+	limit: Math.random() > .5 ? Math.floor(Math.random() * 10) : undefined,
+	visibility: ['public', 'friends', 'unlisted'][Math.floor(Math.random() * 3)] as Item['visibility'],
 	labels: Math.random() > .5 ? [labels[Math.floor(Math.random() * labels.length)]] : []
 }))
 
@@ -48,8 +52,12 @@ export default {
 
 				for (let j = 0; j < numItems; j += 1) {
 					items[strTime].push({
-						name: names[randomNumber(0, names.length - 1)],
-						time: `${randomNumber(0, 24)}:${randomNumber(0, 60)}`,
+						title: titles[randomNumber(0, titles.length - 1)],
+						description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+						start: new Date(time + 60 * 60 * 1000 * randomNumber(0, 23)),
+						end: new Date(time + 60 * 60 * 1000 * randomNumber(0, 23)),
+						limit: Math.random() > .5 ? randomNumber(0, 10) : undefined,
+						visibility: ['public', 'friends', 'unlisted'][randomNumber(0, 2)] as Item['visibility'],
 						labels: Math.random() > .5 ? [labels[randomNumber(0, Object.keys(labels).length - 1)]] : [],
 					})
 				}
@@ -69,15 +77,13 @@ export default {
 
 		// Sort items by time whenever they are loaded
 		Object.keys(state.items).forEach(key => {
+			// items[key] = state.items[key].sort((a, b) => a.start.getTime() - b.start.getTime())
 			items[key] = state.items[key].sort((a, b) => {
-				const aTime = a.time.split(':').map(n => parseInt(n))
-				const bTime = b.time.split(':').map(n => parseInt(n))
+				const aTime = { start: a.start.getTime(), end: a.end.getTime() }
+				const bTime = { start: b.start.getTime(), end: b.end.getTime() }
 
-				if (aTime[0] < bTime[0]) return -1
-				if (aTime[0] > bTime[0]) return 1
-				if (aTime[1] < bTime[1]) return -1
-				if (aTime[1] > bTime[1]) return 1
-				return 0
+				// Sort by start time and if they are the same, sort by end time
+				return aTime.start - bTime.start || aTime.end - bTime.end
 			})
 		})
 
