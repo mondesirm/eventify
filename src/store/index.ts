@@ -7,6 +7,7 @@ import { AuthModel } from './models/auth'
 import { UserModel } from './models/user'
 import { UtilsModel } from './models/utils'
 import { CalendarModel } from './models/calendar'
+import { Timestamp } from 'firebase/firestore'
 
 export type StoreModel = {
 	db: DBModel
@@ -24,7 +25,7 @@ export const useStoreState = typedHooks.useStoreState
 
 export default createStore<StoreModel>(models)
 
-type Timestamp = { seconds: number, nanoseconds: number }
+// type Timestamp = { seconds: number, nanoseconds: number }
 type Base = { id?: string, createdAt?: Timestamp, updatedAt?: Timestamp }
 
 export type Category = {
@@ -44,27 +45,18 @@ export type Place<T = false> = {
 export type Event<T = false> = {
 	title: string
 	description?: string
-	start: Date
-	end?: Date
+	start: Timestamp
+	end?: Timestamp
 	limit?: number
 	visibility: 'public' | 'friends' | 'unlisted'
 	owner: T extends false ? string : User
 	place?: T extends false ? string : Place
-	category: T extends false ? string : Category
-	attendees: T extends false ? string[] : User[]
-	invitations: T extends false ? string[] : Invitation[]
+	category?: T extends false ? string : Category
+	attendees?: T extends false ? string[] : User[]
+	invitations?: T extends false ? string[] : Invitation[]
 } & Base
 
-export type Item = {
-	title: string
-	description?: string
-	start: Date
-	end?: Date
-	limit?: number
-	visibility: 'public' | 'friends' | 'unlisted'
-	labels: { name: string, color: string }[]
-}
-export type Days = Record<string, Item[]>
+export type Days = Record<string, Event[]>
 
 export type User<T = false> = {
 	avatar?: string
@@ -89,7 +81,7 @@ export type Invitation<T = false> = {
 } & Base
 
 export type Trip<T = false> = {
-	day: Date
+	day: Timestamp
 	positions: T extends false ? string[] : Position[]
 	user: T extends false ? string : User
 } & Base

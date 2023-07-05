@@ -8,5 +8,5 @@ export default function Routes() {
 	const roles = useStoreState(({ user }) => user.roles)
 
 	if (roles.length > 0) return <MainStack />
-	else return firstTime ? <OnboardingStack /> : <AuthStack />
+	else return firstTime ? <MainStack /> : <AuthStack />
 }

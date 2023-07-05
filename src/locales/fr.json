@@ -73,6 +73,14 @@
 		"error": "Réinitialisation du mot de passe échouée.",
 		"success": ["Votre mot de passe a bien été réinitialisé !", "Vous pouvez maintenant vous connecter avec."]
 	},
+	"calendar": {
+		"error": "Impossible de charger le calendrier.",
+		"today": "Aujourd'hui",
+		"dayNamesShort": ["Dim.", "Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam."],
+		"dayNames": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+		"monthNamesShort": ["Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."],
+		"monthNames": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+	},
 	"errors": {
 		"size": ["La taille du fichier est trop petite.", "Elle ne doit pas dépasser %{size} Mo."],
 		"type": ["Le type de fichier est invalide.", "Seuls les fichiers de type \"%{type}\" sont autorisés."],
@@ -86,6 +94,7 @@
 		"unique": "Le champ \"%{label}\" doit être unique",
 		"exists": "Le champ \"%{label}\" n'existe pas",
 		"connection": "Veuillez vérifier votre connexion internet.",
+		"permission-denied": "Vous n'avez pas les permissions nécessaires.",
 		"auth": {
 			"missing-email": "L'adresse email est manquante.",
 			"invalid-email": "L'adresse email est invalide.",
@@ -101,12 +110,5 @@
 			"object-not-found": "Le fichier recherché n'a pas été trouvé.",
 			"unauthorized": "Vous n'êtes pas autorisé à accéder à ce fichier."
 		}
-	},
-	"calendar": {
-		"today": "Aujourd'hui",
-		"dayNamesShort": ["Dim.", "Lun.", "Mar.", "Mer.", "Jeu.", "Ven.", "Sam."],
-		"dayNames": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
-		"monthNamesShort": ["Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."],
-		"monthNames": ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 	}
 }

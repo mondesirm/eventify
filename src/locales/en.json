@@ -77,6 +77,9 @@
 	"upload": {
 		"error": "File upload failed."
 	},
+	"calendar": {
+		"error": "Failed to load calendar."
+	},
 	"errors": {
 		"size": ["File size too large.", "It shouldn't exceed %{size}MB."],
 		"type": ["File type not supported.", "Only \"%{type}\" files are allowed."],
@@ -90,6 +93,7 @@
 		"unique": "This %{label} is already taken",
 		"exists": "This %{label} does not exist",
 		"connection": "Please check your internet connection.",
+		"permission-denied": "You do not have the required permissions.",
 		"auth": {
 			"missing-email": "The email address is missing.",
 			"invalid-email": "The email address is invalid.",

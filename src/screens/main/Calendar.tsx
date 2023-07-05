@@ -1,11 +1,14 @@
-import { Agenda } from 'react-native-calendars'
+import Toast from 'react-native-toast-message'
 import { AnimatedFAB, Badge } from 'react-native-paper'
 import { NavigationProp } from '@react-navigation/native'
-import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { Agenda, DateData } from 'react-native-calendars'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { Dimensions, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 
+import { AllowedScope } from '@/locales'
 import { Color, FontFamily, FontSize } from 'globals'
-import { Item, useStoreActions, useStoreState } from '@/store'
+import { useI18n } from '@/contexts/PreferencesContext'
+import { Event, useStoreActions, useStoreState } from '@/store'
 
 interface ScreenProps {
 	navigation: NavigationProp<any, any>
@@ -15,9 +18,16 @@ interface ScreenProps {
 const { width, height } = Dimensions.get('screen')
 
 export default function Calendar({ navigation, route }: ScreenProps) {
+	const { __, locale } = useI18n()
 	const bottomTabBarHeight = useBottomTabBarHeight()
 	const items = useStoreState(({ calendar }) => calendar.items) as any
 	const loadItems = useStoreActions(({ calendar }) => calendar.loadItems)
+
+	// Random color based on category name
+	const randomColor = (name: string | null = null) => {
+		if (!name) return 'transparent'
+		return `#${((parseInt(name, 36) * 2) % 0xffffff).toString(16)}000000`.slice(0, 7)
+	}
 
 	const rowHasChanged: typeof Agenda.prototype.props.rowHasChanged = (r1, r2) => r1.name !== r2.name
 
@@ -28,22 +38,30 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 	)
 
 	const renderItem = (item: any) => {
-		let event = item as Item
-		const labels = event.labels.map((_, i) => <Badge key={i} style={[styles.badge, { backgroundColor: _.color }]}>{_.name}</Badge>)
+		let event = item as Event<true>
 
 		return (
 			<View style={styles.item}>
 				<View>
 					<Text style={{ color: '#48506B', fontFamily: FontFamily.medium, marginBottom: 10 }}>{event.title}</Text>
 					<Text style={{ color: '#9B9B9B', fontFamily: FontFamily.medium }}>
-						{event.start.toLocaleDateString('en', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
-						{event?.end && event.start !== event.end && ' • ' + event.end.toLocaleDateString('en', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
+						{event.start.toDate().toLocaleDateString(locale, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
+						{event?.end && !event.start.isEqual(event.end) && ' • ' + event.end.toDate().toLocaleDateString(locale, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
 					</Text>
 				</View>
 
-				<View /* style="horizontal h-start" */>{labels}</View>
+				<Badge style={[styles.badge, { backgroundColor: randomColor(event.category?.name) }]}>{event.category?.name}</Badge>
 			</View>
 		)
+	}
+
+	const loadItemsForMonth = (data: DateData) => {
+		loadItems(data)
+			// .then((res: AllowedScope[]) => {
+			// 	Toast.show({ text1: __(res[0]), text2: __(res[1]) })
+			// 	navigation.navigate('Login', { email })
+			// })
+			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
 	}
 
 	return (
@@ -55,7 +73,7 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 				enableSwipeMonths
 				renderItem={renderItem}
 				rowHasChanged={rowHasChanged}
-				loadItemsForMonth={loadItems}
+				loadItemsForMonth={loadItemsForMonth}
 				renderEmptyDate={renderEmptyDate}
 				theme={{
 					dotColor: Color.primary,
