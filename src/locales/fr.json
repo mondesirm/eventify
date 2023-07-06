@@ -30,12 +30,43 @@
 	"next": "Suivant",
 	"done": "Terminé",
 	"form": {
+		"cancel": "Annuler",
+		"save": "Enregistrer",
 		"username": "Nom d'utilisateur",
 		"phone": "Numéro de téléphone",
 		"email": "Adresse email",
 		"password": "Mot de passe",
 		"confirm": "Confirmer le mot de passe",
-		"code": "Code de vérification"
+		"code": "Code de vérification",
+		"search": "Rechercher"
+	},
+	"entities": {
+		"event": {
+			"one": "événement",
+			"other": "événements",
+			"new": "Nouvel événement",
+			"title": "Titre",
+			"description": "Description",
+			"start": "Date de début",
+			"end": "Date de fin",
+			"limit": "Maximum de participants",
+			"visibility": "Visibilité",
+			"owner": "Propriétaire",
+			"place": "Lieu",
+			"category": "Catégorie",
+			"attendees": "Participants",
+			"invitations": "Invitations"
+		},
+		"place": {
+			"one": "lieu",
+			"other": "lieux",
+			"new": "Nouveau lieu"
+		},
+		"category": {
+			"one": "catégorie",
+			"other": "catégories",
+			"new": "Nouvelle catégorie"
+		}
 	},
 	"login": {
 		"title": "Connectez-vous à %{title}",
@@ -87,10 +118,13 @@
 		"min": "Doit contenir au moins %{min} caractères",
 		"max": "Doit contenir au plus %{max} caractères",
 		"length": "Doit contenir exactement %{length} caractères",
+		"minDate": "Doit être supérieur au %{min}",
+		"maxDate": "Doit être inférieur au %{max}",
 		"email": "Doit être une adresse email valide",
 		"phone": "Numéros de téléphone français uniquement",
 		"required": "Le champ \"%{label}\" est requis",
 		"is": "Doit correspondre au champ \"%{is}\"",
+		"oneOf": "Doit être l'un des éléments suivants : %{values}",
 		"unique": "Le champ \"%{label}\" doit être unique",
 		"exists": "Le champ \"%{label}\" n'existe pas",
 		"connection": "Veuillez vérifier votre connexion internet.",

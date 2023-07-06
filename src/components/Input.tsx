@@ -9,9 +9,9 @@ import Icons from '@/icons'
 import { useNavs } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
-export interface InputProps<T = 'search'> extends TextInputProps {
+export interface InputProps<T = string> extends TextInputProps {
 	navs?: [number, ReturnType<typeof useNavs>]
-	type?: string
+	type?: T
 	left?: T extends 'search' ? Lowercase<keyof typeof Icons> : keyof typeof MaterialCommunityIcons.glyphMap
 	right?: T extends 'search' ? Lowercase<keyof typeof Icons> : keyof typeof MaterialCommunityIcons.glyphMap
 	errors?: [boolean, any]
@@ -26,11 +26,12 @@ export default forwardRef((props: InputProps, ref) => {
 
 	// Customize autoComplete and keyboardType based on type
 	const types: Record<string, [typeof TextInput.defaultProps.autoComplete, typeof TextInput.defaultProps.keyboardType]> = {
-		username: ['username', 'default'],
 		phone: ['tel', 'phone-pad'],
+		search: ['off', 'web-search'],
 		email: ['email', 'email-address'],
-		password: ['password', 'visible-password'],
-		search: ['off', 'web-search']
+		username: ['username', 'default'],
+		date: ['off', 'numbers-and-punctuation'],
+		password: ['password', 'visible-password']
 	}
 
 	const isPassword = ['password', 'confirm'].includes(props.type)

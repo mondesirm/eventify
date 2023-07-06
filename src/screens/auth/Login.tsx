@@ -87,7 +87,7 @@ export default ({ navigation, route }: ScreenProps) => {
 
 								<View style={styles.extras}>
 									<View style={styles.remember}>
-										<Switch color={Color.primary} value={Boolean(values.remember)} onValueChange={() => setFieldValue('remember', !values.remember)} />
+										<Switch color={Color.primary} value={Boolean(values.remember)} onValueChange={() => setFieldValue('remember', !values.remember) as Promise<void>} />
 										<Text style={styles.text}>{__('login.remember')}</Text>
 									</View>
 

@@ -30,6 +30,8 @@
 	"next": "Next",
 	"done": "Done",
 	"form": {
+		"cancel": "Cancel",
+		"save": "Save",
 		"username": "Username",
 		"phone": "Phone Number",
 		"email": "Email Address",
@@ -37,6 +39,34 @@
 		"confirm": "Confirm Password",
 		"code": "Verification Code",
 		"search": "Search"
+	},
+	"entities": {
+		"event": {
+			"one": "Event",
+			"other": "Events",
+			"new": "New Event",
+			"title": "Title",
+			"description": "Description",
+			"start": "Start Date",
+			"end": "End Date",
+			"limit": "Max Attendees",
+			"visibility": "Visibility",
+			"owner": "Owner",
+			"place": "Place",
+			"category": "Category",
+			"attendees": "Attendees",
+			"invitations": "Invitations"
+		},
+		"place": {
+			"one": "Place",
+			"other": "Places",
+			"new": "New Place"
+		},
+		"category": {
+			"one": "Category",
+			"other": "Categories",
+			"new": "New Category"
+		}
 	},
 	"login": {
 		"title": "Sign in to %{title}",
@@ -86,10 +116,13 @@
 		"min": "Must be at least %{min} characters long",
 		"max": "Must be at most %{max} characters long",
 		"length": "Must be %{length} characters long",
+		"minDate": "Must be after %{min}",
+		"maxDate": "Must be before %{max}",
 		"email": "Must be a valid email address",
 		"phone": "French phone numbers only",
 		"required": "%{label} is required",
 		"is": "Must be the same as %{is}",
+		"oneOf": "Must be one of %{oneOf}",
 		"unique": "This %{label} is already taken",
 		"exists": "This %{label} does not exist",
 		"connection": "Please check your internet connection.",
