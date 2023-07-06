@@ -9,7 +9,7 @@ import Icons from '@/icons'
 import { useNavs } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize, Padding } from 'globals'
 
-export interface InputProps<T = string> extends TextInputProps {
+export interface InputProps<T extends string = any> extends TextInputProps {
 	navs?: [number, ReturnType<typeof useNavs>]
 	type?: T
 	left?: T extends 'search' ? Lowercase<keyof typeof Icons> : keyof typeof MaterialCommunityIcons.glyphMap
@@ -27,6 +27,7 @@ export default forwardRef((props: InputProps, ref) => {
 	// Customize autoComplete and keyboardType based on type
 	const types: Record<string, [typeof TextInput.defaultProps.autoComplete, typeof TextInput.defaultProps.keyboardType]> = {
 		phone: ['tel', 'phone-pad'],
+		number: ['off', 'number-pad'],
 		search: ['off', 'web-search'],
 		email: ['email', 'email-address'],
 		username: ['username', 'default'],
@@ -55,7 +56,7 @@ export default forwardRef((props: InputProps, ref) => {
 				autoComplete={types[props.type]?.[0] || props.autoComplete}
 				keyboardType={types[props.type]?.[1] || props.keyboardType}
 				returnKeyType={props.returnKeyType || 'next'}
-				enablesReturnKeyAutomatically
+				enablesReturnKeyAutomatically={props.enablesReturnKeyAutomatically ?? true}
 				onPressIn={() => props.navs && props.navs[1]?.setCurr(props.navs?.[0])}
 				onSubmitEditing={() => props.navs && props.navs[1]?.next(props.navs?.[0])}
 				left={props.left && <TextInput.Icon icon={() => props.type === 'search'

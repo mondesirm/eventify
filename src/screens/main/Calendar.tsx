@@ -48,13 +48,12 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 			.meta({ icon: 'format-text-variant-outline'})
 			.label(__('entities.event.title'))
 			.min(3, e => __('errors.min', e))
-			.min(50, e => __('errors.max', e))
+			.max(50, e => __('errors.max', e))
 			.required(e => __('errors.required', e)),
 		description: Yup.string()
 			.meta({ icon: 'text-box-outline'})
 			.label(__('entities.event.description'))
-			.min(8, e => __('errors.min', e))
-			.required(e => __('errors.required', e)),
+			.max(500, e => __('errors.max', e)),
 		start: Yup.date()
 			.meta({ icon: 'calendar-start'})
 			.label(__('entities.event.start'))
@@ -130,11 +129,7 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
 	}
 
-	const onChange = (event: DateTimePickerEvent, selectedDate: Date, setter: Function, field: string[]) => {
-		console.log(new Date(selectedDate).toLocaleDateString(locale, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }))
-		const currentDate = selectedDate
-		// setDate(currentDate)
-	}
+	const onChange = (event: DateTimePickerEvent, selectedDate: Date, setter: Function) => setter(selectedDate.toISOString())
 
 	const onSubmit = ({ title, description, start, end, limit, visibility, place, category }) => {
 		// create({ title, description, start, end, limit, visibility, place, category })
@@ -146,7 +141,7 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 	}
 
 	return (
-		<SafeAreaView style={[styles.screen, { height: height - bottomTabBarHeight }]}>
+		<SafeAreaView style={[styles.screen, { height: height - bottomTabBarHeight }]} onTouchStart={navs.dismiss}>
 			<Agenda
 				// style={{ paddingBottom: 20 }}
 				firstDay={1}
@@ -169,8 +164,8 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 
 			<AnimatedFAB style={styles.fab} icon="plus" label="Create Event" extended onPress={() => handleSnapPress(2)} />
 
-			<BottomSheet ref={bottomSheet} style={styles.sheet} index={index} snapPoints={snapPoints} enablePanDownToClose onChange={setIndex} onClose={() => Keyboard.dismiss()}>
-				<SafeAreaView style={styles.modal} onTouchStart={navs.dismiss}>
+			<BottomSheet ref={bottomSheet} style={[styles.sheet, { shadowRadius: index * 10 }]} index={index} snapPoints={snapPoints} enablePanDownToClose onChange={setIndex} onClose={() => Keyboard.dismiss()}>
+				<SafeAreaView style={styles.modal}>
 					<IconButton style={styles.close} icon="close" iconColor={Color.black} onPress={() => handleClosePress()} />
 
 					<Animated.View style={[styles.header, animation]}>
@@ -187,14 +182,13 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 							{({ handleChange, handleSubmit, handleBlur, setFieldValue, values, errors, touched }) => (
 								<View style={styles.inputs}>
 									<Input ref={inputs[0]} navs={[0, navs]} autoFocus={index > -1} label={schema.fields['title'].describe()?.['label']} left={schema.fields['title'].describe()?.['meta']?.icon as any} value={values.title} errors={[touched.title, errors.title]} onBlur={handleBlur('title')} onChangeText={handleChange('title')} />
-									<Input ref={inputs[1]} navs={[1, navs]} label={schema.fields['description'].describe()?.['label']} left={schema.fields['description'].describe()?.['meta']?.icon as any} value={values.description} errors={[touched.description, errors.description]} onBlur={handleBlur('description')} onChangeText={handleChange('description')} />
+									<Input ref={inputs[1]} navs={[1, navs]} label={schema.fields['description'].describe()?.['label']} left={schema.fields['description'].describe()?.['meta']?.icon as any} value={values.description} errors={[touched.description, errors.description]} enablesReturnKeyAutomatically={false} onBlur={handleBlur('description')} onChangeText={handleChange('description')} />
 
 									<View>
 										<View style={styles.group}>
-											{/* <Input ref={inputs[2]} editable={false} navs={[2, navs]} type="date" label={schema.fields['start'].describe()?.['label']} left={schema.fields['start'].describe()?.['meta']?.icon as any} value={values.start} errors={[touched.start, errors.start]} onBlur={handleBlur('start')} onChangeText={handleChange('start')} /> */}
 											<Text style={[styles.text, styles.typo]}>{schema.fields['start'].describe()?.['label']}</Text>
-											<DateTimePicker mode="date" value={new Date(values.start)} is24Hour onChange={(e, s) => onChange(e, s, setFieldValue, ['start', 'date'])} />
-											<DateTimePicker mode="time" value={new Date(values.start)} is24Hour onChange={(e, s) => onChange(e, s, setFieldValue, ['start', 'time'])} />
+											<DateTimePicker mode="date" value={new Date(values.start)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('start'))} />
+											<DateTimePicker mode="time" value={new Date(values.start)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('start'))} />
 										</View>
 
 										{touched.start && errors.start && <Text style={styles.error}>{errors.start.charAt(0).toUpperCase() + errors.start.slice(1).toLowerCase()}.</Text>}
@@ -202,19 +196,18 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 
 									<View>
 										<View style={styles.group}>
-											{/* <Input ref={inputs[3]} editable={false} navs={[3, navs]} type="date" label={schema.fields['end'].describe()?.['label']} left={schema.fields['end'].describe()?.['meta']?.icon as any} value={values.end} errors={[touched.end, errors.end]} onBlur={handleBlur('end')} onChangeText={handleChange('end')} /> */}
 											<Text style={[styles.text, styles.typo]}>{schema.fields['end'].describe()?.['label']}</Text>
-											<DateTimePicker mode="date" value={new Date(values.end)} is24Hour onChange={(e, s) => onChange(e, s, setFieldValue, ['end', 'date'])} />
-											<DateTimePicker mode="time" value={new Date(values.end)} is24Hour onChange={(e, s) => onChange(e, s, setFieldValue, ['end', 'time'])} />
+											<DateTimePicker mode="date" value={new Date(values.end)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('end'))} />
+											<DateTimePicker mode="time" value={new Date(values.end)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('end'))} />
 										</View>
 
 										{touched.end && errors.end && <Text style={styles.error}>{errors.end.charAt(0).toUpperCase() + errors.end.slice(1).toLowerCase()}.</Text>}
 									</View>
 
-									<Input ref={inputs[4]} navs={[2, navs]} label={schema.fields['limit'].describe()?.['label']} left={schema.fields['limit'].describe()?.['meta']?.icon as any} value={values.limit} errors={[touched.limit, errors.limit]} onBlur={handleBlur('limit')} onChangeText={handleChange('limit')} />
+									<Input ref={inputs[4]} navs={[2, navs]} type="number" label={schema.fields['limit'].describe()?.['label']} left={schema.fields['limit'].describe()?.['meta']?.icon as any} value={values.limit} errors={[touched.limit, errors.limit]} enablesReturnKeyAutomatically={false} onBlur={handleBlur('limit')} onChangeText={handleChange('limit')} />
 									<Input ref={inputs[5]} navs={[3, navs]} label={schema.fields['visibility'].describe()?.['label']} left={schema.fields['visibility'].describe()?.['meta']?.icon as any} value={values.visibility} errors={[touched.visibility, errors.visibility]} onBlur={handleBlur('visibility')} onChangeText={handleChange('visibility')} />
-									<Input ref={inputs[6]} navs={[4, navs]} label={schema.fields['place'].describe()?.['label']} left={schema.fields['place'].describe()?.['meta']?.icon as any} value={values.place} errors={[touched.place, errors.place]} onBlur={handleBlur('place')} onChangeText={handleChange('place')} />
-									<Input ref={inputs[7]} navs={[5, navs]} label={schema.fields['category'].describe()?.['label']} left={schema.fields['category'].describe()?.['meta']?.icon as any} value={values.category} errors={[touched.category, errors.category]} onBlur={handleBlur('category')} onChangeText={handleChange('category')} />
+									<Input ref={inputs[6]} navs={[4, navs]} label={schema.fields['place'].describe()?.['label']} left={schema.fields['place'].describe()?.['meta']?.icon as any} value={values.place} errors={[touched.place, errors.place]} enablesReturnKeyAutomatically={false} onBlur={handleBlur('place')} onChangeText={handleChange('place')} />
+									<Input ref={inputs[7]} navs={[5, navs]} label={schema.fields['category'].describe()?.['label']} left={schema.fields['category'].describe()?.['meta']?.icon as any} value={values.category} errors={[touched.category, errors.category]} enablesReturnKeyAutomatically={false} onBlur={handleBlur('category')} onChangeText={handleChange('category')} />
 
 									<View style={styles.actions}>
 										<TouchableOpacity disabled={!_.isEmpty(errors)} style={[styles.submit, !_.isEmpty(errors) && { backgroundColor: Color.border }]} onPress={handleSubmit as (e: GestureResponderEvent | React.FormEvent<HTMLFormElement> | undefined) => void}>

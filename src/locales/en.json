@@ -122,7 +122,7 @@
 		"phone": "French phone numbers only",
 		"required": "%{label} is required",
 		"is": "Must be the same as %{is}",
-		"oneOf": "Must be one of %{oneOf}",
+		"oneOf": "Only a value among %{values} is allowed",
 		"unique": "This %{label} is already taken",
 		"exists": "This %{label} does not exist",
 		"connection": "Please check your internet connection.",

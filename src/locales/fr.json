@@ -124,7 +124,7 @@
 		"phone": "Numéros de téléphone français uniquement",
 		"required": "Le champ \"%{label}\" est requis",
 		"is": "Doit correspondre au champ \"%{is}\"",
-		"oneOf": "Doit être l'un des éléments suivants : %{values}",
+		"oneOf": "Seulement une valeur parmi %{values} est autorisée",
 		"unique": "Le champ \"%{label}\" doit être unique",
 		"exists": "Le champ \"%{label}\" n'existe pas",
 		"connection": "Veuillez vérifier votre connexion internet.",

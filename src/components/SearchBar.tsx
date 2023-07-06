@@ -7,7 +7,7 @@ import { useI18n } from '@/contexts/PreferencesContext'
 
 const { width } = Dimensions.get('window')
 
-export default function SearchBar(props: InputProps) {
+export default function SearchBar(props: InputProps<'search'>) {
 	const { __ } = useI18n()
 
 	return (
