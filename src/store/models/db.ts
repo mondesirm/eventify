@@ -9,6 +9,7 @@ type AllPayload = string | string[]
 type GetPayload = AllPayload
 type SetPayload = { path: AllPayload, data: any }
 type QueryPayload = { path: AllPayload, limit?: number }
+type WherePayload = { path: AllPayload, where: Parameters<typeof where> }
 type BatchPayload = { path: AllPayload, data: any[] }
 
 export interface DBModel {
@@ -61,13 +62,13 @@ const events: Event[] = Array.from({ length: 48 }, () => {
 	const start = Timestamp.fromDate(date.soon({ days: 30 }))
 
 	return {
-		title: lorem.words(),
+		title: titles[number.int(titles.length - 1)],
 		description: lorem.paragraph(),
 		start, end: Timestamp.fromDate(new Date(start.toDate().getTime() + Math.random() * 24 * 60 * 60 * 1000)),
 		limit: Math.random() > .5 ? number.int({ min: 2, max: 10}) : null,
 		visibility: ['public', 'friends', 'unlisted'][number.int(2)] as Event['visibility'],
 		owner: 'malikmondesir@gmail.com',
-		place: Math.random() > .5 ? categories[number.int(categories.length - 1)].name : null,
+		place: Math.random() > .5 ? places[number.int(places.length - 1)].name : null,
 		category: Math.random() > .5 ? categories[number.int(categories.length - 1)].name : null,
 		// attendees: [],
 		// invitations: []

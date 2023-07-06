@@ -38,9 +38,9 @@ export default function Home({ navigation, route }: ScreenProps) {
 	const [search, setSearch] = useState('')
 	const bottomTabBarHeight = useBottomTabBarHeight()
 	const [refreshing, setRefreshing] = useState(false)
-	const currentUser = useStoreState(({ user }) => user.currentUser)
+	const currentUser = useStoreState(({ user }) => user?.currentUser)
 
-	// useEffect(() => { console.log('Home', currentUser?.email) }, [])
+	useEffect(() => { console.log('Home', currentUser) }, [])
 
 	const onRefresh = useCallback(() => {
 		setRefreshing(true)

@@ -41,6 +41,18 @@
 		"search": "Search"
 	},
 	"entities": {
+		"created": {
+			"error": "Creation failed.",
+			"success": ["%{type} %{entity} created successfully!", "Tap to view details."]
+		},
+		"updated": {
+			"error": "Update failed.",
+			"success": "%{entity} updated successfully!"
+		},
+		"deleted": {
+			"error": "Deletion failed.",
+			"success": "%{entity} deleted successfully!"
+		},
 		"event": {
 			"one": "Event",
 			"other": "Events",
@@ -80,6 +92,10 @@
 		"verify": "Please verify your account first with the link we sent you.",
 		"success": ["Welcome!", "You are now signed in!"]
 	},
+	"logout": {
+		"error": "Failed to sign out.",
+		"success": ["See you soon!", "You have been signed out."]
+	},
 	"register": {
 		"title": "Create an account",
 		"subtitle": "Join the community!",
@@ -118,6 +134,8 @@
 		"length": "Must be %{length} characters long",
 		"minDate": "Must be after %{min}",
 		"maxDate": "Must be before %{max}",
+		"minValue": "Must be greater than or equal to %{min}",
+		"maxValue": "Must be less than or equal to %{max}",
 		"email": "Must be a valid email address",
 		"phone": "French phone numbers only",
 		"required": "%{label} is required",
@@ -127,6 +145,7 @@
 		"exists": "This %{label} does not exist",
 		"connection": "Please check your internet connection.",
 		"permission-denied": "You do not have the required permissions.",
+		"undefined": "An unknown error occurred.",
 		"auth": {
 			"missing-email": "The email address is missing.",
 			"invalid-email": "The email address is invalid.",

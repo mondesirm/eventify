@@ -41,6 +41,18 @@
 		"search": "Rechercher"
 	},
 	"entities": {
+		"created": {
+			"error": "Création échouée.",
+			"success": ["%{type} %{entity} créé avec succès !", "Toucher pour afficher les détails."]
+		},
+		"updated": {
+			"error": "Mise à jour échouée.",
+			"success": "%{type} %{entity} mis à jour avec succès !"
+		},
+		"deleted": {
+			"error": "Suppression échouée.",
+			"success": "%{type} %{entity} supprimé avec succès !"
+		},
 		"event": {
 			"one": "événement",
 			"other": "événements",
@@ -80,6 +92,10 @@
 		"verify": "Veuillez vérifier votre compte avec le lien qui vous a été envoyé.",
 		"success": ["Bienvenue !", "Vous êtes maintenant connecté !"]
 	},
+	"logout": {
+		"error": "Déconnexion échouée.",
+		"success": ["À bientôt !", "Vous vous êtes déconnecté."]
+	},
 	"register": {
 		"title": "Créez un compte",
 		"subtitle": "Rejoignez la communauté !",
@@ -118,6 +134,8 @@
 		"min": "Doit contenir au moins %{min} caractères",
 		"max": "Doit contenir au plus %{max} caractères",
 		"length": "Doit contenir exactement %{length} caractères",
+		"minValue": "Doit être supérieur à %{min}",
+		"maxValue": "Doit être inférieur à %{max}",
 		"minDate": "Doit être supérieur au %{min}",
 		"maxDate": "Doit être inférieur au %{max}",
 		"email": "Doit être une adresse email valide",
@@ -129,6 +147,7 @@
 		"exists": "Le champ \"%{label}\" n'existe pas",
 		"connection": "Veuillez vérifier votre connexion internet.",
 		"permission-denied": "Vous n'avez pas les permissions nécessaires.",
+		"undefined": "Une erreur inconnue est survenue.",
 		"auth": {
 			"missing-email": "L'adresse email est manquante.",
 			"invalid-email": "L'adresse email est invalide.",

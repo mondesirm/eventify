@@ -25,8 +25,8 @@ type RegisterPayload = {
 }
 
 export interface AuthModel {
-	login: Thunk<this, LoginPayload, any, StoreModel>
-	logout: Thunk<this, never, any, StoreModel>
+	login: Thunk<this, LoginPayload, any, StoreModel, Promise<AllowedScope[]>>
+	logout: Thunk<this, never, any, StoreModel, Promise<AllowedScope[]>>
 	register: Thunk<this, RegisterPayload, any, StoreModel, Promise<AllowedScope[]>>
 	resetPassword: Thunk<this, string, any, StoreModel, Promise<AllowedScope[]>>
 	restoreSession: Thunk<this, never, any, StoreModel, Promise<string>>
@@ -49,10 +49,12 @@ export default {
 					getDoc(doc(firestore, 'users', user.uid)).then(doc => {
 						const currentUser = doc.data()
 
-						getStoreActions().user.setLogin({ roles: currentUser.roles, token })
-						if (currentUser.roles.includes('admin')) getStoreActions().user.setIsAdmin(true)
+						getStoreActions().user.setLogin({ roles: currentUser?.roles, token })
+						if (currentUser?.roles.includes('admin')) getStoreActions().user.setIsAdmin(true)
 
 						getStoreActions().user.setUser(currentUser)
+
+						Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
 						resolve(['login.success.0', 'login.success.1'])
 					})
 				})
@@ -69,13 +71,20 @@ export default {
 	logout: thunk((actions, payload, { getStoreActions, getStoreState }) => {
 		getStoreActions().user.setLoading(true)
 
+		const isConnected = getStoreState().utils.netInfoState.isConnected
+
 		return new Promise((resolve, reject) => {
 			signOut(auth).then(() => {
 				getStoreActions().user.setLogout()
-				resolve('logout.success')
+
+				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+				resolve(['logout.success.0', 'logout.success.1'])
 			})
-			.catch(() => {
-				reject('logout.error')
+			.catch(({ code }: FirebaseError) => {
+				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+
+				if (!isConnected) reject(['logout.error', 'errors.connection'])
+				reject(['logout.error', 'errors.' + code])
 			})
 			.finally(() => getStoreActions().user.setLoading(false))
 		})
@@ -119,27 +128,30 @@ export default {
 				})
 				// .catch(err => { reject(['register.error', 'errors.unknown']) })
 			})
-			.catch(({ code }: FirebaseError) => {
-				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+			.catch(err => console.log(err))
+			// .catch(({ code }: FirebaseError) => {
+			// 	Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
 
-				if (!isConnected) reject(['register.error', 'errors.connection'])
-				reject(['register.error', 'errors.' + code])
-			})
+			// 	if (!isConnected) reject(['register.error', 'errors.connection'])
+			// 	reject(['register.error', 'errors.' + code])
+			// })
 			.finally(() => getStoreActions().user.setLoading(false))
 		})
 	}),
 	resetPassword: thunk((actions, payload, { getStoreActions, getStoreState }) => {
 		getStoreActions().user.setLoading(true)
 
+		const isConnected = getStoreState().utils.netInfoState.isConnected
+
 		return new Promise((resolve, reject) => {
 			sendPasswordResetEmail(auth, payload).then(() => {
 				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
-
 				resolve(['reset.success.0', 'reset.success.1'])
 			})
 			.catch(({ code }: FirebaseError) => {
 				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
 
+				if (!isConnected) reject(['login.error', 'errors.connection'])
 				reject(['reset.error', 'errors.' + code])
 			})
 			.finally(() => getStoreActions().user.setLoading(false))
@@ -150,16 +162,15 @@ export default {
 
 		return new Promise((resolve, reject) => {
 			onAuthStateChanged(auth, user => {
-				if (user === null || getStoreState().user.roles.length === 0) return getStoreActions().user.setLoading(false) /* reject('You are not logged in.') */
-				if (user.emailVerified !== true) return getStoreActions().user.setLoading(false) /* reject('You are not verified.')
- */
+				if (user === null || getStoreState().user?.roles?.length === 0) return getStoreActions().user.setLoading(false) /* reject('You are not logged in.') */
+				if (user.emailVerified !== true) return getStoreActions().user.setLoading(false) /* reject('You are not verified.') */
 				user.getIdTokenResult().then(({ token }) => {
 					// Get current user data
 					getDoc(doc(collection(firestore, 'users'), user.uid)).then(doc => {
 						const currentUser = doc.data()
 
-						getStoreActions().user.setLogin({ roles: currentUser.roles, token })
-						if (currentUser.roles.includes('Admin')) getStoreActions().user.setIsAdmin(true)
+						getStoreActions().user.setLogin({ roles: currentUser?.roles, token })
+						if (currentUser?.roles.includes('Admin')) getStoreActions().user.setIsAdmin(true)
 
 						// resolve(getStoreActions().user.setUser(userData))
 						console.log('restoreSession', currentUser?.email)

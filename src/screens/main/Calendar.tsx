@@ -7,10 +7,10 @@ import { NavigationProp } from '@react-navigation/native'
 import { Agenda, DateData } from 'react-native-calendars'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import { AnimatedFAB, Badge, Button, IconButton, MD3Colors } from 'react-native-paper'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { AnimatedFAB, Badge, Button, IconButton, MD3Colors } from 'react-native-paper'
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker'
-import { Animated, Dimensions, GestureResponderEvent, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Animated, Dimensions, GestureResponderEvent, Keyboard, RefreshControl, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 import Input from '@/components/Input'
 import { AllowedScope } from '@/locales'
@@ -31,12 +31,18 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 	const bottomSheet = useRef<BottomSheet>(null)
 	const y = useRef(new Animated.Value(0)).current
 	const bottomTabBarHeight = useBottomTabBarHeight()
+	const [refreshing, setRefreshing] = useState(false)
 	const snapPoints = useMemo(() => ['25%', '50%', '90%'], [])
-	// const create = useStoreActions(({ calendar }) => calendar.create)
+	const create = useStoreActions(({ calendar }) => calendar.create)
 	const items = useStoreState(({ calendar }) => calendar.items) as any
 	const loadItems = useStoreActions(({ calendar }) => calendar.loadItems)
 	const handleClosePress = useCallback(() => { bottomSheet.current?.close() }, [])
 	const handleSnapPress = useCallback((i: number) => { bottomSheet.current?.snapToIndex(i) }, [])
+
+	const onRefresh = useCallback(() => {
+		setRefreshing(true)
+		setTimeout(() => setRefreshing(false), 2000)
+	}, [])
 
 	const animation = {
 		height: y.interpolate({ inputRange: [0, 150 - 80], outputRange: [150, 80], extrapolate: 'clamp' }),
@@ -59,16 +65,14 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 			.label(__('entities.event.start'))
 			.min(new Date(), e => __('errors.minDate', { min: new Date(e.min).toLocaleDateString(locale, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) }))
 			.required(e => __('errors.required', e)),
-			// Parse date to Timestamp with transform
 		end: Yup.date()
 			.meta({ icon: 'calendar-end'})
 			.label(__('entities.event.end'))
-			// must be greater than start
 			.min(Yup.ref('start'), e => __('errors.minDate', { min: new Date(e.min).toLocaleDateString(locale, { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) })),
 		limit: Yup.number()
 			.meta({ icon: 'account-multiple-outline'})
 			.label(__('entities.event.limit'))
-			.min(2, e => __('errors.min', e)),
+			.min(2, e => __('errors.minValue', e)),
 		visibility: Yup.string()
 			.meta({ icon: 'eye-outline'})
 			.label(__('entities.event.visibility'))
@@ -96,6 +100,13 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 
 	const rowHasChanged: typeof Agenda.prototype.props.rowHasChanged = (r1, r2) => r1.name !== r2.name
 
+	const renderEmptyData: typeof Agenda.prototype.props.renderEmptyData = () => (
+		<View style={styles.emptyDate}>
+			<Text style={[styles.title, styles.typo]}>Nothing on this day!</Text>
+			<Text style={[styles.subtitle, styles.typo]}>Have some alone time.</Text>
+		</View>
+	)
+
 	const renderEmptyDate: typeof Agenda.prototype.props.renderEmptyDate = () => (
 		<View style={styles.emptyDate}>
 			<Text>Nothing there!</Text>
@@ -115,7 +126,10 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 					</Text>
 				</View>
 
-				<Badge style={[styles.badge, { backgroundColor: randomColor(event.category?.name) }]}>{event.category?.name}</Badge>
+				<View>
+					{event.place?.name && <Badge style={[styles.badge, { backgroundColor: randomColor(event.place?.name) }]}>{event.place?.name}</Badge>}
+					{event.category?.name && <Badge style={[styles.badge, { backgroundColor: randomColor(event.category?.name) }]}>{event.category?.name}</Badge>}
+				</View>
 			</View>
 		)
 	}
@@ -132,12 +146,12 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 	const onChange = (event: DateTimePickerEvent, selectedDate: Date, setter: Function) => setter(selectedDate.toISOString())
 
 	const onSubmit = ({ title, description, start, end, limit, visibility, place, category }) => {
-		// create({ title, description, start, end, limit, visibility, place, category })
-		// 	.then((res: AllowedScope[]) => {
-		// 		Toast.show({ text1: __(res[0]), text2: __(res[1]) })
-		// 		handleClosePress()
-		// 	})
-		// 	.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
+		create({ title, description, start, end, limit, visibility, place, category })
+			.then((res: AllowedScope[]) => {
+				Toast.show({ text1: __(res[0], { type: 'event', entity: title}), text2: __(res[1]) })
+				handleClosePress()
+			})
+			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
 	}
 
 	return (
@@ -149,9 +163,10 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 				enableSwipeMonths
 				renderItem={renderItem}
 				rowHasChanged={rowHasChanged}
-				loadItemsForMonth={loadItemsForMonth}
+				renderEmptyData={renderEmptyData}
 				renderEmptyDate={renderEmptyDate}
-				// refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+				loadItemsForMonth={loadItemsForMonth}
+				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 				theme={{
 					dotColor: Color.primary,
 					backgroundColor: '#F1F1F8',
@@ -179,29 +194,29 @@ export default function Calendar({ navigation, route }: ScreenProps) {
 							validationSchema={schema}
 							onSubmit={(v: typeof values) => onSubmit(v)}
 						>
-							{({ handleChange, handleSubmit, handleBlur, setFieldValue, values, errors, touched }) => (
+							{({ handleChange, handleSubmit, handleBlur, values, errors, touched }) => (
 								<View style={styles.inputs}>
-									<Input ref={inputs[0]} navs={[0, navs]} autoFocus={index > -1} label={schema.fields['title'].describe()?.['label']} left={schema.fields['title'].describe()?.['meta']?.icon as any} value={values.title} errors={[touched.title, errors.title]} onBlur={handleBlur('title')} onChangeText={handleChange('title')} />
+									<Input ref={inputs[0]} navs={[0, navs]} label={schema.fields['title'].describe()?.['label']} left={schema.fields['title'].describe()?.['meta']?.icon as any} value={values.title} errors={[touched.title, errors.title]} onBlur={handleBlur('title')} onChangeText={handleChange('title')} />
 									<Input ref={inputs[1]} navs={[1, navs]} label={schema.fields['description'].describe()?.['label']} left={schema.fields['description'].describe()?.['meta']?.icon as any} value={values.description} errors={[touched.description, errors.description]} enablesReturnKeyAutomatically={false} onBlur={handleBlur('description')} onChangeText={handleChange('description')} />
 
 									<View>
 										<View style={styles.group}>
 											<Text style={[styles.text, styles.typo]}>{schema.fields['start'].describe()?.['label']}</Text>
-											<DateTimePicker mode="date" value={new Date(values.start)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('start'))} />
-											<DateTimePicker mode="time" value={new Date(values.start)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('start'))} />
+											<DateTimePicker mode="date" minimumDate={new Date()} value={new Date(values.start)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('start'))} />
+											<DateTimePicker mode="time" minimumDate={new Date()} value={new Date(values.start)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('start'))} />
 										</View>
 
-										{touched.start && errors.start && <Text style={styles.error}>{errors.start.charAt(0).toUpperCase() + errors.start.slice(1).toLowerCase()}.</Text>}
+										{errors.start && <Text style={styles.error}>{errors.start.charAt(0).toUpperCase() + errors.start.slice(1).toLowerCase()}.</Text>}
 									</View>
 
 									<View>
 										<View style={styles.group}>
 											<Text style={[styles.text, styles.typo]}>{schema.fields['end'].describe()?.['label']}</Text>
-											<DateTimePicker mode="date" value={new Date(values.end)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('end'))} />
-											<DateTimePicker mode="time" value={new Date(values.end)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('end'))} />
+											<DateTimePicker mode="date" minimumDate={new Date(values.start)} value={new Date(values.end)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('end'))} />
+											<DateTimePicker mode="time" minimumDate={new Date(values.start)} value={new Date(values.end)} is24Hour onChange={(e, s) => onChange(e, s, handleChange('end'))} />
 										</View>
 
-										{touched.end && errors.end && <Text style={styles.error}>{errors.end.charAt(0).toUpperCase() + errors.end.slice(1).toLowerCase()}.</Text>}
+										{errors.end && <Text style={styles.error}>{errors.end.charAt(0).toUpperCase() + errors.end.slice(1).toLowerCase()}.</Text>}
 									</View>
 
 									<Input ref={inputs[4]} navs={[2, navs]} type="number" label={schema.fields['limit'].describe()?.['label']} left={schema.fields['limit'].describe()?.['meta']?.icon as any} value={values.limit} errors={[touched.limit, errors.limit]} enablesReturnKeyAutomatically={false} onBlur={handleBlur('limit')} onChangeText={handleChange('limit')} />

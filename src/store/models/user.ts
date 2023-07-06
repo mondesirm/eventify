@@ -48,7 +48,7 @@ export default {
 	token: null,
 	isAdmin: false,
 	loading: false,
-	isLoggedIn: computed((state) => state.roles.length > 0),
+	isLoggedIn: computed((state) => state.roles?.length > 0),
 	allUsers: [],
 	setUser: action((state, payload) => { state.currentUser = payload }),
 	setRoles: action((state, payload) => { state.roles = payload }),
@@ -71,6 +71,8 @@ export default {
 		const isConnected = getStoreState().utils.netInfoState.isConnected
 
 		return new Promise((resolve, reject) => {
+			if (!uri) return resolve(null)
+
 			// Convert URI to Blob
 			uriToBlob(uri).then(blob => {
 				const path = ref(storage, `${dir}/${name}.png`)
@@ -91,12 +93,14 @@ export default {
 				// 	reject(['upload.error', 'errors.' + code])
 				// })
 			})
-			.catch(({ code }: FirebaseError) => {
-				Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+			.catch(err => console.log(err))
+			// TODO this part makes the app crash now
+			// .catch(({ code }: FirebaseError) => {
+			// 	Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
 
-				if (!isConnected) reject(['register.error', 'errors.connection'])
-				reject(['register.error', 'errors.' + code])
-			})
+			// 	if (!isConnected) reject(['upload.error', 'errors.connection'])
+			// 	reject(['upload.error', 'errors.' + code])
+			// })
 			.finally(() => getStoreActions().user.setLoading(false))
 		})
 	})

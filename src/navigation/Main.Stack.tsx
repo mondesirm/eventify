@@ -28,7 +28,7 @@ const screens: { name: string, component: (props: ScreenProps) => JSX.Element, i
 
 export default function MainStack() {
 	return (
-		<Navigator initialRouteName={screens[1].name} screenOptions={({ route }) => ({
+		<Navigator initialRouteName={screens[0].name} screenOptions={({ route }) => ({
 			headerShown: false,
 			tabBarShowLabel: false, // With and without both look good
 			tabBarStyle: [{ position: 'absolute', borderTopWidth: 0 }, route.name === 'Places' && { display: 'none' }],
