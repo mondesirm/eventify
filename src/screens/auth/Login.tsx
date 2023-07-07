@@ -27,6 +27,7 @@ export default ({ navigation, route }: ScreenProps) => {
 	const { __ } = useI18n()
 	const y = useRef(new Animated.Value(0)).current
 	const login = useStoreActions(({ auth }) => auth.login)
+	const currentUser = useStoreActions(({ user }) => user.currentUser)
 
 	const animation = {
 		height: y.interpolate({ inputRange: [0, 150 - 80], outputRange: [150, 80], extrapolate: 'clamp' }),
@@ -55,7 +56,7 @@ export default ({ navigation, route }: ScreenProps) => {
 	const onSubmit = ({ email, password, remember }) => {
 		login({ email, password, remember: Boolean(remember) })
 			.then((res: AllowedScope[]) => {
-				Toast.show({ text1: __(res[0]), text2: __(res[1]) })
+				Toast.show({ text1: __(res[0], currentUser), text2: __(res[1]) })
 				navigation.replace('MainStack')
 			})
 			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))

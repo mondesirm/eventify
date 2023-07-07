@@ -7,7 +7,7 @@ import { AuthModel } from './models/auth'
 import { UserModel } from './models/user'
 import { UtilsModel } from './models/utils'
 import { CalendarModel } from './models/calendar'
-import { Timestamp } from 'firebase/firestore'
+import { GeoPoint, Timestamp } from 'firebase/firestore'
 
 export type StoreModel = {
 	db: DBModel
@@ -59,6 +59,7 @@ export type Event<T = false> = {
 export type Days = Record<string, Event[]>
 
 export type User<T = false> = {
+	uid?: string
 	avatar?: string
 	username: string
 	email: string
@@ -66,11 +67,11 @@ export type User<T = false> = {
 	password?: string
 	isDisabled: boolean
 	roles: ('user' | 'admin')[]
-	ownedEvents: T extends false ? string[] : Event[]
-	attendedEvents: T extends false ? string[] : Event[]
-	sentInvitations: T extends false ? string[] : Invitation[]
-	receivedInvitations: T extends false ? string[] : Invitation[]
-	trips: T extends false ? string[] : Trip[]
+	ownedEvents?: T extends false ? string[] : Event[]
+	attendedEvents?: T extends false ? string[] : Event[]
+	sentInvitations?: T extends false ? string[] : Invitation[]
+	receivedInvitations?: T extends false ? string[] : Invitation[]
+	trips?: T extends false ? string[] : Trip[]
 } & Base
 
 export type Invitation<T = false> = {
@@ -82,11 +83,12 @@ export type Invitation<T = false> = {
 
 export type Trip<T = false> = {
 	day: Timestamp
-	positions: T extends false ? string[] : Position[]
+	positions?: Position[]
 	user: T extends false ? string : User
 } & Base
 
-export type Position<T = false> = {
-	coordinates: { latitude: number, longitude: number, [key: string]: any }
-	trip: T extends false ? string : Trip
+export type Position = {
+	coordinates: GeoPoint
+	// coordinates: Record<'latitude' | 'longitude', number>
+	// trip: T extends false ? string : Trip
 } & Base

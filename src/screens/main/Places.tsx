@@ -35,7 +35,7 @@ export default function Places({ navigation, route }: ScreenProps) {
 		// .catch((error) => setErrorMsg(error.message))
 	}, [])
 
-	// console.log(JSON.stringify(location))
+	console.log(JSON.stringify(location))
 
 	return (
 		<View style={styles.screen}>

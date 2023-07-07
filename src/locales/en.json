@@ -90,7 +90,7 @@
 		"continue": "Or continue with",
 		"error": "Authentication failed.",
 		"verify": "Please verify your account first with the link we sent you.",
-		"success": ["Welcome!", "You are now signed in!"]
+		"success": ["Welcome!", "You are now signed in."]
 	},
 	"logout": {
 		"error": "Failed to sign out.",

@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker'
 import { Thunk, thunk } from 'easy-peasy'
-import { DocumentData, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, where, writeBatch, Timestamp } from 'firebase/firestore'
+import { DocumentData, collection, doc, getDoc, getDocs, limit, orderBy, query, serverTimestamp, setDoc, where, writeBatch, Timestamp, GeoPoint } from 'firebase/firestore'
 
 import { firestore } from '@/utils/firebase'
-import { Category, Event, Place, StoreModel } from '@/store'
+import { Category, Event, Place, StoreModel, User } from '@/store'
 
 type AllPayload = string | string[]
 type GetPayload = AllPayload
@@ -21,7 +21,7 @@ export interface DBModel {
 	batch: Thunk<this, BatchPayload, any, StoreModel, Promise<DocumentData[]>>
 }
 
-const { date, lorem, number } = faker
+const { date, location, lorem, number } = faker
 
 const categories: Category[] = [
 	{ name: 'Parties', icon: 'party-popper' },
@@ -75,8 +75,39 @@ const events: Event[] = Array.from({ length: 48 }, () => {
 	}
 })
 
+// const posit
+
+const users: User<true>[] = Array.from({ length: 20 }, () => {
+	const uid = faker.string.uuid()
+
+	return {
+		uid,
+		avatar: Math.random() > .5 ? 'https://loremflickr.com/640/480/person' : null,
+		username: faker.internet.userName(),
+		email: faker.internet.email(),
+		phone: Math.random() > .5 ? faker.phone.number() : null,
+		isDisabled: Math.random() > .5,
+		roles: ['user'],
+		// ownedEvents: [],
+		// attendedEvents: events.filter(_ => Math.random() > .5).map(_ => _.title),
+		// invitedEvents: events.filter(_ => Math.random() > .5).map(_ => _.title),
+		// receivedInvitations: events.filter(_ => Math.random() > .5).map(_ => _.title),
+		trips: Array.from({ length: number.int({ min: 1, max: 5 }) }, () => ({
+			day: Timestamp.fromDate(date.recent({ days: 30 })),
+			positions: Array.from({ length: number.int({ min: 5, max: 20 }) }, () => ({
+				coordinates: new GeoPoint(...location.nearbyGPSCoordinate({ origin: [48.85341, 2.3488] })),
+			})),
+			user: uid
+		}))
+	}
+})
+
+
 export default {
 	init: thunk((actions, payload, { getStoreActions, getStoreState }) => {
+		// Store users
+		getStoreActions().db.batch({ path: 'users', data: users })
+
 		// Store categories
 		getStoreActions().db.batch({ path: 'categories', data: categories }).then((categories: Category[]) => {
 			// Store places and link them to categories

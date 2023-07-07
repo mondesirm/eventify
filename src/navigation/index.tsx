@@ -26,17 +26,10 @@ export default function NavigationProvider() {
 	// init()
 
 	useEffect(() => {
-		console.log('roles', roles)
-		setTimeout(() => {
-			restoreSession()
-				// .then(() => { console.log('Logged in.') })
-				// .catch(() => { console.log('Not logged in.') })
-		}, 5000)
+		if (roles.length === 0) restoreSession()
+		// const t = setTimeout(restoreSession, 5000)
+		// return () => clearTimeout(t)
 	}, [roles])
 
-
-	// if (roles?.length > 0) return <MainStack />
-	// else return firstTime ? <OnboardingStack /> : <AuthStack />
 	return <Routes roles={roles} firstTime />
-
 }

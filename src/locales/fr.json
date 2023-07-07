@@ -90,7 +90,7 @@
 		"continue": "Ou continuez avec",
 		"error": "Connexion échouée.",
 		"verify": "Veuillez vérifier votre compte avec le lien qui vous a été envoyé.",
-		"success": ["Bienvenue !", "Vous êtes maintenant connecté !"]
+		"success": ["Bienvenue !", "Vous êtes maintenant connecté."]
 	},
 	"logout": {
 		"error": "Déconnexion échouée.",
