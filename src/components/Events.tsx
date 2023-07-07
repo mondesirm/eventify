@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewProps } from 'react-native'
 
-import { Place, useStoreActions, useStoreState } from '@/store'
+import { Event, useStoreActions, useStoreState } from '@/store'
 import { Border, Color, FontFamily, FontSize } from 'globals'
 
 interface SectionProps extends ViewProps {
@@ -15,18 +15,18 @@ interface SectionProps extends ViewProps {
 
 const { width } = Dimensions.get('window')
 
-export default function Places({ limit = null, refreshing = false }: SectionProps) {
-	const [places, setPlaces] = useState<Place<true>[]>([])
+export default function Events({ limit = null, refreshing = false }: SectionProps) {
+	const [events, setEvents] = useState<Event<true>[]>([])
 	const query = useStoreActions(({ db }) => db.query)
 	const currentUser = useStoreState(({ user }) => user?.currentUser)
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
 
-	useEffect(() => { query({ path: 'places', limit }).then(docs => setPlaces(docs as Place<true>[])) }, [limit, refreshing])
+	useEffect(() => { query({ path: 'events', limit }).then(docs => setEvents(docs as Event<true>[])) }, [limit, refreshing])
 
 	return (
 		<View style={styles.section}>
 			<View style={styles.header}>
-				<Text style={[styles.title, styles.typo]}>Places</Text>
+				<Text style={[styles.title, styles.typo]}>Events</Text>
 
 				<TouchableOpacity onPress={() => {}}>
 					<Text style={[styles.more, styles.typo]}>View All</Text>
@@ -34,32 +34,39 @@ export default function Places({ limit = null, refreshing = false }: SectionProp
 			</View>
 
 			<ScrollView contentContainerStyle={styles.content} horizontal showsHorizontalScrollIndicator={false}>
-				{places.map(({ name, uri, price, rating, category }, i) => (
-					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Place', { name })}>
-						<Image style={styles.image} resizeMode="cover" source={{ uri }} />
-						<Badge style={styles.badge}>{category.name}</Badge>
+				{events.filter(_ => _.visibility === 'public').map(({ title, start, end, limit, visibility, owner, place, category, attendees }, i) => (
+					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Event', { name })}>
+						<Image style={styles.image} resizeMode="cover" source={{ uri: 'https://loremflickr.com/640/480/' + title }} />
+						{place?.name && <Badge style={styles.badge}>{place?.name}</Badge>}
+						{category?.name && <Badge style={styles.badge}>{category?.name}</Badge>}
 
 						<View style={styles.container}>
-							<Badge style={styles.price} size={25}>{price === 0 ? 'FREE' : '$' + price}</Badge>
+							<Badge style={styles.price} size={25}>{Number(attendees?.length ?? 0) + ' / ' + (limit ? limit: '∞')}</Badge>
 
 							<View style={styles.row}>
-								<Rating imageSize={10} readonly startingValue={rating} />
-								<Text style={[styles.text, styles.typo, { color: Color.body }]}>{rating.toPrecision(2)}</Text>
+								<Text style={[styles.text, styles.typo, { color: Color.body }]}>
+									{start.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+								</Text>
+
+								<Text style={[styles.text, styles.typo, { color: Color.body }]}>
+									{/* if end.day is not the same as start.date, show it */}
+									{end.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) !== start.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) && end.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+								</Text>
 							</View>
 
-							<Text style={[styles.text, styles.typo]}>{name}</Text>
+							<Text style={[styles.text, styles.typo]}>{title}</Text>
 
 							<View style={styles.row}>
 								<Avatar.Image size={20} source={{ uri: 'https://picsum.photos/seed/picsum/200/300' }} />
-								<Text style={[styles.text, styles.typo, { color: Color.body }]}>{'@eventify'}</Text>
+								<Text style={[styles.text, styles.typo, { color: Color.body }]}>{owner?.username ?? '@eventify'}</Text>
 							</View>
 						</View>
 					</TouchableOpacity>
 				))}
 
-				{places.length === 0 && (
+				{events.length === 0 && (
 					<View style={styles.container}>
-						<Text style={[styles.text, styles.typo]}>No places found</Text>
+						<Text style={[styles.text, styles.typo]}>No events found</Text>
 					</View>
 				)}
 			</ScrollView>

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { Dimensions, I18nManager, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 
+import Events from '@/components/Events'
 import Places from '@/components/Places'
 import { AllowedScope } from '@/locales'
 import Carousel from '@/components/Carousel'
@@ -76,6 +77,7 @@ export default function Home({ navigation, route }: ScreenProps) {
 				<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
 				<Categories limit={6} refreshing={refreshing} />
 				<Places limit={6} refreshing={refreshing} />
+				<Events limit={6} refreshing={refreshing} />
 			</View>
 		</ScrollView>
 	)
