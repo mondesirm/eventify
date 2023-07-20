@@ -25,7 +25,7 @@ export default function Categories({ limit = null, refreshing = false }: Section
 	return (
 		<View style={styles.section}>
 			<View style={styles.header}>
-				<Text style={[styles.title, styles.typo]}>Categories</Text>
+				<Text style={[styles.title, styles.typo]}>Trending Categories</Text>
 
 				<TouchableOpacity onPress={() => navigate('Categories')}>
 					<Text style={[styles.more, styles.typo]}>View All</Text>

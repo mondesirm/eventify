@@ -18,8 +18,8 @@ export default function Blank(props: ScreenProps) {
 	return (
 		<SafeAreaView style={styles.screen}>
 			<View style={styles.header}>
-				<Text style={[styles.title, styles.typo]}>{__('onboarding.0.title', { title: Constants.manifest.name })}</Text>
-				<Text style={[styles.subtitle, styles.typo]}>{__('onboarding.0.subtitle')}</Text>
+				<Text style={[styles.title, styles.typo]}>Coming Soon!</Text>
+				<Text style={[styles.subtitle, styles.typo]}>Please wait for next updates.</Text>
 			</View>
 		</SafeAreaView>
 	)

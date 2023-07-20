@@ -13,6 +13,7 @@ type WherePayload = { path: AllPayload, where: Parameters<typeof where> }
 type BatchPayload = { path: AllPayload, data: any[] }
 
 export interface DBModel {
+	storage: [],
 	init: Thunk<this, never, any, StoreModel, void>
 	all: Thunk<this, AllPayload, any, StoreModel, Promise<DocumentData[]>>
 	get: Thunk<this, GetPayload, any, StoreModel, ReturnType<typeof getDoc<DocumentData>>>
@@ -66,6 +67,7 @@ const events: Event[] = Array.from({ length: 48 }, () => {
 		description: lorem.paragraph(),
 		start, end: Timestamp.fromDate(new Date(start.toDate().getTime() + Math.random() * 24 * 60 * 60 * 1000)),
 		limit: Math.random() > .5 ? number.int({ min: 2, max: 10}) : null,
+		rating: number.float(5),
 		visibility: ['public', 'friends', 'unlisted'][number.int(2)] as Event['visibility'],
 		owner: 'malikmondesir@gmail.com',
 		place: Math.random() > .5 ? places[number.int(places.length - 1)].name : null,
@@ -75,16 +77,29 @@ const events: Event[] = Array.from({ length: 48 }, () => {
 	}
 })
 
-// const posit
+const admin: User<true> = {
+	avatar: 'https://loremflickr.com/640/480/person',
+	username: 'eventify',
+	email: 'admin@eventify.com',
+	phone: faker.phone.number(),
+	isDisabled: false,
+	roles: ['user', 'admin'],
+	trips: Array.from({ length: number.int({ min: 1, max: 5 }) }, () => ({
+		day: Timestamp.fromDate(date.recent({ days: 30 })),
+		positions: Array.from({ length: number.int({ min: 5, max: 20 }) }, () => ({
+			coordinates: new GeoPoint(...location.nearbyGPSCoordinate({ origin: [48.85341, 2.3488] })),
+		})),
+		user: 'admin@eventify.com'
+	}))
+}
 
 const users: User<true>[] = Array.from({ length: 20 }, () => {
-	const uid = faker.string.uuid()
+	const email = faker.internet.email()
 
 	return {
-		uid,
 		avatar: Math.random() > .5 ? 'https://loremflickr.com/640/480/person' : null,
 		username: faker.internet.userName(),
-		email: faker.internet.email(),
+		email,
 		phone: Math.random() > .5 ? faker.phone.number() : null,
 		isDisabled: Math.random() > .5,
 		roles: ['user'],
@@ -97,15 +112,16 @@ const users: User<true>[] = Array.from({ length: 20 }, () => {
 			positions: Array.from({ length: number.int({ min: 5, max: 20 }) }, () => ({
 				coordinates: new GeoPoint(...location.nearbyGPSCoordinate({ origin: [48.85341, 2.3488] })),
 			})),
-			user: uid
+			user: email
 		}))
 	}
 })
 
-
 export default {
-	init: thunk((actions, payload, { getStoreActions, getStoreState }) => {
+	storage: [],
+	init: thunk((actions, payload, { getStoreActions }) => {
 		// Store users
+		// getStoreActions().db.set({ path: 'users/<uid>', data: admin })
 		getStoreActions().db.batch({ path: 'users', data: users })
 
 		// Store categories
@@ -119,33 +135,32 @@ export default {
 			// getStoreActions().db.batch({ path: 'places', data: places.map(p => ({ ...p, category: categories.find(c => c.name === p.category).path })) })
 		})
 	}),
-	all: thunk((actions, payload, { getStoreActions, getStoreState }) => {
-		return getDocs(
-			collection(firestore, typeof payload === 'string' ? payload : payload.join('/')
-		)).then(({ docs }) => docs.map(d => ({ ...d.data(), id: d.id })))
+	all: thunk(async (actions, payload, { getState }) => {
+		const { docs } = await getDocs(collection(firestore, typeof payload === 'string' ? payload : payload.join('/')))
+
+		// Store data locally
+		const data = docs.map(_ => ({ ..._.data(), id: _.id }))
+		getState().storage = { ...getState().storage, [typeof payload === 'string' ? payload : payload.join('/')]: data }
+		return data
 	}),
-	get: thunk((actions, payload, { getStoreActions, getStoreState }) => {
+	get: thunk((actions, payload) => {
 		return getDoc(doc(firestore, typeof payload === 'string' ? payload : payload.join('/')))
 	}),
-	set: thunk((actions, payload, { getStoreActions, getStoreState }) => {
-		const { path, data } = payload
-		return setDoc(doc(collection(firestore, typeof path === 'string' ? path : path.join('/'))), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true })
+	set: thunk((actions, { path, data }) => {
+		return setDoc(doc(firestore, typeof path === 'string' ? path : path.join('/')), { ...data, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true })
 	}),
-	query: thunk((actions, payload, { getStoreActions, getStoreState }) => {
-		const { path, limit: l } = payload
-
+	query: thunk((actions, { path, limit: l }) => {
 		return getDocs(query(
 			collection(firestore, typeof path === 'string' ? path : path.join('/')),
 			l ? limit(l) : null
 		)).then(({ docs }) => docs.map(d => ({ ...d.data(), id: d.id })))
 	}),
-	batch: thunk((actions, payload, { getStoreActions, getStoreState }) => {
-		const { path, data } = payload
+	batch: thunk((actions, { path, data }, { getState, getStoreActions }) => {
 		const batch = writeBatch(firestore)
 
 		if (path === undefined) console.error('No path provided for batch')
 
-		data.forEach(item => batch.set(doc(collection(firestore, typeof path === 'string' ? path : path.join('/'))), { ...item, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true }))
+		data.forEach(item => batch.set(doc(collection(firestore, typeof path === 'string' ? path : path.join('/'))), { createdAt: serverTimestamp(), ...item, updatedAt: serverTimestamp() }, { merge: true }))
 		batch.commit()
 
 		return getStoreActions().db.all(path)

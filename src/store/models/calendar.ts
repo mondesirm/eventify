@@ -19,18 +19,18 @@ export default {
 		// getStoreActions().user.setLoading(true)
 
 		const isConnected = getStoreState().utils.netInfoState?.isConnected
-		const data = { ...payload, owner: getStoreState().user?.currentUser ?? null, place: payload.place ?? null, category: payload.category ?? null }
+		const data = { ...payload, owner: getStoreState().user?.currentUser ?? null, place: null, category: null }
 
 		return new Promise((resolve, reject) => {
 			console.log(getStoreState().user?.currentUser)
 
-			if (data?.category) {
-				const category = getStoreActions().db.query({ path: 'categories', where: ['name', '==', data.category] })
-				console.log(category)
-			}
+			// if (data?.category) {
+			// 	const category = getStoreActions().db.query({ path: 'categories', where: ['name', '==', data.category] })
+			// 	console.log(category)
+			// }
 
-			// getStoreActions().db.set({ path: 'events', data: { ...payload, owner: getStoreState().user?.currentUser ?? null } }).then(() => {
 			// getStoreActions().db.set({ path: 'events', data: payload }).then(() => {
+			// getStoreActions().db.set({ path: 'events', data }).then(() => {
 			// 	Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
 			// 	resolve(['entities.created.success.0', 'entities.created.success.1'])
 			// })

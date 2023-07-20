@@ -162,28 +162,26 @@ export default {
 
 		return new Promise((resolve, reject) => {
 			onAuthStateChanged(auth, user => {
-				if (user === null || getStoreState().user?.roles?.length === 0) return getStoreActions().user.setLoading(false) /* reject('You are not logged in.') */
+				if (user === null/*  || getStoreState().user?.roles?.length === 0 */) return getStoreActions().user.setLoading(false) /* reject('You are not logged in.') */
 				if (user.emailVerified !== true) return getStoreActions().user.setLoading(false) /* reject('You are not verified.') */
+
 				user.getIdTokenResult().then(({ token }) => {
 					// Get current user data
 					getDoc(doc(collection(firestore, 'users'), user.uid)).then(doc => {
 						const currentUser = doc.data()
+						// console.log('uid', user.uid)
+						// console.log('user', user?.email)
+						// console.log('currentUser', currentUser?.email)
 
 						getStoreActions().user.setLogin({ roles: currentUser?.roles, token })
 						if (currentUser?.roles.includes('Admin')) getStoreActions().user.setIsAdmin(true)
 
-						// resolve(getStoreActions().user.setUser(userData))
-						console.log('restoreSession', currentUser?.email)
 						getStoreActions().user.setUser(currentUser)
 						resolve(user.email)
 					})
 				})
-				.catch(() => {
-					reject()
-				})
-				.finally(() => {
-					getStoreActions().user.setLoading(false)
-				})
+				.catch((err: string) => reject(err))
+				.finally(() => getStoreActions().user.setLoading(false))
 			})
 		})
 	})

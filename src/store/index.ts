@@ -25,41 +25,39 @@ export const useStoreState = typedHooks.useStoreState
 
 export default createStore<StoreModel>(models)
 
-// type Timestamp = { seconds: number, nanoseconds: number }
 type Base = { id?: string, createdAt?: Timestamp, updatedAt?: Timestamp }
+type Content = { description?: string, uri?: string } & Base
 
 export type Category = {
 	name: string
 	icon: keyof typeof MaterialCommunityIcons.glyphMap
-} & Base
+} & Content
 
 // If T is true then the relation is serialized
 export type Place<T = false> = {
 	name: string
-	uri: string
 	price: number
 	rating: number
 	category: T extends false ? string : Category
-} & Base
+} & Content
 
 export type Event<T = false> = {
 	title: string
-	description?: string
 	start: Timestamp
 	end?: Timestamp
 	limit?: number
+	rating: number
 	visibility: 'public' | 'friends' | 'unlisted'
 	owner: T extends false ? string : User
 	place?: T extends false ? string : Place
 	category?: T extends false ? string : Category
 	attendees?: T extends false ? string[] : User[]
 	invitations?: T extends false ? string[] : Invitation[]
-} & Base
+} & Content
 
 export type Days = Record<string, Event[]>
 
 export type User<T = false> = {
-	uid?: string
 	avatar?: string
 	username: string
 	email: string

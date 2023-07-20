@@ -21,7 +21,7 @@ interface ScreenProps {
 	route: { key: string, name: string, params: any }
 }
 
-const { width, height } = Dimensions.get('screen')
+const { height } = Dimensions.get('screen')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
 const images = new Array(4).fill('https://loremflickr.com/640/480/people')
@@ -43,8 +43,9 @@ export default function Home({ navigation, route }: ScreenProps) {
 	const [refreshing, setRefreshing] = useState(false)
 	const logout = useStoreActions(({ auth }) => auth.logout)
 	const currentUser = useStoreState(({ user }) => user?.currentUser)
+	const setFirstVisits = useStoreActions(({ utils }) => utils.setFirstVisits)
 
-	// useEffect(() => { console.log('Home', currentUser) }, [currentUser?.roles])
+	useEffect(() => { setFirstVisits({ home: false }) }, [])
 
 	const onRefresh = useCallback(() => {
 		setRefreshing(true)
@@ -53,15 +54,18 @@ export default function Home({ navigation, route }: ScreenProps) {
 
 	const onPress = () => {
 		logout()
-			.then((res: AllowedScope[]) => {
-				Toast.show({ text1: __(res[0]), text2: __(res[1]) })
-				// navigation.replace('AuthStack')
-			})
+			.then((res: AllowedScope[]) => Toast.show({ text1: __(res[0]), text2: __(res[1]) }))
 			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
 	}
 
 	return (
-		<ScrollView style={[styles.screen, { height: height - bottomTabBarHeight }]} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+		<ScrollView
+			style={[styles.screen, { height: height - bottomTabBarHeight }]}
+			keyboardShouldPersistTaps="handled"
+			keyboardDismissMode="interactive"
+			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+			// stickyHeaderIndices={[0]}
+		>
 			<Carousel items={carousel} color={Color.white} autoplay>
 				{({ image }) => (
 					// TODO fix gradient

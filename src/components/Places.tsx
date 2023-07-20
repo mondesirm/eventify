@@ -16,17 +16,17 @@ interface SectionProps extends ViewProps {
 const { width } = Dimensions.get('window')
 
 export default function Places({ limit = null, refreshing = false }: SectionProps) {
-	const [places, setPlaces] = useState<Place<true>[]>([])
+	const [items, setItems] = useState<Place<true>[]>([])
 	const query = useStoreActions(({ db }) => db.query)
 	const currentUser = useStoreState(({ user }) => user?.currentUser)
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
 
-	useEffect(() => { query({ path: 'places', limit }).then(docs => setPlaces(docs as Place<true>[])) }, [limit, refreshing])
+	useEffect(() => { query({ path: 'places', limit }).then(docs => setItems(docs as Place<true>[])) }, [limit, refreshing])
 
 	return (
 		<View style={styles.section}>
 			<View style={styles.header}>
-				<Text style={[styles.title, styles.typo]}>Places</Text>
+				<Text style={[styles.title, styles.typo]}>Trending Places</Text>
 
 				<TouchableOpacity onPress={() => {}}>
 					<Text style={[styles.more, styles.typo]}>View All</Text>
@@ -34,13 +34,13 @@ export default function Places({ limit = null, refreshing = false }: SectionProp
 			</View>
 
 			<ScrollView contentContainerStyle={styles.content} horizontal showsHorizontalScrollIndicator={false}>
-				{places.map(({ name, uri, price, rating, category }, i) => (
+				{items.map(({ name, uri, price, rating, category }, i) => (
 					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Place', { name })}>
 						<Image style={styles.image} resizeMode="cover" source={{ uri }} />
-						<Badge style={styles.badge}>{category.name}</Badge>
+						{category?.name && <Badge style={styles.category}>{category?.name}</Badge>}
 
 						<View style={styles.container}>
-							<Badge style={styles.price} size={25}>{price === 0 ? 'FREE' : '$' + price}</Badge>
+							<Badge style={styles.badge} size={25}>{price === 0 ? 'FREE' : '$' + price}</Badge>
 
 							<View style={styles.row}>
 								<Rating imageSize={10} readonly startingValue={rating} />
@@ -57,7 +57,7 @@ export default function Places({ limit = null, refreshing = false }: SectionProp
 					</TouchableOpacity>
 				))}
 
-				{places.length === 0 && (
+				{items.length === 0 && (
 					<View style={styles.container}>
 						<Text style={[styles.text, styles.typo]}>No places found</Text>
 					</View>
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: Border.xs,
 		backgroundColor: Color.ghostwhite
 	},
-	badge: {
+	category: {
 		top: 10,
 		left: 10,
 		color: Color.primary,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
 		// paddingHorizontal: 10,
 		justifyContent: 'center'
 	},
-	price: {
+	badge: {
 		top: -15,
 		right: 10,
 		height: 'auto',

@@ -55,10 +55,7 @@ export default ({ navigation, route }: ScreenProps) => {
 
 	const onSubmit = ({ email, password, remember }) => {
 		login({ email, password, remember: Boolean(remember) })
-			.then((res: AllowedScope[]) => {
-				Toast.show({ text1: __(res[0], currentUser), text2: __(res[1]) })
-				navigation.replace('MainStack')
-			})
+			.then((res: AllowedScope[]) => Toast.show({ text1: __(res[0], currentUser), text2: __(res[1]) }))
 			.catch((err: AllowedScope[]) => Toast.show({ type: 'error', text1: __(err[0]), text2: __(err[1]) }))
 	}
 

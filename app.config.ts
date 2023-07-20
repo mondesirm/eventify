@@ -7,9 +7,10 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 	description: 'Planning events made easy.',
 	version: '1.0.0',
 	sdkVersion: '48.0.0',
-	runtimeVersion: {
-		policy: 'sdkVersion'
-	},
+	// Fixes "No launchables in database" error in Expo Go
+	// runtimeVersion: {
+	// 	policy: 'sdkVersion'
+	// },
 	orientation: 'portrait',
 	icon: 'https://github.com/expo/expo/blob/master/templates/expo-template-blank/assets/icon.png?raw=true',
 	userInterfaceStyle: 'light',

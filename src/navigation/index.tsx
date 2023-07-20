@@ -8,11 +8,10 @@ import { useStoreActions, useStoreState } from '@/store'
 import OnboardingStack from '@/navigation/Onboarding.Stack'
 
 export default function NavigationProvider() {
-	const firstTime = true
 	const roles = useStoreState(({ user }) => user?.roles)
+	const firstTime = Object.values(useStoreState(({ utils }) => utils.firstVisits)).every(_ => _ !== false)
 
-	const { init, restoreSession, setNetInfoState } = useStoreActions(_ => ({
-		init: _.db.init,
+	const { restoreSession, setNetInfoState } = useStoreActions(_ => ({
 		restoreSession: _.auth.restoreSession,
 		setNetInfoState: _.utils.setNetInfoState
 	}))
@@ -23,13 +22,10 @@ export default function NavigationProvider() {
 		return () => unsubscribe()
 	}, [])
 
-	// init()
-
 	useEffect(() => {
-		if (roles.length === 0) restoreSession()
-		// const t = setTimeout(restoreSession, 5000)
-		// return () => clearTimeout(t)
+		// Restore session if roles are empty
+		if (roles?.length === 0) restoreSession()
 	}, [roles])
 
-	return <Routes roles={roles} firstTime />
+	return <Routes roles={roles} firstTime={firstTime} />
 }

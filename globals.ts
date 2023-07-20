@@ -1,4 +1,8 @@
+import { Dimensions } from 'react-native'
+
 import type { IconlyContextProps } from '@/contexts/IconlyContext'
+
+const { fontScale } = Dimensions.get('screen')
 
 /* Fonts */
 export const FontFamily = {
@@ -24,14 +28,14 @@ export const FontFamily = {
 
 /* Font Sizes */
 export const FontSize = {
-	x2s: 10,
-	xs: 12,
-	sm: 14,
-	base: 16,
-	lg: 18,
-	xl: 20,
-	x2l: 22,
-	title: 30
+	x2s: 10 / fontScale,
+	xs: 12 / fontScale,
+	sm: 14 / fontScale,
+	base: 16 / fontScale,
+	lg: 18 / fontScale,
+	xl: 20 / fontScale,
+	x2l: 22 / fontScale,
+	title: 30 / fontScale
 } as const
 
 /* Colors */

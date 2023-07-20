@@ -34,16 +34,19 @@ const images = [
 
 const steps = images.map((image, key) => ({ image, key }))
 
-export default ({ navigation }: ScreenProps) => {
+export default function Onboarding({ navigation }: ScreenProps) {
 	const { __ } = useI18n()
 	const slider = useRef<AppIntroSlider>(null)
 	const scrollX = useRef(new Animated.Value(0)).current
 	const [step, setStep] = useState(slider.current?.state.activeIndex || 0)
 	const setFirstVisits = useStoreActions(({ utils }) => utils.setFirstVisits)
 
-	useEffect(() => { setFirstVisits({ onboarding: false }) }, [])
-
 	useEffect(() => slider.current?.goToSlide(step), [step])
+
+	const onDone = () => {
+		navigation.replace('AuthStack')
+		setTimeout(() => setFirstVisits({ onboarding: false }), 1000)
+	}
 
 	const renderItem = ({ item }: { item: typeof steps[number] & { key: string } }) => {
 		return (
@@ -128,7 +131,7 @@ export default ({ navigation }: ScreenProps) => {
 			scrollEventThrottle={1}
 			onSlideChange={i => setStep(i)}
 			renderPagination={renderPagination}
-			onDone={() => navigation.replace('AuthStack')}
+			onDone={onDone}
 			onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })}
 		/>
 	)

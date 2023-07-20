@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Rating } from 'react-native-ratings'
 import { Avatar, Badge } from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack'
@@ -16,17 +15,17 @@ interface SectionProps extends ViewProps {
 const { width } = Dimensions.get('window')
 
 export default function Events({ limit = null, refreshing = false }: SectionProps) {
-	const [events, setEvents] = useState<Event<true>[]>([])
+	const [items, setItems] = useState<Event<true>[]>([])
 	const query = useStoreActions(({ db }) => db.query)
 	const currentUser = useStoreState(({ user }) => user?.currentUser)
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
 
-	useEffect(() => { query({ path: 'events', limit }).then(docs => setEvents(docs as Event<true>[])) }, [limit, refreshing])
+	useEffect(() => { query({ path: 'events', limit }).then(docs => setItems(docs as Event<true>[])) }, [limit, refreshing])
 
 	return (
 		<View style={styles.section}>
 			<View style={styles.header}>
-				<Text style={[styles.title, styles.typo]}>Events</Text>
+				<Text style={[styles.title, styles.typo]}>Trending Events</Text>
 
 				<TouchableOpacity onPress={() => {}}>
 					<Text style={[styles.more, styles.typo]}>View All</Text>
@@ -34,11 +33,10 @@ export default function Events({ limit = null, refreshing = false }: SectionProp
 			</View>
 
 			<ScrollView contentContainerStyle={styles.content} horizontal showsHorizontalScrollIndicator={false}>
-				{events.filter(_ => _.visibility === 'public').map(({ title, start, end, limit, visibility, owner, place, category, attendees }, i) => (
+				{items.filter(_ => _.visibility === 'public').map(({ title, start, end, limit, visibility, owner, place, category, attendees }, i) => (
 					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Event', { name })}>
 						<Image style={styles.image} resizeMode="cover" source={{ uri: 'https://loremflickr.com/640/480/' + title }} />
-						{place?.name && <Badge style={styles.badge}>{place?.name}</Badge>}
-						{category?.name && <Badge style={styles.badge}>{category?.name}</Badge>}
+						{category?.name && <Badge style={styles.category}>{category?.name}</Badge>}
 
 						<View style={styles.container}>
 							<Badge style={styles.price} size={25}>{Number(attendees?.length ?? 0) + ' / ' + (limit ? limit: '∞')}</Badge>
@@ -64,7 +62,7 @@ export default function Events({ limit = null, refreshing = false }: SectionProp
 					</TouchableOpacity>
 				))}
 
-				{events.length === 0 && (
+				{items.length === 0 && (
 					<View style={styles.container}>
 						<Text style={[styles.text, styles.typo]}>No events found</Text>
 					</View>
@@ -123,7 +121,7 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: Border.xs,
 		backgroundColor: Color.ghostwhite
 	},
-	badge: {
+	category: {
 		top: 10,
 		left: 10,
 		color: Color.primary,

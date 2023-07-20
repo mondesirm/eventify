@@ -10,8 +10,7 @@ const { Navigator, Screen } = createStackNavigator()
 const screens = [
 	{ name: 'Login', component: Login },
 	{ name: 'Register', component: Register },
-	{ name: 'ForgotPassword', component: ForgotPassword },
-	{ name: 'MainStack', component: MainStack }
+	{ name: 'ForgotPassword', component: ForgotPassword }
 ]
 
 export default function AuthStack() {
