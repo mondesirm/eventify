@@ -1,9 +1,11 @@
 import { FAB } from 'react-native-paper'
+import { StatusBar } from 'expo-status-bar'
 import Toast from 'react-native-toast-message'
 import { LinearGradient } from 'expo-linear-gradient'
-import { useCallback, useEffect, useState } from 'react'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { Dimensions, I18nManager, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { Animated, Dimensions, I18nManager, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 
 import Events from '@/components/Events'
 import Places from '@/components/Places'
@@ -14,7 +16,6 @@ import Categories from '@/components/Categories'
 import { Color, FontFamily, FontSize } from 'globals'
 import { useStoreActions, useStoreState } from '@/store'
 import { useI18n, useNavs } from '@/contexts/PreferencesContext'
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 
 interface ScreenProps {
 	navigation: StackNavigationProp<any, any>
@@ -39,11 +40,19 @@ export default function Home({ navigation, route }: ScreenProps) {
 	const { __ } = useI18n()
 	const { dismiss } = useNavs()
 	const [search, setSearch] = useState('')
+	const y = useRef(new Animated.Value(0)).current
 	const bottomTabBarHeight = useBottomTabBarHeight()
 	const [refreshing, setRefreshing] = useState(false)
 	const logout = useStoreActions(({ auth }) => auth.logout)
 	const currentUser = useStoreState(({ user }) => user?.currentUser)
 	const setFirstVisits = useStoreActions(({ utils }) => utils.setFirstVisits)
+
+	const animation = {
+		transform: [
+			// { scale: y.interpolate({ inputRange: [0, 250 - 80], outputRange: [1, 1.2], extrapolate: 'clamp' }) },
+			{ translateY: y.interpolate({ inputRange: [0, 250], outputRange: [0, -250], extrapolate: 'clamp' }) }
+		]
+	}
 
 	useEffect(() => { setFirstVisits({ home: false }) }, [])
 
@@ -59,37 +68,53 @@ export default function Home({ navigation, route }: ScreenProps) {
 	}
 
 	return (
-		<ScrollView
-			style={[styles.screen, { height: height - bottomTabBarHeight }]}
-			keyboardShouldPersistTaps="handled"
-			keyboardDismissMode="interactive"
-			refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-			// stickyHeaderIndices={[0]}
-		>
-			<Carousel items={carousel} color={Color.white} autoplay>
-				{({ image }) => (
-					// TODO fix gradient
-					<LinearGradient style={{ height: 250 }} locations={[0, 1]} colors={['#000', '#0000']}>
+		<View style={styles.screen}>
+			<StatusBar style="light" />
+
+			<Animated.View style={[{ height: 250 }, animation]}>
+				<Carousel items={carousel} color={Color.white} autoplay>
+					{({ image }) => (<>
+						<LinearGradient style={styles.gradient} colors={['#000C', '#0000']} />
 						<ImageBackground style={styles.screen} source={image} />
-					</LinearGradient>
-				)}
-			</Carousel>
+					</>)}
+				</Carousel>
 
-			<FAB style={styles.fab} icon="logout" onPress={onPress} />
+				<FAB style={styles.fab} icon="logout" onPress={onPress} />
+			</Animated.View>
 
-			<View style={[styles.content, { marginTop: -28 }]}>
-				<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
-				<Categories limit={6} refreshing={refreshing} />
-				<Places limit={6} refreshing={refreshing} />
-				<Events limit={6} refreshing={refreshing} />
-			</View>
-		</ScrollView>
+			<ScrollView
+				style={[styles.scroll, { height: height - bottomTabBarHeight }]}
+				keyboardShouldPersistTaps="handled"
+				keyboardDismissMode="interactive"
+				scrollEventThrottle={16}
+				onScroll={Animated.event([{ nativeEvent: { contentOffset: { y } } }], { useNativeDriver: false } )}
+				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+				// stickyHeaderIndices={[0]}
+			>
+
+				<View style={[styles.content, { marginTop: -28 }]}>
+					<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
+					<Categories limit={6} refreshing={refreshing} />
+					<Places limit={6} refreshing={refreshing} />
+					<Events limit={6} refreshing={refreshing} />
+				</View>
+			</ScrollView>
+		</View>
 	)
 }
 
 const styles = StyleSheet.create({
 	screen: {
 		...StyleSheet.absoluteFillObject,
+		overflow: 'visible',
+		backgroundColor: Color.white
+	},
+	gradient: {
+		zIndex: 1,
+		...StyleSheet.absoluteFillObject
+	},
+	scroll: {
+		// ...StyleSheet.absoluteFillObject,
 		overflow: 'visible',
 		backgroundColor: Color.white
 	},
