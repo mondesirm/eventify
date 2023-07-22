@@ -5,38 +5,62 @@ import { useNavigation } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewProps } from 'react-native'
 
-import { Place, useStoreActions, useStoreState } from '@/store'
+import { Event, Place, useStoreActions } from '@/store'
 import { Border, Color, FontFamily, FontSize } from 'globals'
 
-interface SectionProps extends ViewProps {
-	limit?: number
+interface SectionProps<T extends 'event' | 'place' = any> extends ViewProps {
+    type: T
+    limit?: number
 	refreshing?: boolean
 }
 
 const { width } = Dimensions.get('window')
 
-export default function Places({ limit = null, refreshing = false }: SectionProps) {
-	const [items, setItems] = useState<Place<true>[]>([])
+export default function Section({ type, limit = null, refreshing = false }: SectionProps) {
 	const query = useStoreActions(({ db }) => db.query)
-	const currentUser = useStoreState(({ user }) => user?.currentUser)
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
+	const [items, setItems] = useState<(typeof type extends 'event' ? Event<true> : Place<true>)[]>([])
 
-	useEffect(() => { query({ path: 'places', limit }).then(docs => setItems(docs as Place<true>[])) }, [limit, refreshing])
+	useEffect(() => { query({ path: type + 's', limit }).then(docs => setItems(docs as typeof items)) }, [limit, refreshing])
 
-	return (
-		<View style={styles.section}>
-			<View style={styles.header}>
-				<Text style={[styles.title, styles.typo]}>Trending Places</Text>
+	const renderItems = () => {
+		if (items.length === 0) return <Text style={[styles.text, styles.typo]}>No {type + 's'} found</Text>
 
-				<TouchableOpacity onPress={() => {}}>
-					<Text style={[styles.more, styles.typo]}>View All</Text>
-				</TouchableOpacity>
-			</View>
+		switch (type) {
+			case 'event':
+				return (items as Event<true>[]).filter(_ => _.visibility === 'public').map(({ id, uri, title, start, end, limit, visibility, owner, place, category, attendees }, i) => (
+					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Event', { id })}>
+						<Image style={styles.image} resizeMode="cover" source={{ uri : uri || 'https://fakeimg.pl/260/7750f8/FFF/?text=No%20Image&font=lobster&font_size=50' }} />
+						{category?.name && <Badge style={styles.category}>{category?.name}</Badge>}
 
-			<ScrollView contentContainerStyle={styles.content} horizontal showsHorizontalScrollIndicator={false}>
-				{items.map(({ name, uri, price, rating, category }, i) => (
-					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Place', { name })}>
-						<Image style={styles.image} resizeMode="cover" source={{ uri }} />
+						<View style={styles.container}>
+							<Badge style={styles.badge} size={25}>{Number(attendees?.length ?? 0) + ' / ' + (limit ? limit : '∞')}</Badge>
+
+							<View style={styles.row}>
+								<Text style={[styles.text, styles.typo, { color: Color.body }]}>
+									{start.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+								</Text>
+
+								<Text style={[styles.text, styles.typo, { color: Color.body }]}>
+									{/* if end.day is not the same as start.date, show it */}
+									{end.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) !== start.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) && end.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+								</Text>
+							</View>
+
+							<Text style={[styles.text, styles.typo]}>{title}</Text>
+
+							<View style={styles.row}>
+								<Avatar.Image size={20} source={{ uri: 'https://picsum.photos/seed/picsum/200/300' }} />
+								<Text style={[styles.text, styles.typo, { color: Color.body }]}>{owner?.username ?? '@eventify'}</Text>
+							</View>
+						</View>
+					</TouchableOpacity>
+				))
+
+			case 'place':
+				return (items as Place<true>[]).map(({ id, name, uri, price, rating, category }, i) => (
+					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Place', { id })}>
+						<Image style={styles.image} resizeMode="cover" source={{ uri : uri || 'https://fakeimg.pl/260/7750f8/FFF/?text=No%20Image&font=lobster&font_size=50' }} />
 						{category?.name && <Badge style={styles.category}>{category?.name}</Badge>}
 
 						<View style={styles.container}>
@@ -55,13 +79,22 @@ export default function Places({ limit = null, refreshing = false }: SectionProp
 							</View>
 						</View>
 					</TouchableOpacity>
-				))}
+				))
+		}
+	}
 
-				{items.length === 0 && (
-					<View style={styles.container}>
-						<Text style={[styles.text, styles.typo]}>No places found</Text>
-					</View>
-				)}
+	return (
+		<View style={styles.section}>
+			<View style={styles.header}>
+				<Text style={[styles.title, styles.typo]}>Trending {(type + 's')}</Text>
+
+				<TouchableOpacity onPress={() => {}}>
+					<Text style={[styles.more, styles.typo]}>View All</Text>
+				</TouchableOpacity>
+			</View>
+
+			<ScrollView contentContainerStyle={styles.content} horizontal showsHorizontalScrollIndicator={false}>
+				{renderItems()}
 			</ScrollView>
 		</View>
 	)
@@ -80,6 +113,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between'
 	},
 	typo: {
+		textTransform: 'capitalize',
 		fontFamily: FontFamily.medium
 	},
 	title: {
@@ -87,8 +121,7 @@ const styles = StyleSheet.create({
 		fontSize: FontSize.lg
 	},
 	more: {
-		color: Color.body,
-		textTransform: 'capitalize'
+		color: Color.body
 	},
 	content: {
 		gap: 20,

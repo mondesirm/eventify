@@ -7,9 +7,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { Animated, Dimensions, I18nManager, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
 
-import Events from '@/components/Events'
-import Places from '@/components/Places'
 import { AllowedScope } from '@/locales'
+import Section from '@/components/Section'
 import Carousel from '@/components/Carousel'
 import SearchBar from '@/components/SearchBar'
 import Categories from '@/components/Categories'
@@ -68,7 +67,7 @@ export default function Home({ navigation, route }: ScreenProps) {
 	}
 
 	return (
-		<View style={styles.screen}>
+		<View style={[styles.screen, { height: height - bottomTabBarHeight }]}>
 			<StatusBar style="light" />
 
 			<Animated.View style={[{ height: 250 }, animation]}>
@@ -83,7 +82,7 @@ export default function Home({ navigation, route }: ScreenProps) {
 			</Animated.View>
 
 			<ScrollView
-				style={[styles.scroll, { height: height - bottomTabBarHeight }]}
+				style={{ overflow: 'visible' }}
 				keyboardShouldPersistTaps="handled"
 				keyboardDismissMode="interactive"
 				scrollEventThrottle={16}
@@ -94,9 +93,9 @@ export default function Home({ navigation, route }: ScreenProps) {
 
 				<View style={[styles.content, { marginTop: -28 }]}>
 					<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
-					<Categories limit={6} refreshing={refreshing} />
-					<Places limit={6} refreshing={refreshing} />
-					<Events limit={6} refreshing={refreshing} />
+					<Categories style={{ marginVertical: 32 }} limit={6} refreshing={refreshing} />
+					<Section type="place" limit={6} refreshing={refreshing} />
+					<Section type="event" limit={6} refreshing={refreshing} />
 				</View>
 			</ScrollView>
 		</View>
@@ -106,20 +105,13 @@ export default function Home({ navigation, route }: ScreenProps) {
 const styles = StyleSheet.create({
 	screen: {
 		...StyleSheet.absoluteFillObject,
-		overflow: 'visible',
 		backgroundColor: Color.white
 	},
 	gradient: {
+		...StyleSheet.absoluteFillObject,
 		zIndex: 1,
-		...StyleSheet.absoluteFillObject
-	},
-	scroll: {
-		// ...StyleSheet.absoluteFillObject,
-		overflow: 'visible',
-		backgroundColor: Color.white
 	},
 	content: {
-		gap: 32,
 		paddingHorizontal: 20
 	},
 	typo: {

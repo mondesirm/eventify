@@ -15,7 +15,7 @@ interface SectionProps extends ViewProps {
 
 const { width, height } = Dimensions.get('window')
 
-export default function Categories({ limit = null, refreshing = false }: SectionProps) {
+export default function Categories({ limit = null, refreshing = false, ...rest }: SectionProps) {
 	const query = useStoreActions(({ db }) => db.query)
 	const [categories, setCategories] = useState<Category[]>([])
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
@@ -23,7 +23,7 @@ export default function Categories({ limit = null, refreshing = false }: Section
 	useEffect(() => { query({ path: 'categories', limit }).then(docs => setCategories(docs as Category[])) }, [limit, refreshing])
 
 	return (
-		<View style={styles.section}>
+		<View style={styles.section} {...rest}>
 			<View style={styles.header}>
 				<Text style={[styles.title, styles.typo]}>Trending Categories</Text>
 
@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between'
 	},
 	typo: {
+		textTransform: 'capitalize',
 		fontFamily: FontFamily.medium
 	},
 	title: {
@@ -71,8 +72,7 @@ const styles = StyleSheet.create({
 		fontSize: FontSize.lg
 	},
 	more: {
-		color: Color.body,
-		textTransform: 'capitalize'
+		color: Color.body
 	},
 	content: {
 		gap: 20,
@@ -104,7 +104,6 @@ const styles = StyleSheet.create({
 	text: {
 		textAlign: 'center',
 		color: Color.heading,
-		fontSize: FontSize.xs,
-		textTransform: 'capitalize'
+		fontSize: FontSize.xs
 	}
 })
