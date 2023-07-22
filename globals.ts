@@ -2,7 +2,7 @@ import { Dimensions } from 'react-native'
 
 import type { IconlyContextProps } from '@/contexts/IconlyContext'
 
-const { fontScale } = Dimensions.get('screen')
+const { fontScale } = Dimensions.get('window')
 
 /* Fonts */
 export const FontFamily = {

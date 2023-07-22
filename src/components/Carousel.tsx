@@ -15,7 +15,7 @@ interface CarouselProps extends Partial<AppIntroSlider<{ image: any, key: string
 	children: ({ image, key }) => JSX.Element
 }
 
-const { width } = Dimensions.get('screen')
+const { width } = Dimensions.get('window')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
 export default function Carousel(props: CarouselProps) {

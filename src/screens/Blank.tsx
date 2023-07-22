@@ -10,7 +10,7 @@ interface ScreenProps {
 	route: { key: string, name: string, params: any }
 }
 
-const { width } = Dimensions.get('screen')
+const { width } = Dimensions.get('window')
 
 export default function Blank(props: ScreenProps) {
 	const { __ } = useI18n()

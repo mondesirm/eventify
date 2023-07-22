@@ -21,7 +21,7 @@ interface ScreenProps {
 	route: { key: string, name: string, params: any }
 }
 
-const { height } = Dimensions.get('screen')
+const { height } = Dimensions.get('window')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
 const images = new Array(4).fill('https://loremflickr.com/640/480/people')
@@ -90,7 +90,6 @@ export default function Home({ navigation, route }: ScreenProps) {
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 				// stickyHeaderIndices={[0]}
 			>
-
 				<View style={[styles.content, { marginTop: -28 }]}>
 					<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
 					<Categories style={{ marginVertical: 32 }} limit={6} refreshing={refreshing} />

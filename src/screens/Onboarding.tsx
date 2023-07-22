@@ -22,7 +22,7 @@ interface BtnProps {
 	styles: StyleProp<ViewStyle> | [StyleProp<ViewStyle>, StyleProp<TextStyle>]
 }
 
-const { width, height } = Dimensions.get('screen')
+const { width, height } = Dimensions.get('window')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
 const images = [

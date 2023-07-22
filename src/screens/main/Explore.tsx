@@ -11,7 +11,7 @@ interface ScreenProps {
 	route: { key: string, name: string, params: any }
 }
 
-const { width, height } = Dimensions.get('screen')
+const { width, height } = Dimensions.get('window')
 
 const screens: { name: string, icon: Lowercase<keyof typeof Icons> }[] = [
 	{ name: 'Categories', icon: 'category' },

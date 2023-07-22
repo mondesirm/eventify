@@ -24,7 +24,7 @@ interface ScreenProps {
 }
 
 const regex = /^0\d{9}$/
-const { width } = Dimensions.get('screen')
+const { width } = Dimensions.get('window')
 
 export default ({ navigation }: ScreenProps) => {
 	const { __ } = useI18n()
