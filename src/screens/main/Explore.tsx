@@ -15,7 +15,8 @@ const { width, height } = Dimensions.get('screen')
 
 const screens: { name: string, icon: Lowercase<keyof typeof Icons> }[] = [
 	{ name: 'Categories', icon: 'category' },
-	{ name: 'Places', icon: 'location' }
+	{ name: 'Places', icon: 'location' },
+	{ name: 'Events', icon: 'calendar' },
 ]
 
 export default function Explore({ navigation }: ScreenProps) {
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
 	block: {
 		borderWidth: 1,
 		width: width / 2,
-		height: height / 4,
+		height: height / 5,
 		borderStyle: 'solid',
 		borderRadius: Border.xs,
 		borderColor: Color.border

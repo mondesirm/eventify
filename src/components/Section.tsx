@@ -29,7 +29,7 @@ export default function Section({ type, limit = null, refreshing = false }: Sect
 		switch (type) {
 			case 'event':
 				return (items as Event<true>[]).filter(_ => _.visibility === 'public').map(({ id, uri, title, start, end, limit, visibility, owner, place, category, attendees }, i) => (
-					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Event', { id })}>
+					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('ExploreStack', { screen: 'Event', params: { id } })}>
 						<Image style={styles.image} resizeMode="cover" source={{ uri : uri || 'https://fakeimg.pl/260/7750f8/FFF/?text=No%20Image&font=lobster&font_size=50' }} />
 						{category?.name && <Badge style={styles.category}>{category?.name}</Badge>}
 
@@ -59,7 +59,7 @@ export default function Section({ type, limit = null, refreshing = false }: Sect
 
 			case 'place':
 				return (items as Place<true>[]).map(({ id, name, uri, price, rating, category }, i) => (
-					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Place', { id })}>
+					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('ExploreStack', { screen: 'Place', params: { id } })}>
 						<Image style={styles.image} resizeMode="cover" source={{ uri : uri || 'https://fakeimg.pl/260/7750f8/FFF/?text=No%20Image&font=lobster&font_size=50' }} />
 						{category?.name && <Badge style={styles.category}>{category?.name}</Badge>}
 
@@ -88,7 +88,7 @@ export default function Section({ type, limit = null, refreshing = false }: Sect
 			<View style={styles.header}>
 				<Text style={[styles.title, styles.typo]}>Trending {(type + 's')}</Text>
 
-				<TouchableOpacity onPress={() => {}}>
+				<TouchableOpacity onPress={() => navigate('ExploreStack', { screen: type.charAt(0).toUpperCase() + type.slice(1) + 's' })}>
 					<Text style={[styles.more, styles.typo]}>View All</Text>
 				</TouchableOpacity>
 			</View>

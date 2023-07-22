@@ -27,14 +27,14 @@ export default function Categories({ limit = null, refreshing = false, ...rest }
 			<View style={styles.header}>
 				<Text style={[styles.title, styles.typo]}>Trending Categories</Text>
 
-				<TouchableOpacity onPress={() => navigate('Categories')}>
+				<TouchableOpacity onPress={() => navigate('ExploreStack', { screen: 'Categories' })}>
 					<Text style={[styles.more, styles.typo]}>View All</Text>
 				</TouchableOpacity>
 			</View>
 
 			<SharedElement id="categories" style={styles.content}>
-				{categories.map(({ name, icon }, i) => (
-					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('Category', { name })}>
+				{categories.map(({ id, name, icon }, i) => (
+					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('ExploreStack', { screen: 'Category', params: { id } })}>
 						<View style={styles.image}>
 							<Icon name={icon} size={38} />
 						</View>

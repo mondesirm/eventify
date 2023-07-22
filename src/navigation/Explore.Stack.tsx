@@ -22,7 +22,9 @@ const screens: { name: string, component: (props: ScreenProps) => JSX.Element, s
 	{ name: 'Categories', component: Categories },
 	{ name: 'Category', component: Category, sharedElements: route => [{ id: route.params._.id }],  },
 	{ name: 'Places', component: Places },
-	{ name: 'Place', component: Blank, sharedElements: route => [{ id: route.params._.id }] }
+	{ name: 'Place', component: Blank, sharedElements: route => [{ id: route.params._.id }] },
+	{ name: 'Events', component: Blank },
+	{ name: 'Event', component: Blank, sharedElements: route => [{ id: route.params._.id }] }
 ]
 
 export default function ExploreStack() {
