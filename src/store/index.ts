@@ -1,5 +1,6 @@
 import { createStore, createTypedHooks } from 'easy-peasy'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { DocumentReference, GeoPoint, Timestamp } from 'firebase/firestore'
 
 import models from './models'
 import { DBModel } from './models/db'
@@ -7,7 +8,6 @@ import { AuthModel } from './models/auth'
 import { UserModel } from './models/user'
 import { UtilsModel } from './models/utils'
 import { CalendarModel } from './models/calendar'
-import { GeoPoint, Timestamp } from 'firebase/firestore'
 
 export type StoreModel = {
 	db: DBModel
@@ -19,14 +19,15 @@ export type StoreModel = {
 
 const typedHooks = createTypedHooks<StoreModel>()
 
+export const useStoreState = typedHooks.useStoreState
 export const useStoreActions = typedHooks.useStoreActions
 export const useStoreDispatch = typedHooks.useStoreDispatch
-export const useStoreState = typedHooks.useStoreState
 
 export default createStore<StoreModel>(models)
 
-type Base = { id?: string, createdAt?: Timestamp, updatedAt?: Timestamp }
-type Content = { description?: string, uri?: string } & Base
+export type Base = { id?: string, ref?: DocumentReference, createdAt?: Timestamp, updatedAt?: Timestamp }
+export type Rating<T = false> = { value: number, user: T extends false ? string : User<T> } & Base
+export type Content<T = false> = { uri?: string, description?: string, ratings?: Rating<T>[] } & Base
 
 export type Category = {
 	name: string
@@ -36,8 +37,7 @@ export type Category = {
 // If T is true then the relation is serialized
 export type Place<T = false> = {
 	name: string
-	price: number
-	rating: number
+	price?: number
 	category: T extends false ? string : Category
 } & Content
 
@@ -46,34 +46,32 @@ export type Event<T = false> = {
 	start: Timestamp
 	end?: Timestamp
 	limit?: number
-	rating: number
 	visibility: 'public' | 'friends' | 'unlisted'
-	owner: T extends false ? string : User
-	place?: T extends false ? string : Place
+	owner?: T extends false ? string : User
+	place?: T extends false ? string : Place<T>
 	category?: T extends false ? string : Category
-	attendees?: T extends false ? string[] : User[]
-	invitations?: T extends false ? string[] : Invitation[]
+	attendees?: string[]
+	invitations?: Invitation[]
 } & Content
 
 export type Days = Record<string, Event[]>
 
 export type User<T = false> = {
-	avatar?: string
-	username: string
 	email: string
 	phone?: string
+	username: string
 	password?: string
 	isDisabled: boolean
 	roles: ('user' | 'admin')[]
+	trips?: T extends false ? string[] : Trip[]
 	ownedEvents?: T extends false ? string[] : Event[]
 	attendedEvents?: T extends false ? string[] : Event[]
 	sentInvitations?: T extends false ? string[] : Invitation[]
 	receivedInvitations?: T extends false ? string[] : Invitation[]
-	trips?: T extends false ? string[] : Trip[]
-} & Base
+} & Content
 
 export type Invitation<T = false> = {
-	kind: 'friend_request' | 'event_attendance'
+	kind: 'event_attendance' | 'event_invite' | 'friend_request' | 'message_request'
 	event: T extends false ? string : Event
 	sender: T extends false ? string : User
 	receiver: T extends false ? string : User

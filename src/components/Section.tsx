@@ -1,101 +1,49 @@
 import { useEffect, useState } from 'react'
-import { Rating } from 'react-native-ratings'
-import { Avatar, Badge } from 'react-native-paper'
 import { useNavigation } from '@react-navigation/native'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewProps } from 'react-native'
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View, ViewProps } from 'react-native'
 
-import { Event, Place, useStoreActions } from '@/store'
+import { useStoreActions, useStoreState } from '@/store'
 import { Border, Color, FontFamily, FontSize } from 'globals'
 
-interface SectionProps<T extends 'event' | 'place' = any> extends ViewProps {
-    type: T
+// interface SectionProps extends ViewProps {
+interface SectionProps {
+    path: string
     limit?: number
+	vertical?: boolean
 	refreshing?: boolean
+	predicate?: (_: any[]) => any[]
+	children: (_: any, stylesheet: typeof styles) => JSX.Element
 }
 
 const { width } = Dimensions.get('window')
 
-export default function Section({ type, limit = null, refreshing = false }: SectionProps) {
+export default function Section({ path, limit = null, vertical = false, refreshing = false, predicate = _ => _, children }: SectionProps) {
 	const query = useStoreActions(({ db }) => db.query)
+	const storage = useStoreState(({ db }) => db.storage)
+	const [items, setItems] = useState(storage[path] || [])
 	const { navigate } = useNavigation<StackNavigationProp<any, any>>()
-	const [items, setItems] = useState<(typeof type extends 'event' ? Event<true> : Place<true>)[]>([])
 
-	useEffect(() => { query({ path: type + 's', limit }).then(docs => setItems(docs as typeof items)) }, [limit, refreshing])
-
-	const renderItems = () => {
-		if (items.length === 0) return <Text style={[styles.text, styles.typo]}>No {type + 's'} found</Text>
-
-		switch (type) {
-			case 'event':
-				return (items as Event<true>[]).filter(_ => _.visibility === 'public').map(({ id, uri, title, start, end, limit, visibility, owner, place, category, attendees }, i) => (
-					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('ExploreStack', { screen: 'Event', params: { id } })}>
-						<Image style={styles.image} resizeMode="cover" source={{ uri : uri || 'https://fakeimg.pl/260/7750f8/FFF/?text=No%20Image&font=lobster&font_size=50' }} />
-						{category?.name && <Badge style={styles.category}>{category?.name}</Badge>}
-
-						<View style={styles.container}>
-							<Badge style={styles.badge} size={25}>{Number(attendees?.length ?? 0) + ' / ' + (limit ? limit : '∞')}</Badge>
-
-							<View style={styles.row}>
-								<Text style={[styles.text, styles.typo, { color: Color.body }]}>
-									{start.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-								</Text>
-
-								<Text style={[styles.text, styles.typo, { color: Color.body }]}>
-									{/* if end.day is not the same as start.date, show it */}
-									{end.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) !== start.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) && end.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-								</Text>
-							</View>
-
-							<Text style={[styles.text, styles.typo]}>{title}</Text>
-
-							<View style={styles.row}>
-								<Avatar.Image size={20} source={{ uri: 'https://picsum.photos/seed/picsum/200/300' }} />
-								<Text style={[styles.text, styles.typo, { color: Color.body }]}>{owner?.username ?? '@eventify'}</Text>
-							</View>
-						</View>
-					</TouchableOpacity>
-				))
-
-			case 'place':
-				return (items as Place<true>[]).map(({ id, name, uri, price, rating, category }, i) => (
-					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('ExploreStack', { screen: 'Place', params: { id } })}>
-						<Image style={styles.image} resizeMode="cover" source={{ uri : uri || 'https://fakeimg.pl/260/7750f8/FFF/?text=No%20Image&font=lobster&font_size=50' }} />
-						{category?.name && <Badge style={styles.category}>{category?.name}</Badge>}
-
-						<View style={styles.container}>
-							<Badge style={styles.badge} size={25}>{price === 0 ? 'FREE' : '$' + price}</Badge>
-
-							<View style={styles.row}>
-								<Rating imageSize={10} readonly startingValue={rating} />
-								<Text style={[styles.text, styles.typo, { color: Color.body }]}>{rating.toPrecision(2)}</Text>
-							</View>
-
-							<Text style={[styles.text, styles.typo]}>{name}</Text>
-
-							<View style={styles.row}>
-								<Avatar.Image size={20} source={{ uri: 'https://picsum.photos/seed/picsum/200/300' }} />
-								<Text style={[styles.text, styles.typo, { color: Color.body }]}>{'@eventify'}</Text>
-							</View>
-						</View>
-					</TouchableOpacity>
-				))
-		}
-	}
+	useEffect(() => { query({ path, limit }).then(docs => setItems(docs)) }, [limit, refreshing])
 
 	return (
-		<View style={styles.section}>
-			<View style={styles.header}>
-				<Text style={[styles.title, styles.typo]}>Trending {(type + 's')}</Text>
+		<View style={[styles.section, vertical && { backgroundColor: 'transparent' }]}>
+			{!vertical && <View style={styles.header}>
+				<Text style={[styles.title, styles.typo]}>Trending {path.charAt(0).toUpperCase() + path.slice(1)}</Text>
 
-				<TouchableOpacity onPress={() => navigate('ExploreStack', { screen: type.charAt(0).toUpperCase() + type.slice(1) + 's' })}>
+				<TouchableOpacity onPress={() => navigate('ExploreStack', { screen: path.charAt(0).toUpperCase() + path.slice(1) })}>
 					<Text style={[styles.more, styles.typo]}>View All</Text>
 				</TouchableOpacity>
-			</View>
+			</View>}
 
-			<ScrollView contentContainerStyle={styles.content} horizontal showsHorizontalScrollIndicator={false}>
-				{renderItems()}
-			</ScrollView>
+			{predicate(items).length === 0 ?
+				<View style={[styles.content, vertical && { marginTop: 0 }]}>
+					<Text style={[styles.text, styles.typo]}>No {path} found</Text>
+				</View> :
+				<ScrollView contentContainerStyle={[styles.content, vertical && { marginTop: 0 }]} horizontal={!vertical} showsHorizontalScrollIndicator={false} decelerationRate="fast" snapToInterval={styles.block.width + 20}>
+					{children(predicate(items), styles)}
+				</ScrollView>
+			}
 		</View>
 	)
 }
@@ -113,7 +61,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-between'
 	},
 	typo: {
-		textTransform: 'capitalize',
 		fontFamily: FontFamily.medium
 	},
 	title: {
@@ -127,6 +74,7 @@ const styles = StyleSheet.create({
 		gap: 20,
 		marginTop: 16,
 		flexWrap: 'wrap',
+		alignSelf: 'center',
 		flexDirection: 'row',
 		paddingHorizontal: 20
 	},
@@ -162,7 +110,6 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		flex: 1,
-		// paddingHorizontal: 10,
 		justifyContent: 'center'
 	},
 	badge: {
@@ -189,7 +136,6 @@ const styles = StyleSheet.create({
 		color: Color.heading,
 		fontSize: FontSize.xs,
 		paddingHorizontal: 10,
-		textTransform: 'capitalize',
 		fontFamily: FontFamily.medium
 	}
 })

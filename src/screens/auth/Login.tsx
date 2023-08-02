@@ -21,7 +21,7 @@ interface ScreenProps {
 	route: { key: string, name: string, params: any }
 }
 
-const { width } = Dimensions.get('window')
+const { width } = Dimensions.get('screen')
 
 export default ({ navigation, route }: ScreenProps) => {
 	const { __ } = useI18n()

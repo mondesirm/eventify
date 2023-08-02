@@ -33,14 +33,14 @@ export default function Categories({ limit = null, refreshing = false, ...rest }
 			</View>
 
 			<SharedElement id="categories" style={styles.content}>
-				{categories.map(({ id, name, icon }, i) => (
-					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('ExploreStack', { screen: 'Category', params: { id } })}>
+				{categories.map((_, i) => (
+					<TouchableOpacity key={i} style={styles.block} onPress={() => navigate('ExploreStack', { screen: 'Category', params: { _ } })}>
 						<View style={styles.image}>
-							<Icon name={icon} size={38} />
+							<Icon name={_.icon} size={38} />
 						</View>
 
 						<View style={styles.container}>
-							<Text style={[styles.text, styles.typo]}>{name}</Text>
+							<Text style={[styles.text, styles.typo]}>{_.name}</Text>
 						</View>
 					</TouchableOpacity>
 				))}

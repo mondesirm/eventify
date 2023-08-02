@@ -5,11 +5,11 @@ import Home from '@/screens/main/Home'
 
 const { Navigator, Screen } = createStackNavigator()
 
-const screens = [
+export const screens = [
 	{ name: 'Home', component: Home },
 	{ name: 'Category', component: Blank },
 	{ name: 'Place', component: Blank }
-]
+] as const
 
 export default function HomeStack() {
 	return (

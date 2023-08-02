@@ -17,15 +17,17 @@ interface ScreenProps {
 
 const { Navigator, Screen } = createSharedElementStackNavigator()
 
-const screens: { name: string, component: (props: ScreenProps) => JSX.Element, sharedElements?: SharedElementsComponentConfig }[] = [
-	{ name: 'Explore', component: Explore },
-	{ name: 'Categories', component: Categories },
-	{ name: 'Category', component: Category, sharedElements: route => [{ id: route.params._.id }],  },
-	{ name: 'Places', component: Places },
-	{ name: 'Place', component: Blank, sharedElements: route => [{ id: route.params._.id }] },
-	{ name: 'Events', component: Blank },
-	{ name: 'Event', component: Blank, sharedElements: route => [{ id: route.params._.id }] }
-]
+const sharedElements = (cb: SharedElementsComponentConfig) => cb
+
+export const screens = [
+	{ name: 'Explore', component: Explore, sharedElements: null },
+	{ name: 'Categories', component: Categories, sharedElements: null },
+	{ name: 'Category', component: Category, sharedElements: sharedElements(route => [{ id: route.params._.id }]),  },
+	{ name: 'Places', component: Places, sharedElements: null },
+	{ name: 'Place', component: Blank, sharedElements: sharedElements(route => [{ id: route.params._.id }]) },
+	{ name: 'Events', component: Blank, sharedElements: null },
+	{ name: 'Event', component: Blank, sharedElements: sharedElements(route => [{ id: route.params._.id }]) }
+] as const
 
 export default function ExploreStack() {
 	return (

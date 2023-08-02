@@ -146,8 +146,10 @@
 		"unique": "Le champ \"%{label}\" doit être unique",
 		"exists": "Le champ \"%{label}\" n'existe pas",
 		"connection": "Veuillez vérifier votre connexion internet.",
-		"permission-denied": "Vous n'avez pas les permissions nécessaires.",
 		"undefined": "Une erreur inconnue est survenue.",
+		"invalid-argument": "Un argument invalide a été fourni.",
+		"permission-denied": "Vous n'avez pas les permissions nécessaires.",
+		"failed-precondition": "L'opération n'a pas pu être effectuée.",
 		"auth": {
 			"missing-email": "L'adresse email est manquante.",
 			"invalid-email": "L'adresse email est invalide.",
@@ -163,5 +165,9 @@
 			"object-not-found": "Le fichier recherché n'a pas été trouvé.",
 			"unauthorized": "Vous n'êtes pas autorisé à accéder à ce fichier."
 		}
+	},
+	"wip": {
+		"title": "Bientôt disponible !",
+		"subtitle": "Cette fonctionnalité n'est pas encore disponible."
 	}
 }

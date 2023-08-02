@@ -5,10 +5,10 @@ import AuthStack from '@/navigation/Auth.Stack'
 
 const { Navigator, Screen } = createStackNavigator()
 
-const screens = [
+export const screens = [
 	{ name: 'Onboarding', component: Onboarding },
 	{ name: 'AuthStack', component: AuthStack }
-]
+] as const
 
 export default function OnboardingStack() {
 	return (

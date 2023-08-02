@@ -4,12 +4,12 @@ import { NavigationProp } from '@react-navigation/native'
 import Icon from '@expo/vector-icons/MaterialCommunityIcons'
 import { SharedElement } from 'react-navigation-shared-element'
 import { getDefaultHeaderHeight } from '@react-navigation/elements'
-import { Dimensions, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { Category, useStoreActions } from '@/store'
 import { useI18n } from '@/contexts/PreferencesContext'
 import { Border, Color, FontFamily, FontSize } from 'globals'
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 
 interface ScreenProps {
 	navigation: NavigationProp<any, any>
@@ -29,7 +29,7 @@ export default function Explore({ navigation }: ScreenProps) {
 
 	return (
 		<View style={[styles.screen, { height: height - bottomTabBarHeight - defaultHeaderHeight }]}>
-			{/* TODO lottie Nothing */}
+			{/* TODO Lottie Nothing */}
 			{categories.length === 0 ?
 				<View style={styles.container}>
 					<Text style={styles.text}>No categories found</Text>

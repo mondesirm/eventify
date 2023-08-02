@@ -160,6 +160,8 @@ export default {
 	restoreSession: thunk((actions, payload, { getStoreActions, getStoreState }) => {
 		getStoreActions().user.setLoading(true)
 
+		const isConnected = getStoreState().utils.netInfoState?.isConnected
+
 		return new Promise((resolve, reject) => {
 			onAuthStateChanged(auth, user => {
 				if (user === null/*  || getStoreState().user?.roles?.length === 0 */) return getStoreActions().user.setLoading(false) /* reject('You are not logged in.') */
@@ -179,8 +181,19 @@ export default {
 						getStoreActions().user.setUser(currentUser)
 						resolve(user.email)
 					})
+					.catch(({ code }: FirebaseError) => {
+						Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+
+						if (!isConnected) reject(['login.error', 'errors.connection'])
+						reject(['login.error', 'errors.' + code])
+					})
 				})
-				.catch((err: string) => reject(err))
+				.catch(({ code }: FirebaseError) => {
+					Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error)
+
+					if (!isConnected) reject(['login.error', 'errors.connection'])
+					reject(['login.error', 'errors.' + code])
+				})
 				.finally(() => getStoreActions().user.setLoading(false))
 			})
 		})

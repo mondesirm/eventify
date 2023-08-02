@@ -1,27 +1,28 @@
-import { FAB } from 'react-native-paper'
 import { StatusBar } from 'expo-status-bar'
+import { Rating } from 'react-native-ratings'
 import Toast from 'react-native-toast-message'
 import { LinearGradient } from 'expo-linear-gradient'
+import { Avatar, Badge, FAB } from 'react-native-paper'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import { Animated, Dimensions, I18nManager, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, View } from 'react-native'
+import { Animated, Dimensions, I18nManager, Image, ImageBackground, Platform, RefreshControl, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { AllowedScope } from '@/locales'
 import Section from '@/components/Section'
 import Carousel from '@/components/Carousel'
 import SearchBar from '@/components/SearchBar'
 import Categories from '@/components/Categories'
-import { Color, FontFamily, FontSize } from 'globals'
-import { useStoreActions, useStoreState } from '@/store'
+import { Border, Color, FontFamily, FontSize } from 'globals'
 import { useI18n, useNavs } from '@/contexts/PreferencesContext'
+import { Event, Place, useStoreActions, useStoreState } from '@/store'
 
 interface ScreenProps {
 	navigation: StackNavigationProp<any, any>
 	route: { key: string, name: string, params: any }
 }
 
-const { height } = Dimensions.get('window')
+const { width, height } = Dimensions.get('window')
 const isAndroidRTL = I18nManager.isRTL && Platform.OS === 'android'
 
 const images = new Array(4).fill('https://loremflickr.com/640/480/people')
@@ -83,18 +84,72 @@ export default function Home({ navigation, route }: ScreenProps) {
 
 			<ScrollView
 				style={{ overflow: 'visible' }}
-				keyboardShouldPersistTaps="handled"
-				keyboardDismissMode="interactive"
 				scrollEventThrottle={16}
-				onScroll={Animated.event([{ nativeEvent: { contentOffset: { y } } }], { useNativeDriver: false } )}
+				keyboardDismissMode="interactive"
+				keyboardShouldPersistTaps="handled"
 				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-				// stickyHeaderIndices={[0]}
+				onScroll={Animated.event([{ nativeEvent: { contentOffset: { y } } }], { useNativeDriver: false } )}
 			>
-				<View style={[styles.content, { marginTop: -28 }]}>
-					<SearchBar value={search} onBlur={() => setSearch('')} onChangeText={setSearch} />
+				<View style={styles.content}>
+					<SearchBar value={search} onChangeText={setSearch} />
 					<Categories style={{ marginVertical: 32 }} limit={6} refreshing={refreshing} />
-					<Section type="place" limit={6} refreshing={refreshing} />
-					<Section type="event" limit={6} refreshing={refreshing} />
+
+					<Section path="places" limit={6} refreshing={refreshing}>
+						{(items, styles) => items.map((_: Place<true>) => (
+							<TouchableOpacity key={_.id} style={styles.block} onPress={() => navigation.navigate('ExploreStack', { screen: 'Place', params: { _ } })}>
+								<Image style={styles.image} resizeMode="cover" source={{ uri : _.uri || 'https://fakeimg.pl/260/5f60b9/FFF/?text=No%20Image&font=lobster&font_size=50' }} />
+								{_.category?.name && <Badge style={styles.category}>{_.category?.name}</Badge>}
+
+								<View style={styles.container}>
+									<Badge style={styles.badge} size={25}>{_.price === 0 ? 'FREE' : '$' + (_.price === Number(_.price.toFixed(0)) ? _.price : _.price.toFixed(2))}</Badge>
+
+									<View style={styles.row}>
+										<Rating imageSize={10} readonly startingValue={_.ratings && _.ratings.length > 0 ? _.ratings.reduce((a, b) => a + b.value, 0) / _.ratings.length : 0} />
+										<Text style={[styles.text, styles.typo, { color: Color.body }]}>{_.ratings && _.ratings.length > 0 ? (_.ratings.reduce((a, b) => a + b.value, 0) / _.ratings.length).toFixed(1) : '∅'} ({ _.ratings.length || 0 })</Text>
+									</View>
+
+									<Text style={[styles.text, styles.typo]}>{_.name}</Text>
+
+									<View style={styles.row}>
+										<Avatar.Image size={20} source={{ uri: 'https://picsum.photos/seed/picsum/200/300' }} />
+										<Text style={[styles.text, styles.typo, { color: Color.body }]}>{'@eventify'}</Text>
+									</View>
+								</View>
+							</TouchableOpacity>
+						))}
+					</Section>
+
+					<Section path="events" limit={6} refreshing={refreshing} predicate={(_: Event<true>[]) => _.filter(_ => _.visibility === 'public')}>
+						{(items, styles) => items.map((_: Event<true>) => (
+							<TouchableOpacity key={_.id} style={styles.block} onPress={() => navigation.navigate('ExploreStack', { screen: 'Event', params: { _ } })}>
+								<Image style={styles.image} resizeMode="cover" source={{ uri : _.uri || 'https://fakeimg.pl/260/5f60b9/FFF/?text=No%20Image&font=lobster&font_size=50' }} />
+								{_.category?.name && <Badge style={styles.category}>{_.category?.name}</Badge>}
+
+								<View style={styles.container}>
+									<Badge style={styles.badge} size={25}>{Number(_.attendees?.length ?? 0) + ' / ' + (_.limit ? _.limit : '∞')}</Badge>
+
+									<View style={styles.row}>
+										<Rating imageSize={10} readonly startingValue={_.ratings ? _.ratings.reduce((a, b) => a + b.value, 0) / _.ratings.length : 3} />
+										<Text style={[styles.text, styles.typo, { color: Color.body }]}>{_.ratings && _.ratings.length > 0 ? (_.ratings.reduce((a, b) => a + b.value, 0) / _.ratings.length).toFixed(1) : '∅'} ({ _.ratings.length || 0 })</Text>
+									</View>
+
+									<Text style={[styles.text, styles.typo]}>{_.title}</Text>
+
+									{/* <View style={styles.row}>
+										<Text style={[styles.text, styles.typo, { color: Color.body }]}>
+											{_.start.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+											{_.end.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) !== _.start.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) && ' • ' + _.end.toDate().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+										</Text>
+									</View> */}
+
+									<View style={styles.row}>
+										<Avatar.Image size={20} source={{ uri: _.owner?.uri || 'https://picsum.photos/seed/picsum/200/300' }} />
+										<Text style={[styles.text, styles.typo, { color: Color.body }]}>@{_.owner?.username ?? 'eventify'}</Text>
+									</View>
+								</View>
+							</TouchableOpacity>
+						))}
+					</Section>
 				</View>
 			</ScrollView>
 		</View>
@@ -111,19 +166,8 @@ const styles = StyleSheet.create({
 		zIndex: 1,
 	},
 	content: {
+		marginTop: -28,
 		paddingHorizontal: 20
-	},
-	typo: {
-		textAlign: 'center',
-		fontFamily: FontFamily.medium
-	},
-	title: {
-		fontSize: FontSize.x2l,
-		textTransform: 'capitalize'
-	},
-	subtitle: {
-		color: Color.body,
-		fontSize: FontSize.sm
 	},
 	fab: {
 		top: 36,
@@ -132,18 +176,5 @@ const styles = StyleSheet.create({
 		borderRadius: 28,
 		position: 'absolute',
 		backgroundColor: Color.white
-	},
-	dots: {
-		gap: 8,
-		height: 16,
-		margin: 16,
-		alignItems: 'center',
-		justifyContent: 'center',
-		flexDirection: isAndroidRTL ? 'row-reverse' : 'row'
-	},
-	dot: {
-		height: 10,
-		borderRadius: 5,
-		backgroundColor: Color.primary
 	}
 })

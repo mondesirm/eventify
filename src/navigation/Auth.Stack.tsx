@@ -7,7 +7,7 @@ import ForgotPassword from '@/screens/auth/ForgotPassword'
 
 const { Navigator, Screen } = createStackNavigator()
 
-const screens = [
+export const screens = [
 	{ name: 'Login', component: Login },
 	{ name: 'Register', component: Register },
 	{ name: 'ForgotPassword', component: ForgotPassword }

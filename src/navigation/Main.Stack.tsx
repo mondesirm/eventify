@@ -3,8 +3,9 @@ import { BlurView } from 'expo-blur'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { BottomTabNavigationProp, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 
+import { Icon } from '@/icons'
 import Blank from '@/screens/Blank'
-import Icons, { Icon } from '@/icons'
+import { iconly } from '@/utils/icon'
 import Chat from '@/screens/main/Chat'
 import { Color, FontFamily } from 'globals'
 import Calendar from '@/screens/main/Calendar'
@@ -18,13 +19,13 @@ interface ScreenProps {
 
 const { Navigator, Screen } = createBottomTabNavigator()
 
-const screens: { name: string, component: (props: ScreenProps) => JSX.Element, icon: Lowercase<keyof typeof Icons> }[] = [
-	{ name: 'HomeStack', component: HomeStack, icon: 'home' },
-	{ name: 'Calendar', component: Calendar, icon: 'calendar' },
-	{ name: 'ExploreStack', component: ExploreStack, icon: 'discovery' },
-	{ name: 'Chat', component: Chat, icon: 'chat' },
-	{ name: 'Profile', component: Blank, icon: 'user' }
-]
+export const screens = [
+	{ name: 'HomeStack', component: HomeStack, icon: iconly('home') },
+	{ name: 'Calendar', component: Calendar, icon: iconly('calendar') },
+	{ name: 'ExploreStack', component: ExploreStack, icon: iconly('discovery') },
+	{ name: 'Chat', component: Chat, icon: iconly('chat') },
+	{ name: 'Profile', component: Blank, icon: iconly('user') }
+] as const
 
 export default function MainStack() {
 	return (
