@@ -2,9 +2,10 @@ import * as Location from 'expo-location'
 import { useEffect, useState } from 'react'
 import Toast from 'react-native-toast-message'
 import { NavigationProp } from '@react-navigation/native'
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import { Dimensions, Text, StyleSheet, View } from 'react-native'
+import MapView, { Geojson, Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 
+import { User, useStoreState } from '@/store'
 import { FontFamily, FontSize, Color } from 'globals'
 import { useI18n } from '@/contexts/PreferencesContext'
 
@@ -26,6 +27,37 @@ export default function Places({ navigation, route }: ScreenProps) {
 	const [region, setRegion] = useState(null)
 	const [location, setLocation] = useState(null)
 	const [errorMsg, setErrorMsg] = useState(null)
+	const currentUser = useStoreState(({ user }) => user?.currentUser)
+
+	const geojson: GeoJSON.FeatureCollection = {
+		type: 'FeatureCollection',
+		features: [
+			// {
+			// 	type: 'Feature',
+			// 	properties: {},
+			// 	geometry: {
+			// 		type: 'MultiLineString',
+			// 		coordinates: currentUser?.trips?.map(_ => _.positions.map(_ => [_.coordinates.longitude, _.coordinates.latitude]))
+			// 	}
+			// },
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					type: 'LineString',
+					coordinates: currentUser?.trips?.map(_ => _.positions.map(_ => [_.coordinates.longitude, _.coordinates.latitude]))[0]
+				}
+			},
+			{
+				type: 'Feature',
+				properties: {},
+				geometry: {
+					type: 'MultiPoint',
+					coordinates: currentUser?.trips?.map(_ => _.positions.map(_ => [_.coordinates.longitude, _.coordinates.latitude]))[0]
+				}
+			}
+		]
+	}
 
 	useEffect(() => {
 		Location.requestForegroundPermissionsAsync().then(({ status }) => {
@@ -34,8 +66,6 @@ export default function Places({ navigation, route }: ScreenProps) {
 		})
 		// .catch((error) => setErrorMsg(error.message))
 	}, [])
-
-	console.log(JSON.stringify(location))
 
 	return (
 		<View style={styles.screen}>
@@ -46,6 +76,8 @@ export default function Places({ navigation, route }: ScreenProps) {
 				onRegionChange={setRegion}
 			>
 				<Marker coordinate={location} title="Me" description="My location" />
+
+				<Geojson geojson={geojson} color={Color.primary} strokeColor={Color.black} fillColor="green" strokeWidth={2} />
 			</MapView>
 		</View>
 	)

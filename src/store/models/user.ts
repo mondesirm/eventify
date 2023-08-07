@@ -4,20 +4,9 @@ import { DocumentData } from 'firebase/firestore'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { Action, action, Computed, computed, thunk, Thunk } from 'easy-peasy'
 
-import { StoreModel } from '@/store'
 import uriToBlob from '@/utils/uriToBlob'
 import { storage } from '@/utils/firebase'
-
-type User = DocumentData | {
-	uid: string
-	avatar: string
-	username: string
-	email: string
-	phone: string
-	roles: string[]
-	createdAt: any
-	updatedAt: any
-}
+import { StoreModel, User } from '@/store'
 
 type UploadPayload = {
 	uri: string
@@ -26,14 +15,14 @@ type UploadPayload = {
 }
 
 export interface UserModel {
-	currentUser: User
+	currentUser: User<true>
 	roles: string[]
 	token: string
 	isAdmin: boolean
 	loading: boolean
 	isLoggedIn: Computed<this, boolean>
 	allUsers: []
-	setUser: Action<this, User>
+	setUser: Action<this, User<true>>
 	setRoles: Action<this, string[]>
 	setIsAdmin: Action<this, boolean>
 	setLoading: Action<this, boolean>
